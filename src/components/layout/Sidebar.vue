@@ -13,37 +13,31 @@
 
     <!-- Menu -->
     <nav class="flex-1 px-3 py-4 space-y-1 text-sm">
-      <RouterLink to="/" custom v-slot="{ isActive, navigate }">
-        <a
-          @click="navigate"
-          class="flex items-center gap-3 px-4 py-3 rounded-lg transition"
-          :class="isActive ? 'bg-slate-800 text-white' : 'hover:bg-slate-800 text-slate-300'"
-        >
-          🏠
-          <span>Beranda</span>
-        </a>
+      <RouterLink
+        to="/"
+        class="flex items-center gap-3 px-4 py-3 rounded-lg transition"
+        :class="$route.path === '/' ? 'bg-slate-800 text-white' : 'hover:bg-slate-800 text-slate-300'"
+      >
+        🏠
+        <span>Beranda</span>
       </RouterLink>
 
-      <RouterLink to="/tryout" custom v-slot="{ isActive, navigate }">
-        <a
-          @click="navigate"
-          class="flex items-center gap-3 px-4 py-3 rounded-lg transition"
-          :class="isActive || isTryoutRoute ? 'bg-slate-800 text-white' : 'hover:bg-slate-800 text-slate-300'"
-        >
-          📝
-          <span>Tryout</span>
-        </a>
+      <RouterLink
+        to="/tryout"
+        class="flex items-center gap-3 px-4 py-3 rounded-lg transition"
+        :class="isTryoutRoute ? 'bg-slate-800 text-white' : 'hover:bg-slate-800 text-slate-300'"
+      >
+        📝
+        <span>Tryout</span>
       </RouterLink>
 
-      <RouterLink to="/peringkat" custom v-slot="{ isActive, navigate }">
-        <a
-          @click="navigate"
-          class="flex items-center gap-3 px-4 py-3 rounded-lg transition"
-          :class="isActive ? 'bg-slate-800 text-white' : 'hover:bg-slate-800 text-slate-300'"
-        >
-          🏆
-          <span>Peringkat</span>
-        </a>
+      <RouterLink
+        to="/peringkat"
+        class="flex items-center gap-3 px-4 py-3 rounded-lg transition"
+        :class="$route.path === '/peringkat' ? 'bg-slate-800 text-white' : 'hover:bg-slate-800 text-slate-300'"
+      >
+        🏆
+        <span>Peringkat</span>
       </RouterLink>
     </nav>
 
