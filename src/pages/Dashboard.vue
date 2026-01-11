@@ -56,7 +56,7 @@
                 <span class="text-xs bg-indigo-50 text-indigo-600 px-2 py-1 rounded">OSN SMA</span>
                 <h4 class="font-medium mt-3 text-slate-800">Tryout OSN Matematika</h4>
                 <p class="text-sm text-slate-500 mt-1">120 menit • 30 soal</p>
-                <button class="mt-4 w-full bg-primary text-white py-2 rounded-lg hover:bg-indigo-700 transition">
+                <button class="mt-4 w-full bg-indigo-500 text-white py-2 rounded-lg hover:bg-indigo-700 transition">
                   Mulai Tryout
                 </button>
               </div>
@@ -65,7 +65,7 @@
                 <span class="text-xs bg-indigo-50 text-indigo-600 px-2 py-1 rounded">OSN SMA</span>
                 <h4 class="font-medium mt-3 text-slate-800">Tryout OSN Fisika</h4>
                 <p class="text-sm text-slate-500 mt-1">120 menit • 30 soal</p>
-                <button class="mt-4 w-full bg-primary text-white py-2 rounded-lg hover:bg-indigo-700 transition">
+                <button class="mt-4 w-full bg-indigo-500 text-white py-2 rounded-lg hover:bg-indigo-700 transition">
                   Mulai Tryout
                 </button>
               </div>
@@ -74,7 +74,7 @@
                 <span class="text-xs bg-indigo-50 text-indigo-600 px-2 py-1 rounded">OSN SMA</span>
                 <h4 class="font-medium mt-3 text-slate-800">Tryout OSN Kimia</h4>
                 <p class="text-sm text-slate-500 mt-1">120 menit • 30 soal</p>
-                <button class="mt-4 w-full bg-primary text-white py-2 rounded-lg hover:bg-indigo-700 transition">
+                <button class="mt-4 w-full bg-indigo-500 text-white py-2 rounded-lg hover:bg-indigo-700 transition">
                   Mulai Tryout
                 </button>
               </div>
