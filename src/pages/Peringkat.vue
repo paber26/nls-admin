@@ -1,21 +1,26 @@
 <template>
-  <div class="bg-bgsoft font-poppins">
+  <body class="bg-bgsoft font-poppins">
     <div class="flex min-h-screen">
       <Sidebar></Sidebar>
+
       <!-- ================= MAIN ================= -->
       <main class="flex-1">
-        <TopbarPeringkat></TopbarPeringkat>
+        <!-- Topbar -->
+        <header class="bg-white border-b px-6 py-4">
+          <h1 class="text-lg font-semibold text-slate-800">Peringkat</h1>
+          <p class="text-sm text-slate-500">Lihat peringkat berdasarkan hasil tryout</p>
+        </header>
 
         <!-- Content -->
         <div class="px-6 py-8">
           <!-- Filter -->
           <section class="flex flex-wrap gap-4 mb-6">
-            <select class="px-4 py-2 rounded-lg border text-sm">
+            <select class="px-4 py-2 rounded-lg border text-sm bg-white">
               <option>Nasional</option>
               <option>Sekolah</option>
             </select>
 
-            <select class="px-4 py-2 rounded-lg border text-sm">
+            <select class="px-4 py-2 rounded-lg border text-sm bg-white">
               <option>Semua Mapel</option>
               <option>Matematika</option>
               <option>Fisika</option>
@@ -24,7 +29,7 @@
               <option>Informatika</option>
             </select>
 
-            <select class="px-4 py-2 rounded-lg border text-sm">
+            <select class="px-4 py-2 rounded-lg border text-sm bg-white">
               <option>Tryout Terbaru</option>
               <option>Tryout #1</option>
               <option>Tryout #2</option>
@@ -91,7 +96,7 @@
         </div>
       </main>
     </div>
-  </div>
+  </body>
 </template>
 
 <script setup>
