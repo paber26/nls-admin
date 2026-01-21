@@ -13,13 +13,31 @@
 
     <!-- Menu -->
     <nav class="flex-1 px-3 py-4 space-y-1 text-sm">
+      <!-- <RouterLink
+        to="/tryout"
+        class="flex items-center gap-3 px-4 py-3 rounded-lg transition"
+        :class="isTryoutRoute ? 'bg-slate-800 text-white' : 'hover:bg-slate-800 text-slate-300'"
+      >
+        📝
+        <span>Tryout</span>
+      </RouterLink> -->
+
       <RouterLink
         to="/"
         class="flex items-center gap-3 px-4 py-3 rounded-lg transition"
         :class="$route.path === '/' ? 'bg-slate-800 text-white' : 'hover:bg-slate-800 text-slate-300'"
       >
-        🏠
-        <span>Beranda</span>
+        📊
+        <span>Dashboard</span>
+      </RouterLink>
+
+      <RouterLink
+        to="/peserta"
+        class="flex items-center gap-3 px-4 py-3 rounded-lg transition"
+        :class="$route.path === '/peserta' ? 'bg-slate-800 text-white' : 'hover:bg-slate-800 text-slate-300'"
+      >
+        👨‍🎓
+        <span>Peserta</span>
       </RouterLink>
 
       <RouterLink
@@ -32,12 +50,39 @@
       </RouterLink>
 
       <RouterLink
+        to="/banksoal"
+        class="flex items-center gap-3 px-4 py-3 rounded-lg transition"
+        :class="$route.path === '/banksoal' ? 'bg-slate-800 text-white' : 'hover:bg-slate-800 text-slate-300'"
+      >
+        📚
+        <span>Bank Soal</span>
+      </RouterLink>
+
+      <RouterLink
         to="/peringkat"
         class="flex items-center gap-3 px-4 py-3 rounded-lg transition"
         :class="$route.path === '/peringkat' ? 'bg-slate-800 text-white' : 'hover:bg-slate-800 text-slate-300'"
       >
         🏆
         <span>Peringkat</span>
+      </RouterLink>
+
+      <RouterLink
+        to="/sekolah"
+        class="flex items-center gap-3 px-4 py-3 rounded-lg transition"
+        :class="isSekolahRoute ? 'bg-slate-800 text-white' : 'hover:bg-slate-800 text-slate-300'"
+      >
+        🏫
+        <span>Sekolah</span>
+      </RouterLink>
+
+      <RouterLink
+        to="/pengaturan"
+        class="flex items-center gap-3 px-4 py-3 rounded-lg transition"
+        :class="$route.path === '/pengaturan' ? 'bg-slate-800 text-white' : 'hover:bg-slate-800 text-slate-300'"
+      >
+        ⚙️
+        <span>Pengaturan</span>
       </RouterLink>
     </nav>
 
@@ -61,4 +106,5 @@ import { computed } from "vue"
 const route = useRoute()
 
 const isTryoutRoute = computed(() => route.path.startsWith("/tryout")).value
+const isSekolahRoute = computed(() => route.path.startsWith("/sekolah")).value
 </script>

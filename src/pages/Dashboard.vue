@@ -1,84 +1,76 @@
 <template>
-  <body class="bg-slate-100 font-poppins">
+  <body class="bg-bgsoft font-poppins">
     <div class="flex min-h-screen">
       <Sidebar></Sidebar>
 
-      <!-- ================= MAIN CONTENT ================= -->
+      <!-- ================= MAIN ================= -->
       <main class="flex-1">
-        <TopbarDashboard></TopbarDashboard>
+        <!-- Topbar -->
+        <header class="bg-white border-b px-6 py-4 flex justify-between items-center">
+          <div>
+            <h1 class="text-lg font-semibold text-slate-800">Dashboard Admin</h1>
+            <p class="text-sm text-slate-500">Ringkasan aktivitas platform</p>
+          </div>
+
+          <div class="text-right text-sm">
+            <p class="font-medium text-slate-800">Admin</p>
+            <p class="text-slate-500">Super Administrator</p>
+          </div>
+        </header>
+
         <!-- Content -->
         <div class="px-6 py-8">
-          <!-- ================= SUMMARY & STATISTIK PENDAFTAR ================= -->
+          <!-- ================= SUMMARY ================= -->
           <section class="grid md:grid-cols-4 gap-6 mb-10">
             <div class="bg-white p-6 rounded-xl border">
-              <p class="text-sm text-slate-500">Tryout Diikuti</p>
-              <h2 class="text-3xl font-semibold text-slate-800 mt-2">2</h2>
+              <p class="text-sm text-slate-500">Total Peserta</p>
+              <h2 class="text-3xl font-semibold text-slate-800 mt-2">3.462</h2>
             </div>
 
             <div class="bg-white p-6 rounded-xl border">
-              <p class="text-sm text-slate-500">Tryout Tersedia</p>
-              <h2 class="text-3xl font-semibold text-slate-800 mt-2">9</h2>
+              <p class="text-sm text-slate-500">Total Sekolah</p>
+              <h2 class="text-3xl font-semibold text-slate-800 mt-2">128</h2>
             </div>
 
-            <!-- Sekolah -->
-            <div class="bg-white p-6 rounded-xl border flex items-center gap-5">
-              <div class="w-12 h-12 rounded-lg bg-indigo-100 flex items-center justify-center text-indigo-600 text-xl">
-                🏫
-              </div>
-              <div>
-                <p class="text-sm text-slate-500">Sekolah Terdaftar</p>
-                <h2 class="text-3xl font-semibold text-slate-800">128</h2>
-                <p class="text-xs text-slate-400 mt-1">SMA/MA dari berbagai daerah</p>
-              </div>
+            <div class="bg-white p-6 rounded-xl border">
+              <p class="text-sm text-slate-500">Total Tryout</p>
+              <h2 class="text-3xl font-semibold text-slate-800 mt-2">24</h2>
             </div>
 
-            <!-- Siswa -->
-            <div class="bg-white p-6 rounded-xl border flex items-center gap-5">
-              <div
-                class="w-12 h-12 rounded-lg bg-emerald-100 flex items-center justify-center text-emerald-600 text-xl"
-              >
-                👨‍🎓
-              </div>
-              <div>
-                <p class="text-sm text-slate-500">Siswa Terdaftar</p>
-                <h2 class="text-3xl font-semibold text-slate-800">3.462</h2>
-                <p class="text-xs text-slate-400 mt-1">Peserta aktif tryout OSN & KSN</p>
-              </div>
+            <div class="bg-white p-6 rounded-xl border">
+              <p class="text-sm text-slate-500">Total Soal</p>
+              <h2 class="text-3xl font-semibold text-slate-800 mt-2">720</h2>
             </div>
           </section>
 
-          <!-- Tryout -->
-          <section>
-            <h3 class="text-lg font-semibold text-slate-800 mb-4">Tryout Tersedia</h3>
+          <!-- ================= QUICK ACTION ================= -->
+          <section class="grid md:grid-cols-3 gap-6 mb-10">
+            <a href="admin-bank-soal.html" class="bg-white p-6 rounded-xl border hover:border-primary transition">
+              <h3 class="font-semibold text-slate-800 mb-1">➕ Tambah Soal</h3>
+              <p class="text-sm text-slate-500">Input dan kelola bank soal</p>
+            </a>
 
-            <div class="grid md:grid-cols-3 gap-6">
-              <div class="bg-white p-6 rounded-xl border">
-                <span class="text-xs bg-indigo-50 text-indigo-600 px-2 py-1 rounded">OSN SMA</span>
-                <h4 class="font-medium mt-3 text-slate-800">Tryout OSN Matematika</h4>
-                <p class="text-sm text-slate-500 mt-1">120 menit • 30 soal</p>
-                <button class="mt-4 w-full bg-indigo-500 text-white py-2 rounded-lg hover:bg-indigo-700 transition">
-                  Mulai Tryout
-                </button>
-              </div>
+            <a href="admin-tryout.html" class="bg-white p-6 rounded-xl border hover:border-primary transition">
+              <h3 class="font-semibold text-slate-800 mb-1">📝 Buat Tryout</h3>
+              <p class="text-sm text-slate-500">Atur jadwal & paket soal</p>
+            </a>
 
-              <div class="bg-white p-6 rounded-xl border">
-                <span class="text-xs bg-indigo-50 text-indigo-600 px-2 py-1 rounded">OSN SMA</span>
-                <h4 class="font-medium mt-3 text-slate-800">Tryout OSN Fisika</h4>
-                <p class="text-sm text-slate-500 mt-1">120 menit • 30 soal</p>
-                <button class="mt-4 w-full bg-indigo-500 text-white py-2 rounded-lg hover:bg-indigo-700 transition">
-                  Mulai Tryout
-                </button>
-              </div>
+            <a href="admin-peringkat.html" class="bg-white p-6 rounded-xl border hover:border-primary transition">
+              <h3 class="font-semibold text-slate-800 mb-1">🏆 Lihat Peringkat</h3>
+              <p class="text-sm text-slate-500">Ranking nasional & sekolah</p>
+            </a>
+          </section>
 
-              <div class="bg-white p-6 rounded-xl border">
-                <span class="text-xs bg-indigo-50 text-indigo-600 px-2 py-1 rounded">OSN SMA</span>
-                <h4 class="font-medium mt-3 text-slate-800">Tryout OSN Kimia</h4>
-                <p class="text-sm text-slate-500 mt-1">120 menit • 30 soal</p>
-                <button class="mt-4 w-full bg-indigo-500 text-white py-2 rounded-lg hover:bg-indigo-700 transition">
-                  Mulai Tryout
-                </button>
-              </div>
-            </div>
+          <!-- ================= AKTIVITAS TERBARU ================= -->
+          <section class="bg-white rounded-xl border p-6">
+            <h3 class="font-semibold text-slate-800 mb-4">Aktivitas Terbaru</h3>
+
+            <ul class="text-sm text-slate-600 space-y-3">
+              <li>👨‍🎓 25 peserta baru mendaftar hari ini</li>
+              <li>📝 Tryout OSN Matematika #3 berhasil dibuat</li>
+              <li>📚 30 soal baru ditambahkan ke Bank Soal</li>
+              <li>🏫 SMA Negeri 2 Surabaya bergabung</li>
+            </ul>
           </section>
         </div>
       </main>
