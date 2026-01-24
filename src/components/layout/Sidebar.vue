@@ -34,7 +34,7 @@
       <RouterLink
         to="/peserta"
         class="flex items-center gap-3 px-4 py-3 rounded-lg transition"
-        :class="$route.path === '/peserta' ? 'bg-slate-800 text-white' : 'hover:bg-slate-800 text-slate-300'"
+        :class="isPesertaRoute ? 'bg-slate-800 text-white' : 'hover:bg-slate-800 text-slate-300'"
       >
         👨‍🎓
         <span>Peserta</span>
@@ -107,4 +107,6 @@ const route = useRoute()
 
 const isTryoutRoute = computed(() => route.path.startsWith("/tryout")).value
 const isSekolahRoute = computed(() => route.path.startsWith("/sekolah")).value
+const isPesertaRoute = computed(() => route.path.startsWith("/peserta")).value
+console.log(isPesertaRoute)
 </script>

@@ -61,7 +61,7 @@
                     <span class="px-2 py-1 text-xs bg-emerald-100 text-emerald-600 rounded">Lengkap</span>
                   </td>
                   <td class="px-4 py-3 text-center space-x-2">
-                    <a href="#" class="text-primary text-xs hover:underline">Detail</a>
+                    <RouterLink to="/peserta/detail" class="text-primary text-xs hover:underline">Detail</RouterLink>
                     <a href="#" class="text-red-500 text-xs hover:underline">Nonaktifkan</a>
                   </td>
                 </tr>
@@ -75,7 +75,7 @@
                     <span class="px-2 py-1 text-xs bg-yellow-100 text-yellow-700 rounded">Belum Lengkap</span>
                   </td>
                   <td class="px-4 py-3 text-center space-x-2">
-                    <a href="#" class="text-primary text-xs hover:underline">Detail</a>
+                    <RouterLink to="/pesertadetail" class="text-primary text-xs hover:underline">Detail</RouterLink>
                     <a href="#" class="text-red-500 text-xs hover:underline">Nonaktifkan</a>
                   </td>
                 </tr>
