@@ -4,6 +4,7 @@ import Home from "../pages/Home.vue"
 import About from "../pages/About.vue"
 import Dashboard from "../pages/Dashboard.vue"
 import Peserta from "../pages/Peserta.vue"
+import PesertaDetail from "../pages/PesertaDetail.vue"
 import Banksoal from "../pages/Banksoal.vue"
 import Sekolah from "../pages/Sekolah.vue"
 import Sekolahdetail from "../pages/SekolahDetail.vue"
@@ -27,6 +28,11 @@ const routes = [
     path: "/peserta",
     name: "Peserta",
     component: Peserta
+  },
+  {
+    path: "/peserta/detail",
+    name: "PesertaDetail",
+    component: PesertaDetail
   },
   {
     path: "/tryout",
