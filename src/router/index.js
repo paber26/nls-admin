@@ -17,7 +17,7 @@ import Sekolahdetail from "../pages/SekolahDetail.vue"
 import Tryout from "../pages/Tryout.vue"
 import TryoutDetail from "../pages/TryoutDetail.vue"
 import TryoutDetailEdit from "../pages/TryoutDetailEdit.vue"
-import TryoutTambahPaket from "../pages/TryoutTambahPaket.vue"
+import TryoutTambah from "../pages/TryoutTambah.vue"
 
 import Peringkat from "../pages/Peringkat.vue"
 import Persiapan from "../pages/TryoutPersiapan.vue"
@@ -55,9 +55,9 @@ const routes = [
     component: TryoutDetailEdit
   },
   {
-    path: "/tryout/tambahpaket",
-    name: "TryoutTambahPaket",
-    component: TryoutTambahPaket
+    path: "/tryout/tambah",
+    name: "TryoutTambah",
+    component: TryoutTambah
   },
   {
     path: "/banksoal",
