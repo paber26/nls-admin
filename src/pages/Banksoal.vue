@@ -12,9 +12,12 @@
             <p class="text-sm text-slate-500">Kelola paket soal berdasarkan mata pelajaran KSN SMA</p>
           </div>
 
-          <a href="#" class="px-4 py-2 rounded-lg bg-primary text-white text-sm hover:bg-indigo-700">
-            ➕ Buat Paket Soal
-          </a>
+          <RouterLink
+            to="/banksoal/tambah"
+            class="px-4 py-2 rounded-lg bg-primary text-white text-sm hover:bg-indigo-700"
+          >
+            ➕ Tambah Soal
+          </RouterLink>
         </header>
 
         <!-- Content -->
@@ -46,39 +49,28 @@
             <table class="w-full text-sm">
               <thead class="bg-slate-100">
                 <tr>
-                  <th class="px-4 py-3 text-left">Nama Paket</th>
                   <th class="px-4 py-3 text-left">Mapel</th>
-                  <th class="px-4 py-3 text-center">Jumlah Soal</th>
-                  <th class="px-4 py-3 text-center">Status</th>
+                  <th class="px-4 py-3 text-left">Soal</th>
+                  <th class="px-4 py-3 text-center">Pengentri</th>
+                  <th class="px-4 py-3 text-center">Jumlah Terpakai</th>
                   <th class="px-4 py-3 text-center">Aksi</th>
                 </tr>
               </thead>
 
               <tbody>
-                <tr class="border-t">
-                  <td class="px-4 py-3 font-medium">Paket Matematika KSN #1</td>
-                  <td class="px-4 py-3">Matematika</td>
-                  <td class="px-4 py-3 text-center">30</td>
-                  <td class="px-4 py-3 text-center">
-                    <span class="px-2 py-1 text-xs bg-emerald-100 text-emerald-600 rounded">Aktif</span>
-                  </td>
-                  <td class="px-4 py-3 text-center space-x-2">
-                    <a href="admin-paket-detail.html" class="text-primary text-xs hover:underline">Kelola Soal</a>
-                    <a href="#" class="text-slate-600 text-xs hover:underline">Edit</a>
-                    <a href="#" class="text-red-500 text-xs hover:underline">Hapus</a>
-                  </td>
+                <tr v-if="loading">
+                  <td colspan="5" class="px-4 py-6 text-center text-slate-400">Memuat data...</td>
                 </tr>
 
-                <tr class="border-t bg-slate-50">
-                  <td class="px-4 py-3 font-medium">Paket Fisika KSN #1</td>
-                  <td class="px-4 py-3">Fisika</td>
-                  <td class="px-4 py-3 text-center">25</td>
-                  <td class="px-4 py-3 text-center">
-                    <span class="px-2 py-1 text-xs bg-yellow-100 text-yellow-700 rounded">Draft</span>
-                  </td>
+                <tr v-for="item in bankSoal" :key="item.id" class="border-t">
+                  <td class="px-4 py-3">{{ item.mapel }}</td>
+                  <td class="px-4 py-3 font-medium">{{ truncate(item.pertanyaan, 100) }}</td>
+                  <td class="px-4 py-3 text-center">{{ item.pembuat }}</td>
+                  <td class="px-4 py-3 text-center">{{ item.jumlah_terpakai }}</td>
                   <td class="px-4 py-3 text-center space-x-2">
-                    <a href="admin-paket-detail.html" class="text-primary text-xs hover:underline">Kelola Soal</a>
-                    <a href="#" class="text-slate-600 text-xs hover:underline">Edit</a>
+                    <RouterLink :to="`/banksoal/edit/${item.id}`" class="text-slate-600 text-xs hover:underline">
+                      Edit
+                    </RouterLink>
                     <a href="#" class="text-red-500 text-xs hover:underline">Hapus</a>
                   </td>
                 </tr>
@@ -98,6 +90,26 @@
 
 <script setup>
 import { RouterLink, RouterView } from "vue-router"
+import { ref, onMounted } from "vue"
+// import { api } from "@/services/api"
+import api from "@/services/api"
 
 import Sidebar from "../components/layout/Sidebar.vue"
+
+const bankSoal = ref([])
+const loading = ref(true)
+
+const truncate = (text, limit = 100) => {
+  if (!text) return "-"
+  return text.length > limit ? text.slice(0, limit) + "..." : text
+}
+
+onMounted(async () => {
+  const res = await api.get("/banksoal")
+  bankSoal.value = res.data
+  loading.value = false
+
+  console.log("Bank Soal Data:", res.data)
+  console.log("Loaing State:", loading.value)
+})
 </script>

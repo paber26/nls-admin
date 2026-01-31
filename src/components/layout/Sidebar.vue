@@ -76,14 +76,14 @@
         <span>Sekolah</span>
       </RouterLink>
 
-      <RouterLink
+      <!-- <RouterLink
         to="/pengaturan"
         class="flex items-center gap-3 px-4 py-3 rounded-lg transition"
         :class="$route.path === '/pengaturan' ? 'bg-slate-800 text-white' : 'hover:bg-slate-800 text-slate-300'"
       >
         ⚙️
         <span>Pengaturan</span>
-      </RouterLink>
+      </RouterLink> -->
     </nav>
 
     <!-- Logout -->

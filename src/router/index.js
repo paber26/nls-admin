@@ -1,11 +1,16 @@
 import { createRouter, createWebHistory } from "vue-router"
 
 import Home from "../pages/Home.vue"
+import OAuthCallback from "../pages/autentifikasi/OAuthCallback.vue"
+
 import About from "../pages/About.vue"
 import Dashboard from "../pages/Dashboard.vue"
 import Peserta from "../pages/Peserta.vue"
 import PesertaDetail from "../pages/PesertaDetail.vue"
-import Banksoal from "../pages/Banksoal.vue"
+import BankSoal from "../pages/BankSoal.vue"
+import BankSoalTambah from "../pages/BankSoalTambah.vue"
+import BankSoalEdit from "../pages/BankSoalEdit.vue"
+
 import Sekolah from "../pages/Sekolah.vue"
 import Sekolahdetail from "../pages/SekolahDetail.vue"
 
@@ -56,8 +61,18 @@ const routes = [
   },
   {
     path: "/banksoal",
-    name: "Banksoal",
-    component: Banksoal
+    name: "BankSoal",
+    component: BankSoal
+  },
+  {
+    path: "/banksoal/tambah",
+    name: "BankSoalTambah",
+    component: BankSoalTambah
+  },
+  {
+    path: "/banksoal/edit/:id",
+    name: "BankSoalEdit",
+    component: BankSoalEdit
   },
   {
     path: "/peringkat",
@@ -89,6 +104,12 @@ const routes = [
     path: "/about",
     name: "About",
     component: About
+  },
+
+  {
+    path: "/oauth/callback",
+    name: "oauth-callback",
+    component: OAuthCallback
   }
 ]
 
