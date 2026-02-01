@@ -7,13 +7,11 @@ const api = axios.create({
     Accept: "application/json"
   }
 })
-console.log("API Service Initialized")
 
 // 🔐 Inject token otomatis
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("auth_token")
-    console.log("Injecting Token:", token)
     if (token) {
       config.headers.Authorization = `Bearer ${token}`
     }

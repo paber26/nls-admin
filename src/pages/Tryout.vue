@@ -38,15 +38,21 @@
               <td class="px-4 py-3">{{ item.mapel }}</td>
               <td class="px-4 py-3 text-center">
                 <span
-                  class="px-2 py-1 text-xs rounded"
-                  :class="item.status === 'Aktif' ? 'bg-emerald-100 text-emerald-600' : 'bg-slate-200 text-slate-600'"
+                  class="px-2 py-1 text-xs rounded font-medium"
+                  :class="{
+                    'bg-slate-200 text-slate-700': item.status === 'draft',
+                    'bg-emerald-100 text-emerald-700': item.status === 'active',
+                    'bg-blue-100 text-blue-700': item.status === 'finished'
+                  }"
                 >
-                  {{ item.status }}
+                  {{ item.status === "draft" ? "Draft" : item.status === "active" ? "Aktif" : "Selesai" }}
                 </span>
               </td>
               <td class="px-4 py-3 text-center">{{ item.pembuat }}</td>
               <td class="px-4 py-3 text-center space-x-2">
-                <RouterLink :to="`/tryout/${item.id}`" class="text-xs text-primary hover:underline">Detail</RouterLink>
+                <RouterLink :to="`/tryout/detail/${item.id}`" class="text-xs text-primary hover:underline">
+                  Detail
+                </RouterLink>
                 <RouterLink :to="`/tryout/edit/${item.id}`" class="text-xs text-slate-600 hover:underline">
                   Edit
                 </RouterLink>

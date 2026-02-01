@@ -15,6 +15,9 @@ import Sekolah from "../pages/Sekolah.vue"
 import Sekolahdetail from "../pages/SekolahDetail.vue"
 
 import Tryout from "../pages/Tryout.vue"
+import TryoutEdit from "../pages/TryoutEdit.vue"
+import TryoutKelola from "../pages/TryoutKelola.vue"
+
 import TryoutDetail from "../pages/TryoutDetail.vue"
 import TryoutDetailEdit from "../pages/TryoutDetailEdit.vue"
 import TryoutTambah from "../pages/TryoutTambah.vue"
@@ -45,7 +48,17 @@ const routes = [
     component: Tryout
   },
   {
-    path: "/tryout/detail",
+    path: "/tryout/edit/:id",
+    name: "TryoutEdit",
+    component: TryoutEdit
+  },
+  {
+    path: "/tryout/kelola/:id",
+    name: "TryoutKelola",
+    component: TryoutKelola
+  },
+  {
+    path: "/tryout/detail/:id",
     name: "TryoutDetail",
     component: TryoutDetail
   },
