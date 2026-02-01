@@ -26,12 +26,13 @@
             <tr>
               <th class="px-3 py-2 text-left">Urutan</th>
               <th class="px-3 py-2 text-left">Isi Soal</th>
+              <th class="px-3 py-2 text-center">Poin</th>
               <th class="px-3 py-2 text-center">Aksi</th>
             </tr>
           </thead>
           <tbody>
             <tr v-if="soalTryout.length === 0">
-              <td colspan="3" class="px-3 py-4 text-center text-slate-400">Belum ada soal di tryout ini</td>
+              <td colspan="4" class="px-3 py-4 text-center text-slate-400">Belum ada soal di tryout ini</td>
             </tr>
 
             <tr v-for="(soal, index) in soalTryout" :key="soal.id" class="border-t">
@@ -51,6 +52,17 @@
                 <span class="ml-2">{{ index + 1 }}</span>
               </td>
               <td class="px-3 py-2">{{ (soal.pertanyaan || "").substring(0, 100) }}...</td>
+
+              <td class="px-3 py-2 text-center">
+                <input
+                  type="number"
+                  min="0"
+                  class="w-20 px-2 py-1 border rounded text-sm text-center"
+                  v-model.number="soal.poin"
+                  @change="updatePoin(soal)"
+                />
+              </td>
+
               <td class="px-3 py-2 text-center">
                 <button class="text-xs text-red-500 hover:underline" @click="hapusSoal(soal.id)">Hapus</button>
               </td>
@@ -144,7 +156,6 @@ const daftarMapel = ref([])
 const loadTryout = async () => {
   const res = await api.get(`/tryout/${route.params.id}`)
   tryout.value = res.data
-  console.log("Nilai tryout:", tryout.value)
 }
 
 const loadMapel = async () => {
@@ -184,7 +195,6 @@ const loadBankSoal = async () => {
 }
 
 const tambahSoal = async (soalId) => {
-  console.log("Menambahkan soal dengan ID:", soalId)
   await api.post(`/tryout/${route.params.id}/soal`, {
     banksoal_id: soalId
   })
@@ -208,6 +218,16 @@ const turunkanUrutan = (index) => {
   const temp = soalTryout.value[index]
   soalTryout.value[index] = soalTryout.value[index + 1]
   soalTryout.value[index + 1] = temp
+}
+
+const updatePoin = async (soal) => {
+  try {
+    await api.put(`/tryout/${route.params.id}/soal/${soal.id}/poin`, {
+      poin: soal.poin
+    })
+  } catch (e) {
+    console.error("Gagal update poin", e)
+  }
 }
 
 onMounted(() => {
