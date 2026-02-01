@@ -49,6 +49,11 @@
           </div>
 
           <div>
+            <p class="text-slate-500">Total Poin</p>
+            <p class="font-medium">{{ totalPoin }}</p>
+          </div>
+
+          <div>
             <p class="text-slate-500">Durasi</p>
             <p class="font-medium">{{ tryout?.durasi_menit }} menit</p>
           </div>
@@ -109,6 +114,13 @@
               </span>
             </div>
 
+            <!-- POIN -->
+            <div class="mb-2 text-sm">
+              <span class="inline-block bg-amber-100 text-amber-700 px-3 py-1 rounded font-medium">
+                Poin: {{ item.poin }}
+              </span>
+            </div>
+
             <!-- PEMBAHASAN -->
             <div v-if="item.pembahasan" class="mt-4 p-4 bg-slate-50 rounded-lg text-sm">
               <p class="font-medium mb-1">Pembahasan:</p>
@@ -122,7 +134,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue"
+import { ref, onMounted, computed } from "vue"
 import { RouterLink, useRoute } from "vue-router"
 import api from "@/services/api"
 import Sidebar from "@/components/layout/Sidebar.vue"
@@ -131,6 +143,11 @@ const route = useRoute()
 
 const tryout = ref(null)
 const soalList = ref([])
+const totalPoin = computed(() => {
+  return soalList.value.reduce((total, soal) => {
+    return total + (Number(soal.poin) || 0)
+  }, 0)
+})
 const loading = ref(true)
 
 onMounted(async () => {
