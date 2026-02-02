@@ -30,6 +30,7 @@ onMounted(async () => {
     // ✅ SIMPAN KE LOCALSTORAGE
     localStorage.setItem("dataapi", JSON.stringify(res.data))
     localStorage.setItem("loggedIn", 1)
+    localStorage.setItem("datalengkap", 1)
   } catch (err) {
     console.log("BELUM LOGIN / TOKEN INVALID")
     localStorage.setItem("loggedIn", 0)
