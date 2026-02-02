@@ -1,24 +1,18 @@
 import axios from "axios"
 
 const api = axios.create({
-  baseURL: "http://127.0.0.1:8000/api",
+  baseURL: import.meta.env.VITE_API_URL, // ⬅️ PENTING
   headers: {
-    "Content-Type": "application/json",
     Accept: "application/json"
   }
 })
 
-// 🔐 Inject token otomatis
-api.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem("auth_token")
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`
-    }
-    return config
-  },
-  (error) => Promise.reject(error)
-)
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem("auth_token")
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`
+  }
+  return config
+})
 
-// console.log("API Interceptor Set Up", api.get("/me"))
 export default api

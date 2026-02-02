@@ -15,6 +15,9 @@ const loggedIn = ref(localStorage.getItem("loggedIn") || 0)
 const datalengkap = ref(localStorage.getItem("datalengkap") || 0)
 const proseslogin = ref(0)
 
+console.log("API URL:", import.meta.env.VITE_API_URL)
+// console.log(import.meta.env.VITE_API_URL)
+
 const urlParams = new URLSearchParams(window.location.search)
 if (urlParams.get("token")) {
   proseslogin.value = 1
@@ -29,6 +32,7 @@ onMounted(async () => {
 
     // ✅ SIMPAN KE LOCALSTORAGE
     localStorage.setItem("dataapi", JSON.stringify(res.data))
+    // localStorage.setItem("dataapi", "coba jo dulu")
   } catch (err) {
     console.log("BELUM LOGIN / TOKEN INVALID")
   }
