@@ -28,10 +28,11 @@ const token = params.get("token")
 
 onMounted(async () => {
   try {
-    const res = api.get("/me")
+    const res = await api.get("/me")
 
     // ✅ SIMPAN KE LOCALSTORAGE
     localStorage.setItem("dataapi", JSON.stringify(res.data))
+    localStorage.setItem("datalengkap", 1)
     // localStorage.setItem("dataapi", "coba jo dulu")
   } catch (err) {
     console.log("BELUM LOGIN / TOKEN INVALID")
