@@ -88,13 +88,14 @@
 
     <!-- Logout -->
     <div class="px-3 py-4 border-t border-slate-800">
-      <a
-        href="login.html"
-        class="flex items-center gap-3 px-4 py-3 rounded-lg text-red-400 hover:bg-red-500/10 transition"
+      <button
+        type="button"
+        @click="handleLogout"
+        class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-red-400 hover:bg-red-500/10 transition"
       >
         🚪
         <span>Logout</span>
-      </a>
+      </button>
     </div>
   </aside>
 </template>
@@ -109,4 +110,16 @@ const isTryoutRoute = computed(() => route.path.startsWith("/tryout")).value
 const isSekolahRoute = computed(() => route.path.startsWith("/sekolah")).value
 const isPesertaRoute = computed(() => route.path.startsWith("/peserta")).value
 console.log(isPesertaRoute)
+
+const handleLogout = () => {
+  // hapus semua data autentikasi & sesi
+  localStorage.removeItem("auth_token")
+  localStorage.removeItem("dataapi")
+  localStorage.removeItem("datalengkap")
+  localStorage.removeItem("loggedIn")
+  localStorage.removeItem("draft_banksoal")
+
+  // hard redirect (reset total SPA state)
+  window.location.href = "/login"
+}
 </script>
