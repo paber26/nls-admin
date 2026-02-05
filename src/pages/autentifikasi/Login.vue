@@ -55,6 +55,6 @@
 
 <script setup>
 const loginWithGoogle = () => {
-  window.location.href = "https://sduki9.litesa.xyz/api/auth/google"
+  window.location.href = import.meta.env.VITE_API_URL + "/auth/google"
 }
 </script>

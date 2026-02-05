@@ -31,6 +31,7 @@
               <select v-model="tipeSoal" class="w-full px-4 py-2 border rounded-lg text-sm">
                 <option value="pg">Pilihan Ganda</option>
                 <option value="isian">Isian</option>
+                <option value="pg_kompleks">PG Kompleks (Benar / Salah)</option>
               </select>
             </div>
 
@@ -90,6 +91,28 @@
               </button>
             </div>
 
+            <div v-if="tipeSoal === 'pg_kompleks'">
+              <label class="block text-sm font-medium mb-2">Pernyataan</label>
+
+              <div v-for="(item, index) in pernyataanKompleks" :key="index" class="flex items-center gap-3 mb-2">
+                <span class="text-sm w-5">{{ index + 1 }}.</span>
+
+                <input
+                  v-model="item.text"
+                  type="text"
+                  class="flex-1 px-4 py-2 border rounded-lg text-sm"
+                  placeholder="Tulis pernyataan"
+                />
+
+                <select v-model="item.jawaban" class="px-3 py-2 border rounded-lg text-sm">
+                  <option :value="true">Benar</option>
+                  <option :value="false">Salah</option>
+                </select>
+              </div>
+
+              <p class="text-xs text-slate-500 mt-2">Skor otomatis: 4 benar = 1 poin, 3 benar = 0.6, 2 benar = 0.2</p>
+            </div>
+
             <!-- Pembahasan -->
             <div>
               <label class="block text-sm font-medium mb-1">Pembahasan</label>
@@ -132,6 +155,12 @@ const jawabanIsian = ref("")
 const opsiJawaban = ref([
   { text: "", is_correct: false, poin: 0 },
   { text: "", is_correct: false, poin: 0 }
+])
+const pernyataanKompleks = ref([
+  { text: "", jawaban: true },
+  { text: "", jawaban: true },
+  { text: "", jawaban: true },
+  { text: "", jawaban: true }
 ])
 const draftSoal = ref([])
 
@@ -180,6 +209,13 @@ onMounted(async () => {
       jawabanIsian.value = last.jawaban || ""
     } else if (last.tipe === "pg") {
       opsiJawaban.value = last.jawaban || []
+    } else if (last.tipe === "pg_kompleks") {
+      pernyataanKompleks.value = last.pernyataan || [
+        { text: "", jawaban: true },
+        { text: "", jawaban: true },
+        { text: "", jawaban: true },
+        { text: "", jawaban: true }
+      ]
     }
   }
 })
@@ -209,6 +245,14 @@ const submitSoal = async () => {
     }
   }
 
+  if (tipeSoal.value === "pg_kompleks") {
+    const kosong = pernyataanKompleks.value.some((p) => !p.text.trim())
+    if (kosong) {
+      alert("Semua pernyataan wajib diisi")
+      return
+    }
+  }
+
   loading.value = true
 
   try {
@@ -218,7 +262,8 @@ const submitSoal = async () => {
       pertanyaan: pertanyaan.value,
       pembahasan: pembahasan.value,
       jawaban_isian: tipeSoal.value === "isian" ? jawabanIsian.value : null,
-      opsi_jawaban: tipeSoal.value === "pg" ? opsiJawaban.value : []
+      opsi_jawaban: tipeSoal.value === "pg" ? opsiJawaban.value : [],
+      pernyataan: tipeSoal.value === "pg_kompleks" ? pernyataanKompleks.value : []
     }
 
     const existing = localStorage.getItem("draft_banksoal")
@@ -235,6 +280,7 @@ const submitSoal = async () => {
     // Kirim draft ke backend
     console.log("Mengirim soal ke API:", payload)
     const res = await api.post("/banksoal", payload)
+    console.log("isi res adalah", res)
 
     if (res.data && res.data.success) {
       alert(res.data.message || "Soal berhasil disimpan")

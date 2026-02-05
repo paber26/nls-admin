@@ -23,6 +23,7 @@
           <select v-model="tipeSoal" class="w-full px-4 py-2 border rounded-lg">
             <option value="pg">Pilihan Ganda</option>
             <option value="isian">Isian</option>
+            <option value="pg_kompleks">PG Kompleks (Benar / Salah)</option>
           </select>
         </div>
 
@@ -56,6 +57,21 @@
           <button type="button" class="mt-2 px-4 py-2 border rounded-lg text-sm" @click="tambahOpsi">
             + Tambah Opsi
           </button>
+        </div>
+
+        <div v-if="tipeSoal === 'pg_kompleks'">
+          <label class="block text-sm font-medium mb-2">Pernyataan</label>
+
+          <div v-for="(item, index) in pernyataanKompleks" :key="index" class="flex items-center gap-3 mb-2">
+            <span class="text-sm w-5">{{ index + 1 }}.</span>
+
+            <input v-model="item.text" class="flex-1 px-4 py-2 border rounded-lg" placeholder="Tulis pernyataan" />
+
+            <select v-model="item.jawaban" class="px-3 py-2 border rounded-lg text-sm">
+              <option :value="true">Benar</option>
+              <option :value="false">Salah</option>
+            </select>
+          </div>
         </div>
 
         <!-- Pembahasan -->
@@ -93,6 +109,12 @@ const pertanyaan = ref("")
 const pembahasan = ref("")
 const jawabanIsian = ref("")
 const opsiJawaban = ref([])
+const pernyataanKompleks = ref([
+  { text: "", jawaban: true },
+  { text: "", jawaban: true },
+  { text: "", jawaban: true },
+  { text: "", jawaban: true }
+])
 const loading = ref(false)
 
 const setJawabanBenar = (index) => {
@@ -135,8 +157,13 @@ onMounted(async () => {
   if (data.tipe === "isian") {
     jawabanIsian.value = data.jawaban
     opsiJawaban.value = []
-  } else {
+    pernyataanKompleks.value = []
+  } else if (data.tipe === "pg") {
     opsiJawaban.value = data.opsi_jawaban ?? []
+    pernyataanKompleks.value = []
+  } else if (data.tipe === "pg_kompleks") {
+    pernyataanKompleks.value = data.pernyataan ?? []
+    opsiJawaban.value = []
   }
 })
 
@@ -149,7 +176,8 @@ const submitEdit = async () => {
     pertanyaan: pertanyaan.value,
     pembahasan: pembahasan.value,
     jawaban_isian: tipeSoal.value === "isian" ? jawabanIsian.value : null,
-    opsi_jawaban: tipeSoal.value === "pg" ? opsiJawaban.value : []
+    opsi_jawaban: tipeSoal.value === "pg" ? opsiJawaban.value : [],
+    pernyataan: tipeSoal.value === "pg_kompleks" ? pernyataanKompleks.value : []
   }
   console.log("Submit Edit Payload:", payload)
 
