@@ -80,14 +80,37 @@
               <h3 class="font-semibold">
                 Soal {{ index + 1 }}
                 <span class="text-xs text-slate-500">
-                  ({{ item.tipe === "pg" ? "Pilihan Ganda" : "Isian Singkat" }})
+                  (
+                  {{
+                    item.tipe === "pg"
+                      ? "Pilihan Ganda"
+                      : item.tipe === "pg_kompleks"
+                        ? "Pilihan Ganda Kompleks"
+                        : "Isian Singkat"
+                  }}
+                  )
                 </span>
               </h3>
             </div>
 
-            <p class="mb-4 leading-relaxed">
-              {{ item.pertanyaan }}
-            </p>
+            <div class="mb-4 leading-relaxed mathjax-content inline-mathjax" v-html="formatSoal(item.pertanyaan)"></div>
+
+            <!-- PERNYATAAN PG KOMPLEKS -->
+            <div
+              v-if="item.tipe === 'pg_kompleks' && item.pernyataan && item.pernyataan.length"
+              class="space-y-2 text-sm mb-4"
+            >
+              <div v-for="p in item.pernyataan" :key="p.urutan" class="flex items-start gap-2">
+                <span class="font-medium">{{ p.urutan }}.</span>
+                <span class="mathjax-content inline-mathjax" v-html="formatSoal(p.teks)"></span>
+                <span
+                  class="ml-auto text-xs px-2 py-0.5 rounded"
+                  :class="p.jawaban_benar ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500'"
+                >
+                  {{ p.jawaban_benar ? "Benar" : "Salah" }}
+                </span>
+              </div>
+            </div>
 
             <!-- OPSI PG -->
             <ul v-if="item.tipe === 'pg'" class="space-y-2 text-sm">
@@ -97,7 +120,7 @@
                 class="flex justify-between items-center"
                 :class="opsi.is_correct ? 'font-semibold text-emerald-600' : ''"
               >
-                <span>{{ opsi.label }}. {{ opsi.teks }}</span>
+                <span class="mathjax-content inline-mathjax" v-html="formatSoal(`${opsi.label}. ${opsi.teks}`)"></span>
 
                 <span class="text-xs px-2 py-0.5 rounded bg-slate-100 text-slate-600">{{ opsi.poin }} poin</span>
               </li>
@@ -105,7 +128,10 @@
 
             <!-- JAWABAN / KUNCI -->
             <div class="mb-3 text-sm">
-              <span v-if="item.tipe === 'pg'" class="inline-block bg-slate-100 px-3 py-1 rounded font-medium">
+              <span
+                v-if="item.tipe === 'pg' || item.tipe === 'pg_kompleks'"
+                class="inline-block bg-slate-100 px-3 py-1 rounded font-medium"
+              >
                 Kunci: {{ item.jawaban_label }}
               </span>
 
@@ -124,7 +150,7 @@
             <!-- PEMBAHASAN -->
             <div v-if="item.pembahasan" class="mt-4 p-4 bg-slate-50 rounded-lg text-sm">
               <p class="font-medium mb-1">Pembahasan:</p>
-              {{ item.pembahasan }}
+              <div class="mathjax-content inline-mathjax" v-html="item.pembahasan"></div>
             </div>
           </div>
         </section>
@@ -134,7 +160,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from "vue"
+import { ref, onMounted, computed, nextTick, watch } from "vue"
 import { RouterLink, useRoute } from "vue-router"
 import api from "@/services/api"
 import Sidebar from "@/components/layout/Sidebar.vue"
@@ -148,6 +174,39 @@ const totalPoin = computed(() => {
     return total + (Number(soal.poin) || 0)
   }, 0)
 })
+
+const formatSoal = (text, limit = 100) => {
+  if (!text) return "-"
+
+  let result = text
+
+  // Paksa display math ($$) jadi inline math ($) khusus untuk tabel
+  result = result.replace(/\$\$(.*?)\$\$/gs, "$$$1$")
+
+  // Hilangkan newline yang bikin MathJax turun baris
+  result = result.replace(/\n+/g, " ")
+
+  // Truncate hanya jika tidak ada LaTeX
+  if (!result.includes("$")) {
+    return result.length > limit ? result.slice(0, limit) + "..." : result
+  }
+
+  return result
+}
+
+const renderMathJax = async () => {
+  await nextTick()
+
+  if (!window.MathJax) return
+
+  // Tunggu MathJax benar‑benar siap (script async)
+  if (window.MathJax.startup?.promise) {
+    await window.MathJax.startup.promise
+  }
+
+  await window.MathJax.typesetPromise()
+}
+
 const loading = ref(true)
 
 onMounted(async () => {
@@ -161,10 +220,30 @@ onMounted(async () => {
     console.log("Tryout Res Data:", tryout.value)
     soalList.value = soalRes.data
     console.log("Soal Value:", soalList.value)
+    await renderMathJax()
   } catch (err) {
     console.error("Gagal mengambil detail tryout", err)
   } finally {
     loading.value = false
   }
 })
+
+watch(soalList, async () => {
+  await renderMathJax()
+})
 </script>
+
+<style scoped>
+.inline-mathjax {
+  white-space: normal;
+  line-height: 1.5;
+}
+
+.inline-mathjax :deep(mjx-container[jax="SVG"]) {
+  display: inline !important;
+}
+
+.inline-mathjax :deep(svg) {
+  vertical-align: middle;
+}
+</style>

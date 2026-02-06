@@ -64,7 +64,9 @@
 
                 <tr v-for="item in bankSoal" :key="item.id" class="border-t">
                   <td class="px-4 py-3">{{ item.mapel }}</td>
-                  <td class="px-4 py-3 font-medium">{{ truncate(item.pertanyaan, 100) }}</td>
+                  <td class="px-4 py-3 font-medium">
+                    <div class="mathjax-content inline-mathjax" v-html="formatSoal(item.pertanyaan)"></div>
+                  </td>
                   <td class="px-4 py-3 text-center">{{ item.pembuat }}</td>
                   <td class="px-4 py-3 text-center">{{ item.jumlah_terpakai }}</td>
                   <td class="px-4 py-3 text-center space-x-2">
@@ -89,8 +91,7 @@
 </template>
 
 <script setup>
-import { RouterLink, RouterView } from "vue-router"
-import { ref, onMounted } from "vue"
+import { ref, onMounted, nextTick } from "vue"
 // import { api } from "@/services/api"
 import api from "@/services/api"
 
@@ -101,7 +102,39 @@ const loading = ref(true)
 
 const truncate = (text, limit = 100) => {
   if (!text) return "-"
+
+  // Jika mengandung LaTeX, jangan truncate supaya MathJax tidak error
+  if (text.includes("$")) {
+    return text
+  }
+  
   return text.length > limit ? text.slice(0, limit) + "..." : text
+}
+
+const formatSoal = (text, limit = 100) => {
+  if (!text) return "-"
+
+  let result = text
+
+  // Paksa display math ($$) jadi inline math ($) khusus untuk tabel
+  result = result.replace(/\$\$(.*?)\$\$/gs, "$$$1$")
+
+  // Hilangkan newline yang bikin MathJax turun baris
+  result = result.replace(/\n+/g, " ")
+
+  // Truncate hanya jika tidak ada LaTeX
+  if (!result.includes("$")) {
+    return result.length > limit ? result.slice(0, limit) + "..." : result
+  }
+
+  return result
+}
+
+const renderMathJax = async () => {
+  await nextTick()
+  if (window.MathJax) {
+    window.MathJax.typesetPromise()
+  }
 }
 
 onMounted(async () => {
@@ -109,7 +142,21 @@ onMounted(async () => {
   bankSoal.value = res.data
   loading.value = false
 
-  console.log("Bank Soal Data:", res.data)
-  console.log("Loaing State:", loading.value)
+  await renderMathJax()
 })
 </script>
+
+<style scoped>
+.inline-mathjax {
+  white-space: normal;
+  line-height: 1.5;
+}
+
+.inline-mathjax :deep(mjx-container[jax="SVG"]) {
+  display: inline !important;
+}
+
+.inline-mathjax :deep(svg) {
+  vertical-align: middle;
+}
+</style>
