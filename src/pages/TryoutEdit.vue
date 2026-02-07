@@ -101,7 +101,7 @@
                 Simpan Perubahan
               </button>
 
-              <RouterLink to="/admin-tryout" class="px-6 py-3 rounded-lg border hover:bg-slate-100">Batal</RouterLink>
+              <RouterLink to="/tryout" class="px-6 py-3 rounded-lg border hover:bg-slate-100">Batal</RouterLink>
             </section>
           </form>
         </div>
