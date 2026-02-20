@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
   <head>
     <meta charset="UTF-8" />
@@ -10,8 +10,29 @@
       rel="stylesheet"
     />
 
-    <script type="module" crossorigin src="/assets/index-C8sZnBbP.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/index-sbIMjUCX.css">
+    <!-- MathJax Configuration -->
+    <script>
+      window.MathJax = {
+        tex: {
+          inlineMath: [
+            ["$", "$"],
+            ["\\(", "\\)"]
+          ],
+          displayMath: [
+            ["$$", "$$"],
+            ["\\[", "\\]"]
+          ]
+        },
+        svg: {
+          fontCache: "global"
+        }
+      }
+    </script>
+
+    <!-- MathJax Library -->
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+    <script type="module" crossorigin src="/assets/index-CGoiTmTM.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-BMbPoNVg.css">
   </head>
   <!-- <body :class="[loggedIn ? 'bg-bgsoft font-poppins' : '']"> -->
   <body>
