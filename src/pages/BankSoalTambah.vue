@@ -137,27 +137,80 @@
 import Sidebar from "@/components/layout/Sidebar.vue"
 import { ref, onMounted } from "vue"
 // import { ClassicEditor } from "@ckeditor/ckeditor5-build-classic"
-import ClassicEditor from "@ckeditor/ckeditor5-build-classic"
+import {
+  ClassicEditor,
+  Bold,
+  Essentials,
+  Italic,
+  Mention,
+  Paragraph,
+  Undo,
+  Link,
+  List,
+  Image,
+  ImageToolbar,
+  ImageStyle,
+  ImageUpload
+} from "ckeditor5"
+// import ClassicEditor from "@ckeditor/ckeditor5-build-classic"
 import api from "@/services/api"
 import { useRouter } from "vue-router"
 
 const editor = ClassicEditor
 
+// ===============================
+// CKEditor Custom Upload Adapter
+// ===============================
+
+function MyUploadAdapter(loader) {
+  this.loader = loader
+}
+
+MyUploadAdapter.prototype.upload = function () {
+  return this.loader.file.then((file) => {
+    const data = new FormData()
+    data.append("upload", file)
+
+    return api
+      .post("/upload-image", data, {
+        headers: {
+          "Content-Type": "multipart/form-data"
+        }
+      })
+      .then((res) => {
+        return {
+          default: res.data.url
+        }
+      })
+  })
+}
+
+MyUploadAdapter.prototype.abort = function () {}
+
+function MyCustomUploadAdapterPlugin(editor) {
+  editor.plugins.get("FileRepository").createUploadAdapter = (loader) => {
+    return new MyUploadAdapter(loader)
+  }
+}
+
 const editorConfig = {
-  toolbar: [
-    "heading",
-    "|",
-    "bold",
-    "italic",
-    "link",
-    "bulletedList",
-    "numberedList",
-    "|",
-    "uploadImage",
-    "blockQuote",
-    "undo",
-    "redo"
+  licenseKey: "GPL",
+  plugins: [
+    Essentials,
+    Bold,
+    Italic,
+    Paragraph,
+    Mention,
+    Undo,
+    Link,
+    List,
+    Image,
+    ImageToolbar,
+    ImageStyle,
+    ImageUpload
   ],
+  extraPlugins: [MyCustomUploadAdapterPlugin],
+  toolbar: ["undo", "redo", "|", "bold", "italic", "link", "|", "bulletedList", "numberedList", "|", "uploadImage"],
   image: {
     toolbar: ["imageTextAlternative", "imageStyle:alignLeft", "imageStyle:alignCenter", "imageStyle:alignRight"]
   }
