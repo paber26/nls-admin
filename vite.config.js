@@ -5,6 +5,9 @@ import { fileURLToPath, URL } from "node:url"
 
 // https://vite.dev/config/
 export default defineConfig({
+  optimizeDeps: {
+    include: ["@ckeditor/ckeditor5-vue", "@ckeditor/ckeditor5-build-classic"]
+  },
   base: "/",
   plugins: [vue(), tailwindcss()],
   resolve: {

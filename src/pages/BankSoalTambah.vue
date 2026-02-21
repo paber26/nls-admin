@@ -38,12 +38,7 @@
             <!-- Pertanyaan -->
             <div>
               <label class="block text-sm font-medium mb-1">Pertanyaan</label>
-              <textarea
-                v-model="pertanyaan"
-                class="w-full px-4 py-2 border rounded-lg text-sm"
-                rows="4"
-                placeholder="Tulis soal di sini..."
-              ></textarea>
+              <ckeditor :editor="editor" v-model="pertanyaan" :config="editorConfig" />
             </div>
 
             <div v-if="tipeSoal === 'isian'">
@@ -116,12 +111,7 @@
             <!-- Pembahasan -->
             <div>
               <label class="block text-sm font-medium mb-1">Pembahasan</label>
-              <textarea
-                v-model="pembahasan"
-                class="w-full px-4 py-2 border rounded-lg text-sm"
-                rows="4"
-                placeholder="Pembahasan (opsional)"
-              ></textarea>
+              <ckeditor :editor="editor" v-model="pembahasan" :config="editorConfig" />
             </div>
 
             <!-- Action -->
@@ -146,8 +136,32 @@
 <script setup>
 import Sidebar from "@/components/layout/Sidebar.vue"
 import { ref, onMounted } from "vue"
+// import { ClassicEditor } from "@ckeditor/ckeditor5-build-classic"
+import ClassicEditor from "@ckeditor/ckeditor5-build-classic"
 import api from "@/services/api"
 import { useRouter } from "vue-router"
+
+const editor = ClassicEditor
+
+const editorConfig = {
+  toolbar: [
+    "heading",
+    "|",
+    "bold",
+    "italic",
+    "link",
+    "bulletedList",
+    "numberedList",
+    "|",
+    "uploadImage",
+    "blockQuote",
+    "undo",
+    "redo"
+  ],
+  image: {
+    toolbar: ["imageTextAlternative", "imageStyle:alignLeft", "imageStyle:alignCenter", "imageStyle:alignRight"]
+  }
+}
 
 const router = useRouter()
 const tipeSoal = ref("pg")
