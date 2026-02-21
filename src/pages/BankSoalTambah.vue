@@ -378,7 +378,12 @@ const submitSoal = async () => {
 
     if (res.data && res.data.success) {
       alert(res.data.message || "Soal berhasil disimpan")
-      router.push("/banksoal") // ⬅️ Vue Router navigation
+
+      // Hapus draft setelah berhasil disimpan ke server
+      localStorage.removeItem("draft_banksoal")
+      draftSoal.value = []
+
+      router.push("/banksoal")
     } else {
       alert("Soal tersimpan di localStorage, tapi gagal dikirim ke server")
     }
