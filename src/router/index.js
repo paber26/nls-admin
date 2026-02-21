@@ -27,6 +27,8 @@ import Peringkat from "../pages/Peringkat.vue"
 import Persiapan from "../pages/TryoutPersiapan.vue"
 import TryoutHasil from "../pages/TryoutHasil.vue"
 
+import KelolaAdmin from "../pages/KelolaAdmin.vue"
+
 const routes = [
   {
     path: "/",
@@ -124,7 +126,11 @@ const routes = [
     name: "About",
     component: About
   },
-
+  {
+    path: "/kelolaadmin",
+    name: "KelolaAdmin",
+    component: KelolaAdmin
+  },
   {
     path: "/oauth/callback",
     name: "oauth-callback",
