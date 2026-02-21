@@ -95,6 +95,8 @@
 
 <script setup>
 import { ref, onMounted, nextTick } from "vue"
+import renderMathInElement from "katex/contrib/auto-render"
+import "katex/dist/katex.min.css"
 // import { api } from "@/services/api"
 import api from "@/services/api"
 
@@ -133,33 +135,18 @@ const formatSoal = (text, limit = 100) => {
   return result
 }
 
-const renderMathJax = async () => {
-  await nextTick()
-  if (window.MathJax) {
-    window.MathJax.typesetPromise()
-  }
-}
-
 onMounted(async () => {
   const res = await api.get("/banksoal")
   bankSoal.value = res.data
   loading.value = false
 
-  await renderMathJax()
+  await nextTick()
+  renderMathInElement(document.querySelector("main"), {
+    delimiters: [
+      { left: "$$", right: "$$", display: true },
+      { left: "$", right: "$", display: false }
+    ],
+    throwOnError: false
+  })
 })
 </script>
-
-<style scoped>
-.inline-mathjax {
-  white-space: normal;
-  line-height: 1.5;
-}
-
-.inline-mathjax :deep(mjx-container[jax="SVG"]) {
-  display: inline !important;
-}
-
-.inline-mathjax :deep(svg) {
-  vertical-align: middle;
-}
-</style>
