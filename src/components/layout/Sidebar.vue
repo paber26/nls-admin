@@ -5,10 +5,20 @@
     <div class="px-6 py-5 text-lg font-semibold border-b border-slate-800">Next Level Study</div>
 
     <!-- User Info -->
-    <div class="px-6 py-4 border-b border-slate-800">
-      <p class="text-xs text-slate-400">Siswa</p>
-      <p class="font-medium">Aldo</p>
-      <p class="text-xs text-slate-400">SMA • Kelas XI</p>
+    <div class="px-6 py-4 border-b border-slate-800" v-if="user">
+      <template v-if="user.role === 'admin'">
+        <p class="text-xs text-slate-400">Administrator</p>
+        <p class="font-medium">{{ user.name }}</p>
+      </template>
+
+      <template v-else>
+        <p class="text-xs text-slate-400">Siswa</p>
+        <p class="font-medium">{{ user.name }}</p>
+        <p class="text-xs text-slate-400">
+          {{ user.sekolah_nama || "Sekolah belum diisi" }}
+          <span v-if="user.kelas">• Kelas {{ user.kelas }}</span>
+        </p>
+      </template>
     </div>
 
     <!-- Menu -->
@@ -114,6 +124,7 @@
 <script setup>
 import { useRoute } from "vue-router"
 import { computed } from "vue"
+import { ref, onMounted } from "vue"
 
 const route = useRoute()
 
@@ -121,6 +132,15 @@ const isTryoutRoute = computed(() => route.path.startsWith("/tryout")).value
 const isSekolahRoute = computed(() => route.path.startsWith("/sekolah")).value
 const isPesertaRoute = computed(() => route.path.startsWith("/peserta")).value
 console.log(isPesertaRoute)
+
+const user = ref(null)
+
+onMounted(() => {
+  const data = localStorage.getItem("dataapi")
+  if (data) {
+    user.value = JSON.parse(data)
+  }
+})
 
 const handleLogout = () => {
   // hapus semua data autentikasi & sesi
