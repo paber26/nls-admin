@@ -10,6 +10,7 @@ import PesertaDetail from "../pages/PesertaDetail.vue"
 import BankSoal from "../pages/BankSoal.vue"
 import BankSoalTambah from "../pages/BankSoalTambah.vue"
 import BankSoalEdit from "../pages/BankSoalEdit.vue"
+import BankSoalLihat from "../pages/BankSoalLihat.vue"
 
 import Sekolah from "../pages/Sekolah.vue"
 import Sekolahdetail from "../pages/SekolahDetail.vue"
@@ -86,6 +87,11 @@ const routes = [
     path: "/banksoal/edit/:id",
     name: "BankSoalEdit",
     component: BankSoalEdit
+  },
+  {
+    path: "/banksoal/lihat/:id",
+    name: "BankSoalLihat",
+    component: BankSoalLihat
   },
   {
     path: "/peringkat",

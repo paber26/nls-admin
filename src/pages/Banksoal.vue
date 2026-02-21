@@ -70,6 +70,9 @@
                   <td class="px-4 py-3 text-center">{{ item.pembuat }}</td>
                   <td class="px-4 py-3 text-center">{{ item.jumlah_terpakai }}</td>
                   <td class="px-4 py-3 text-center space-x-2">
+                    <RouterLink :to="`/banksoal/lihat/${item.id}`" class="text-blue-600 text-xs hover:underline">
+                      Lihat
+                    </RouterLink>
                     <RouterLink :to="`/banksoal/edit/${item.id}`" class="text-slate-600 text-xs hover:underline">
                       Edit
                     </RouterLink>
@@ -107,7 +110,7 @@ const truncate = (text, limit = 100) => {
   if (text.includes("$")) {
     return text
   }
-  
+
   return text.length > limit ? text.slice(0, limit) + "..." : text
 }
 
