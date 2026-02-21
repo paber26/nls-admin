@@ -91,6 +91,10 @@ import { ref, onMounted } from "vue"
 import { useRoute, useRouter } from "vue-router"
 import api from "@/services/api"
 import Sidebar from "@/components/layout/Sidebar.vue"
+import { nextTick } from "vue"
+import katex from "katex"
+import renderMathInElement from "katex/contrib/auto-render"
+import "katex/dist/katex.min.css"
 
 const route = useRoute()
 const router = useRouter()
@@ -103,6 +107,18 @@ const pembahasan = ref("")
 const jawabanIsian = ref("")
 const opsiJawaban = ref([])
 const pernyataanKompleks = ref([])
+
+const renderKatex = () => {
+  nextTick(() => {
+    renderMathInElement(document.body, {
+      delimiters: [
+        { left: "$$", right: "$$", display: true },
+        { left: "$", right: "$", display: false }
+      ],
+      throwOnError: false
+    })
+  })
+}
 
 onMounted(async () => {
   const res = await api.get(`/banksoal/${id}`)
@@ -120,5 +136,6 @@ onMounted(async () => {
   } else if (data.tipe === "pg_kompleks") {
     pernyataanKompleks.value = data.pernyataan ?? []
   }
+  renderKatex()
 })
 </script>
