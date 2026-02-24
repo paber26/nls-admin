@@ -69,17 +69,10 @@
               </div>
             </section>
 
-            <!-- JADWAL -->
-            <section class="bg-white rounded-xl border p-6 grid md:grid-cols-2 gap-6">
-              <div>
-                <label class="text-sm text-slate-500">Tanggal Mulai</label>
-                <input type="datetime-local" v-model="form.mulai" class="w-full mt-1 px-4 py-2 border rounded-lg" />
-              </div>
-
-              <div>
-                <label class="text-sm text-slate-500">Tanggal Selesai</label>
-                <input type="datetime-local" v-model="form.selesai" class="w-full mt-1 px-4 py-2 border rounded-lg" />
-              </div>
+            <!-- KETENTUAN KHUSUS -->
+            <section class="bg-white rounded-xl border p-6">
+              <label class="text-sm text-slate-500">Ketentuan Khusus (ditampilkan sebelum mulai tryout)</label>
+              <ckeditor :editor="editor" v-model="form.ketentuan_khusus" :config="editorConfig" class="mt-2" />
             </section>
 
             <!-- STATUS -->
@@ -115,9 +108,68 @@ import { ref, onMounted, computed } from "vue"
 import { useRoute, useRouter, RouterLink, RouterView } from "vue-router"
 import Sidebar from "../components/layout/Sidebar.vue"
 import api from "../services/api"
+import {
+  ClassicEditor,
+  Bold,
+  Essentials,
+  Italic,
+  Mention,
+  Paragraph,
+  Undo,
+  Link,
+  List,
+  Image,
+  ImageToolbar,
+  ImageStyle,
+  ImageUpload,
+  ImageResize,
+  ImageResizeButtons
+} from "ckeditor5"
 
 const route = useRoute()
 const router = useRouter()
+
+const editor = ClassicEditor
+
+const editorConfig = {
+  licenseKey: "GPL",
+  plugins: [
+    Essentials,
+    Bold,
+    Italic,
+    Paragraph,
+    Mention,
+    Undo,
+    Link,
+    List,
+    Image,
+    ImageToolbar,
+    ImageStyle,
+    ImageUpload,
+    ImageResize
+  ],
+  toolbar: ["undo", "redo", "|", "bold", "italic", "link", "bulletedList", "numberedList", "|", "uploadImage"],
+  image: {
+    toolbar: ["imageStyle:alignLeft", "imageStyle:alignCenter", "imageStyle:alignRight", "|", "resizeImage"],
+    resizeOptions: [
+      {
+        name: "resizeImage:original",
+        label: "Original",
+        value: null
+      },
+      {
+        name: "resizeImage:50",
+        label: "50%",
+        value: "50"
+      },
+      {
+        name: "resizeImage:75",
+        label: "75%",
+        value: "75"
+      }
+    ]
+  }
+}
 
 const form = ref({
   paket: "",
@@ -125,7 +177,8 @@ const form = ref({
   mapel_nama: "",
   durasi_menit: "",
   mulai: "",
-  selesai: ""
+  selesai: "",
+  ketentuan_khusus: ""
 })
 
 const statusOptions = computed(() => [
@@ -145,7 +198,8 @@ onMounted(async () => {
       durasi_menit: data.durasi_menit ?? "",
       mulai: data.mulai ?? "",
       selesai: data.selesai ?? "",
-      status: data.status ?? ""
+      status: data.status ?? "",
+      ketentuan_khusus: data.ketentuan_khusus ?? ""
     }
   } catch (err) {
     // handle error, e.g. notify user
@@ -161,7 +215,8 @@ const handleSubmit = async () => {
       durasi_menit: Number(form.value.durasi_menit),
       mulai: form.value.mulai,
       selesai: form.value.selesai,
-      status: form.value.status
+      status: form.value.status,
+      ketentuan_khusus: form.value.ketentuan_khusus
     }
 
     const res = await api.put(`/tryout/${id}`, payload)

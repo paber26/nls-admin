@@ -24,29 +24,37 @@
         <div class="px-6 py-6">
           <!-- ================= FILTER ================= -->
           <section class="bg-white rounded-xl border p-4 mb-6 flex flex-wrap gap-4">
-            <select class="px-4 py-2 border rounded-lg text-sm w-full md:w-56">
-              <option>Semua Mapel</option>
-              <option>Matematika</option>
-              <option>Fisika</option>
-              <option>Kimia</option>
-              <option>Biologi</option>
-              <option>Informatika</option>
-              <option>Astronomi</option>
-              <option>Ekonomi</option>
-              <option>Geografi</option>
-              <option>Kebumian</option>
+            <select
+              v-model="selectedMapel"
+              @change="fetchBankSoal"
+              class="px-4 py-2 border rounded-lg text-sm w-full md:w-56"
+            >
+              <option value="">Semua Mapel</option>
+              <option value="Matematika">Matematika</option>
+              <option value="Fisika">Fisika</option>
+              <option value="Kimia">Kimia</option>
+              <option value="Biologi">Biologi</option>
+              <option value="Informatika">Informatika</option>
+              <option value="Astronomi">Astronomi</option>
+              <option value="Ekonomi">Ekonomi</option>
+              <option value="Geografi">Geografi</option>
+              <option value="Kebumian">Kebumian</option>
             </select>
 
-            <select class="px-4 py-2 border rounded-lg text-sm w-full md:w-40">
-              <option>Status</option>
-              <option>Draft</option>
-              <option>Aktif</option>
+            <select
+              v-model="selectedStatus"
+              @change="fetchBankSoal"
+              class="px-4 py-2 border rounded-lg text-sm w-full md:w-40"
+            >
+              <option value="">Semua Status</option>
+              <option value="draft">Draft</option>
+              <option value="aktif">Aktif</option>
             </select>
           </section>
 
           <!-- ================= TABLE PAKET ================= -->
           <section class="bg-white rounded-xl border overflow-x-auto">
-            <table class="w-full text-sm">
+            <table ref="tableRef" class="w-full text-sm">
               <thead class="bg-slate-100">
                 <tr>
                   <th class="px-4 py-3 text-left">Mapel</th>
@@ -60,6 +68,11 @@
               <tbody>
                 <tr v-if="loading">
                   <td colspan="5" class="px-4 py-6 text-center text-slate-400">Memuat data...</td>
+                </tr>
+                <tr v-else-if="bankSoal.length === 0">
+                  <td colspan="5" class="px-4 py-8 text-center text-slate-400">
+                    Belum ada soal pada kategori ini atau coba refresh
+                  </td>
                 </tr>
 
                 <tr v-for="item in bankSoal" :key="item.id" class="border-t">
@@ -105,6 +118,11 @@ import Sidebar from "../components/layout/Sidebar.vue"
 const bankSoal = ref([])
 const loading = ref(true)
 
+const selectedMapel = ref("")
+const selectedStatus = ref("")
+
+const tableRef = ref(null)
+
 const truncate = (text, limit = 100) => {
   if (!text) return "-"
 
@@ -135,18 +153,47 @@ const formatSoal = (text, limit = 100) => {
   return result
 }
 
-onMounted(async () => {
-  const res = await api.get("/banksoal")
-  bankSoal.value = res.data
-  loading.value = false
+const fetchBankSoal = async () => {
+  try {
+    loading.value = true
 
-  await nextTick()
-  renderMathInElement(document.querySelector("main"), {
-    delimiters: [
-      { left: "$$", right: "$$", display: true },
-      { left: "$", right: "$", display: false }
-    ],
-    throwOnError: false
-  })
+    const params = {}
+    if (selectedMapel.value) params.mapel = selectedMapel.value
+    if (selectedStatus.value) params.status = selectedStatus.value
+
+    const res = await api.get("/banksoal", { params })
+
+    // Pastikan selalu array
+    bankSoal.value = Array.isArray(res.data) ? res.data : []
+
+    await nextTick()
+
+    // Render KaTeX dengan ref (aman untuk Vue lifecycle)
+    if (bankSoal.value.length > 0 && tableRef.value) {
+      try {
+        // Pastikan element masih ada di DOM
+        if (document.body.contains(tableRef.value)) {
+          renderMathInElement(tableRef.value, {
+            delimiters: [
+              { left: "$$", right: "$$", display: true },
+              { left: "$", right: "$", display: false }
+            ],
+            throwOnError: false
+          })
+        }
+      } catch (e) {
+        console.warn("Render KaTeX error (ignored):", e)
+      }
+    }
+  } catch (error) {
+    console.error("Gagal mengambil bank soal:", error)
+    bankSoal.value = []
+  } finally {
+    loading.value = false
+  }
+}
+
+onMounted(() => {
+  fetchBankSoal()
 })
 </script>

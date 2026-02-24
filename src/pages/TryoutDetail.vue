@@ -73,6 +73,13 @@
           </div>
         </section>
 
+        <!-- KETENTUAN KHUSUS -->
+        <section v-if="tryout?.ketentuan_khusus" class="bg-white rounded-xl border p-6 mb-6">
+          <h2 class="text-sm font-semibold mb-3 text-slate-700">Ketentuan Khusus</h2>
+
+          <div class="text-sm leading-relaxed mathjax-content inline-mathjax" v-html="tryout.ketentuan_khusus"></div>
+        </section>
+
         <!-- PREVIEW SOAL -->
         <section class="space-y-6">
           <div v-for="(item, index) in soalList" :key="item.id" class="bg-white rounded-xl border p-6">

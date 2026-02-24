@@ -136,7 +136,6 @@
 <script setup>
 import Sidebar from "@/components/layout/Sidebar.vue"
 import { ref, onMounted } from "vue"
-// import { ClassicEditor } from "@ckeditor/ckeditor5-build-classic"
 import {
   ClassicEditor,
   Bold,
@@ -154,7 +153,6 @@ import {
   ImageResize,
   ImageResizeButtons
 } from "ckeditor5"
-// import ClassicEditor from "@ckeditor/ckeditor5-build-classic"
 import api from "@/services/api"
 import { useRouter } from "vue-router"
 
