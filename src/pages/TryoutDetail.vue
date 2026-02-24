@@ -77,7 +77,7 @@
         <section v-if="tryout?.ketentuan_khusus" class="bg-white rounded-xl border p-6 mb-6">
           <h2 class="text-sm font-semibold mb-3 text-slate-700">Ketentuan Khusus</h2>
 
-          <div class="text-sm leading-relaxed mathjax-content inline-mathjax" v-html="tryout.ketentuan_khusus"></div>
+          <div class="text-sm leading-relaxed" v-html="tryout.ketentuan_khusus"></div>
         </section>
 
         <!-- PREVIEW SOAL -->
@@ -100,7 +100,7 @@
               </h3>
             </div>
 
-            <div class="mb-4 leading-relaxed mathjax-content inline-mathjax" v-html="formatSoal(item.pertanyaan)"></div>
+            <div class="mb-4 leading-relaxed" v-html="item.pertanyaan"></div>
 
             <!-- PERNYATAAN PG KOMPLEKS -->
             <div
@@ -109,7 +109,7 @@
             >
               <div v-for="p in item.pernyataan" :key="p.urutan" class="flex items-start gap-2">
                 <span class="font-medium">{{ p.urutan }}.</span>
-                <span class="mathjax-content inline-mathjax" v-html="formatSoal(p.teks)"></span>
+                <span v-html="p.teks"></span>
                 <span
                   class="ml-auto text-xs px-2 py-0.5 rounded"
                   :class="p.jawaban_benar ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500'"
@@ -127,7 +127,7 @@
                 class="flex justify-between items-center"
                 :class="opsi.is_correct ? 'font-semibold text-emerald-600' : ''"
               >
-                <span class="mathjax-content inline-mathjax" v-html="formatSoal(`${opsi.label}. ${opsi.teks}`)"></span>
+                <span v-html="`${opsi.label}. ${opsi.teks}`"></span>
 
                 <span class="text-xs px-2 py-0.5 rounded bg-slate-100 text-slate-600">{{ opsi.poin }} poin</span>
               </li>
@@ -157,7 +157,7 @@
             <!-- PEMBAHASAN -->
             <div v-if="item.pembahasan" class="mt-4 p-4 bg-slate-50 rounded-lg text-sm">
               <p class="font-medium mb-1">Pembahasan:</p>
-              <div class="mathjax-content inline-mathjax" v-html="item.pembahasan"></div>
+              <div v-html="item.pembahasan"></div>
             </div>
           </div>
         </section>
@@ -167,10 +167,13 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed, nextTick, watch } from "vue"
+import { ref, onMounted, computed, watch, nextTick } from "vue"
 import { RouterLink, useRoute } from "vue-router"
 import api from "@/services/api"
 import Sidebar from "@/components/layout/Sidebar.vue"
+import katex from "katex"
+import renderMathInElement from "katex/contrib/auto-render"
+import "katex/dist/katex.min.css"
 
 const route = useRoute()
 
@@ -182,36 +185,23 @@ const totalPoin = computed(() => {
   }, 0)
 })
 
-const formatSoal = (text, limit = 100) => {
-  if (!text) return "-"
-
-  let result = text
-
-  // Paksa display math ($$) jadi inline math ($) khusus untuk tabel
-  result = result.replace(/\$\$(.*?)\$\$/gs, "$$$1$")
-
-  // Hilangkan newline yang bikin MathJax turun baris
-  result = result.replace(/\n+/g, " ")
-
-  // Truncate hanya jika tidak ada LaTeX
-  if (!result.includes("$")) {
-    return result.length > limit ? result.slice(0, limit) + "..." : result
-  }
-
-  return result
-}
-
-const renderMathJax = async () => {
+const renderKatex = async () => {
   await nextTick()
 
-  if (!window.MathJax) return
+  const container = document.querySelector("main")
+  if (!container) return
 
-  // Tunggu MathJax benar‑benar siap (script async)
-  if (window.MathJax.startup?.promise) {
-    await window.MathJax.startup.promise
+  try {
+    renderMathInElement(container, {
+      delimiters: [
+        { left: "$$", right: "$$", display: true },
+        { left: "$", right: "$", display: false }
+      ],
+      throwOnError: false
+    })
+  } catch (e) {
+    console.error("KaTeX render error:", e)
   }
-
-  await window.MathJax.typesetPromise()
 }
 
 const loading = ref(true)
@@ -224,33 +214,28 @@ onMounted(async () => {
     ])
 
     tryout.value = tryoutRes.data
-    console.log("Tryout Res Data:", tryout.value)
     soalList.value = soalRes.data
-    console.log("Soal Value:", soalList.value)
-    await renderMathJax()
+
+    // tampilkan dulu kontennya
+    loading.value = false
+
+    // tunggu DOM benar-benar selesai render
+    await nextTick()
+
+    // baru render KaTeX
+    await renderKatex()
   } catch (err) {
     console.error("Gagal mengambil detail tryout", err)
-  } finally {
     loading.value = false
   }
 })
 
-watch(soalList, async () => {
-  await renderMathJax()
-})
+watch(
+  () => soalList.value,
+  async () => {
+    await nextTick()
+    await renderKatex()
+  },
+  { deep: true }
+)
 </script>
-
-<style scoped>
-.inline-mathjax {
-  white-space: normal;
-  line-height: 1.5;
-}
-
-.inline-mathjax :deep(mjx-container[jax="SVG"]) {
-  display: inline !important;
-}
-
-.inline-mathjax :deep(svg) {
-  vertical-align: middle;
-}
-</style>
