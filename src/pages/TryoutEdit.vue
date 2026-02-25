@@ -67,6 +67,16 @@
                 <label class="text-sm text-slate-500">Durasi (menit)</label>
                 <input type="number" v-model="form.durasi_menit" class="w-full mt-1 px-4 py-2 border rounded-lg" />
               </div>
+
+              <div>
+                <label class="text-sm text-slate-500">Waktu Mulai</label>
+                <input type="datetime-local" v-model="form.mulai" class="w-full mt-1 px-4 py-2 border rounded-lg" />
+              </div>
+
+              <div>
+                <label class="text-sm text-slate-500">Waktu Selesai</label>
+                <input type="datetime-local" v-model="form.selesai" class="w-full mt-1 px-4 py-2 border rounded-lg" />
+              </div>
             </section>
 
             <!-- KETENTUAN KHUSUS -->
