@@ -72,7 +72,7 @@
             </section>
 
             <!-- JADWAL -->
-            <!-- <section class="bg-white rounded-xl border p-6 grid md:grid-cols-2 gap-6">
+            <section class="bg-white rounded-xl border p-6 grid md:grid-cols-2 gap-6">
               <div>
                 <label class="text-sm text-slate-500">Tanggal Mulai</label>
                 <input type="date" class="w-full mt-1 px-4 py-2 border rounded-lg" v-model="form.mulai" />
@@ -98,7 +98,7 @@
                 <label class="text-sm text-slate-500">Waktu Selesai</label>
                 <input type="time" class="w-full mt-1 px-4 py-2 border rounded-lg" />
               </div>
-            </section> -->
+            </section>
 
             <!-- ACTION -->
             <section class="flex gap-4 justify-end">

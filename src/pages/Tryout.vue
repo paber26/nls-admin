@@ -22,6 +22,7 @@
             <tr>
               <th class="px-4 py-3 text-left">Nama Paket</th>
               <th class="px-4 py-3 text-left">Mapel</th>
+              <th class="px-4 py-3 text-center">Periode</th>
               <th class="px-4 py-3 text-center">Status</th>
               <th class="px-4 py-3 text-center">Pembuat</th>
               <th class="px-4 py-3 text-center">Aksi</th>
@@ -30,12 +31,21 @@
 
           <tbody>
             <tr v-if="loading">
-              <td colspan="5" class="px-4 py-6 text-center text-slate-400">Memuat data...</td>
+              <td colspan="6" class="px-4 py-6 text-center text-slate-400">Memuat data...</td>
             </tr>
 
             <tr v-for="item in tryouts" :key="item.id" class="border-t">
               <td class="px-4 py-3 font-medium">{{ item.paket }}</td>
               <td class="px-4 py-3">{{ item.mapel }}</td>
+
+              <td class="px-4 py-3 text-center text-xs text-slate-600">
+                <div class="flex flex-col leading-tight">
+                  <span>{{ formatDate(item.mulai) }}</span>
+                  <span class="text-slate-400">s/d</span>
+                  <span>{{ formatDate(item.selesai) }}</span>
+                </div>
+              </td>
+
               <td class="px-4 py-3 text-center">
                 <span
                   class="px-2 py-1 text-xs rounded font-medium"
@@ -73,6 +83,18 @@ import Sidebar from "@/components/layout/Sidebar.vue"
 
 const tryouts = ref([])
 const loading = ref(true)
+
+const formatDate = (datetime) => {
+  if (!datetime) return "-"
+  const date = new Date(datetime)
+  return date.toLocaleString("id-ID", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit"
+  })
+}
 
 onMounted(async () => {
   const res = await api.get("/tryout")
