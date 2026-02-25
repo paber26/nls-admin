@@ -32,36 +32,19 @@
 
       <div v-else class="px-6 py-6">
         <!-- INFO TRYOUT -->
-        <section class="bg-white rounded-xl border p-4 mb-6 grid md:grid-cols-5 gap-4 text-sm">
-          <div>
-            <p class="text-slate-500">Nama Tryout</p>
-            <p class="font-medium">{{ tryout?.paket }}</p>
-          </div>
+        <section class="bg-white rounded-2xl border shadow-sm p-6 mb-6">
+          <div class="flex items-center justify-between mb-6">
+            <div>
+              <h2 class="text-base font-semibold text-slate-800">
+                {{ tryout?.paket }}
+              </h2>
+              <p class="text-xs text-slate-500">
+                {{ tryout?.mapel_nama }}
+              </p>
+            </div>
 
-          <div>
-            <p class="text-slate-500">Mapel</p>
-            <p class="font-medium">{{ tryout?.mapel_nama }}</p>
-          </div>
-
-          <div>
-            <p class="text-slate-500">Jumlah Soal</p>
-            <p class="font-medium">{{ soalList.length }}</p>
-          </div>
-
-          <div>
-            <p class="text-slate-500">Total Poin</p>
-            <p class="font-medium">{{ totalPoin }}</p>
-          </div>
-
-          <div>
-            <p class="text-slate-500">Durasi</p>
-            <p class="font-medium">{{ tryout?.durasi_menit }} menit</p>
-          </div>
-
-          <div>
-            <p class="text-slate-500">Status</p>
             <span
-              class="px-2 py-1 text-xs rounded"
+              class="px-3 py-1 text-xs rounded-full font-medium"
               :class="{
                 'bg-slate-200 text-slate-700': tryout?.status === 'draft',
                 'bg-emerald-100 text-emerald-700': tryout?.status === 'active',
@@ -70,6 +53,34 @@
             >
               {{ tryout?.status }}
             </span>
+          </div>
+
+          <div class="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
+            <div class="bg-slate-50 rounded-xl p-4">
+              <p class="text-slate-500 text-xs mb-1">Jumlah Soal</p>
+              <p class="text-lg font-semibold text-slate-800">
+                {{ soalList.length }}
+              </p>
+            </div>
+
+            <div class="bg-slate-50 rounded-xl p-4">
+              <p class="text-slate-500 text-xs mb-1">Total Poin</p>
+              <p class="text-lg font-semibold text-slate-800">
+                {{ totalPoin }}
+              </p>
+            </div>
+
+            <div class="bg-slate-50 rounded-xl p-4">
+              <p class="text-slate-500 text-xs mb-1">Durasi</p>
+              <p class="text-lg font-semibold text-slate-800">{{ tryout?.durasi_menit }} menit</p>
+            </div>
+
+            <div class="bg-slate-50 rounded-xl p-4 md:col-span-2">
+              <p class="text-slate-500 text-xs mb-1">Waktu Pelaksanaan</p>
+              <p class="text-sm font-medium text-slate-700">
+                {{ formatDateTime(tryout?.mulai) }} - {{ formatDateTime(tryout?.selesai) }}
+              </p>
+            </div>
           </div>
         </section>
 
@@ -184,6 +195,18 @@ const totalPoin = computed(() => {
     return total + (Number(soal.poin) || 0)
   }, 0)
 })
+
+const formatDateTime = (datetime) => {
+  if (!datetime) return "-"
+  const date = new Date(datetime)
+  return date.toLocaleString("id-ID", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit"
+  })
+}
 
 const renderKatex = async () => {
   await nextTick()
