@@ -159,7 +159,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from "vue"
+import { ref, onMounted, computed, watch } from "vue"
 import api from "@/services/api"
 
 import Sidebar from "../components/layout/Sidebar.vue"
@@ -175,6 +175,11 @@ const currentPage = ref(1)
 const lastPage = ref(1)
 const total = ref(0)
 const perPage = ref(10)
+
+watch([searchQuery, filterSekolah, filterKelas, filterStatus], () => {
+  currentPage.value = 1
+  fetchPeserta()
+})
 
 const fetchPeserta = async () => {
   try {
