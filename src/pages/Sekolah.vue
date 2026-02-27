@@ -39,6 +39,14 @@
               <option :value="50">50</option>
               <option :value="100">100</option>
             </select>
+            <div class="ml-auto">
+              <button
+                @click="showModal = true"
+                class="px-4 py-2 bg-indigo-600 text-white text-sm rounded-lg hover:bg-indigo-700"
+              >
+                + Tambah Sekolah
+              </button>
+            </div>
           </section>
 
           <!-- TABLE SEKOLAH -->
@@ -102,6 +110,46 @@
           <!-- INFO -->
           <p class="text-xs text-slate-500 mt-4">*Peringkat sekolah dihitung berdasarkan akumulasi nilai peserta.</p>
         </div>
+        <div v-if="showModal" class="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+          <div class="bg-white w-full max-w-md rounded-xl p-6">
+            <h2 class="text-lg font-semibold mb-4">Tambah Sekolah</h2>
+
+            <input
+              v-model="form.nama"
+              type="text"
+              placeholder="Nama Sekolah"
+              class="w-full mb-3 px-4 py-2 border rounded-lg text-sm"
+            />
+
+            <input
+              v-model="form.npsn"
+              type="text"
+              placeholder="NPSN"
+              class="w-full mb-3 px-4 py-2 border rounded-lg text-sm"
+            />
+
+            <input
+              v-model="form.jenjang"
+              type="text"
+              placeholder="Jenjang (contoh: SMA / SMK / MAN / dll)"
+              class="w-full mb-3 px-4 py-2 border rounded-lg text-sm"
+            />
+
+            <select v-model="form.status" class="w-full mb-4 px-4 py-2 border rounded-lg text-sm">
+              <option value="">Pilih Status</option>
+              <option value="Negeri">Negeri</option>
+              <option value="Swasta">Swasta</option>
+            </select>
+
+            <div class="flex justify-end gap-2">
+              <button @click="showModal = false" class="px-4 py-2 text-sm border rounded-lg">Batal</button>
+
+              <button @click="submitSekolah" class="px-4 py-2 bg-indigo-600 text-white text-sm rounded-lg">
+                Simpan
+              </button>
+            </div>
+          </div>
+        </div>
       </main>
     </div>
   </body>
@@ -122,6 +170,26 @@ const filterPeserta = ref("")
 
 const currentPage = ref(1)
 const perPage = ref(20)
+
+const showModal = ref(false)
+
+const form = ref({
+  nama: "",
+  npsn: "",
+  jenjang: "",
+  status: ""
+})
+
+const submitSekolah = async () => {
+  try {
+    await api.post("/sekolah", form.value)
+    showModal.value = false
+    form.value = { nama: "", npsn: "", jenjang: "", status: "" }
+    fetchSchools()
+  } catch (err) {
+    console.error("Gagal menambahkan sekolah:", err)
+  }
+}
 
 const totalPages = computed(() => {
   return Math.ceil(filteredSekolah.value.length / perPage.value) || 1
