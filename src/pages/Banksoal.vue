@@ -54,7 +54,7 @@
 
           <!-- ================= TABLE PAKET ================= -->
           <section class="bg-white rounded-xl border overflow-x-auto">
-            <table ref="tableRef" class="w-full text-sm">
+            <table :key="currentPage" class="w-full text-sm">
               <thead class="bg-slate-100">
                 <tr>
                   <th class="px-4 py-3 text-left">Mapel</th>
@@ -78,7 +78,7 @@
                 <tr v-for="item in bankSoal" :key="item.id" class="border-t">
                   <td class="px-4 py-3">{{ item.mapel }}</td>
                   <td class="px-4 py-3 font-medium">
-                    <div class="mathjax-content inline-mathjax" v-html="formatSoal(item.pertanyaan)"></div>
+                    <div v-html="formatSoal(item.pertanyaan)"></div>
                   </td>
                   <td class="px-4 py-3 text-center">{{ item.pembuat }}</td>
                   <td class="px-4 py-3 text-center">{{ item.jumlah_terpakai }}</td>
@@ -96,6 +96,27 @@
             </table>
           </section>
 
+          <!-- ================= PAGINATION ================= -->
+          <div class="flex justify-between items-center mt-4 text-sm">
+            <button
+              @click="goToPage(currentPage - 1)"
+              :disabled="currentPage === 1"
+              class="px-3 py-1 border rounded disabled:opacity-50"
+            >
+              ⬅ Sebelumnya
+            </button>
+
+            <span>Halaman {{ currentPage }} dari {{ lastPage }}</span>
+
+            <button
+              @click="goToPage(currentPage + 1)"
+              :disabled="currentPage === lastPage"
+              class="px-3 py-1 border rounded disabled:opacity-50"
+            >
+              Selanjutnya ➡
+            </button>
+          </div>
+
           <!-- ================= INFO ================= -->
           <p class="text-xs text-slate-500 mt-4">
             *Setiap paket soal hanya untuk satu mata pelajaran dan dapat digunakan pada satu atau beberapa tryout.
@@ -107,8 +128,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, nextTick } from "vue"
-import renderMathInElement from "katex/contrib/auto-render"
+import { ref, onMounted, nextTick, watch } from "vue"
 import "katex/dist/katex.min.css"
 // import { api } from "@/services/api"
 import api from "@/services/api"
@@ -121,7 +141,9 @@ const loading = ref(true)
 const selectedMapel = ref("")
 const selectedStatus = ref("")
 
-const tableRef = ref(null)
+const currentPage = ref(1)
+const lastPage = ref(1)
+const perPage = ref(50)
 
 const truncate = (text, limit = 100) => {
   if (!text) return "-"
@@ -161,36 +183,46 @@ const fetchBankSoal = async () => {
     if (selectedMapel.value) params.mapel = selectedMapel.value
     if (selectedStatus.value) params.status = selectedStatus.value
 
-    const res = await api.get("/banksoal", { params })
+    params.page = currentPage.value
+    params.per_page = perPage.value
 
-    // Pastikan selalu array
-    bankSoal.value = Array.isArray(res.data) ? res.data : []
+    const res = await api.get("/banksoal", { params })
+    console.log("API Bank Soal Response:", res.data)
+
+    // Support array, normal pagination, or nested resource pagination
+    if (Array.isArray(res.data)) {
+      bankSoal.value = res.data
+      currentPage.value = 1
+      lastPage.value = 1
+    } else if (Array.isArray(res.data.data)) {
+      // Normal Laravel pagination
+      bankSoal.value = res.data.data
+      currentPage.value = res.data.current_page ?? 1
+      lastPage.value = res.data.last_page ?? 1
+    } else if (Array.isArray(res.data.data?.data)) {
+      // Laravel Resource pagination (nested)
+      bankSoal.value = res.data.data.data
+      currentPage.value = res.data.data.current_page ?? 1
+      lastPage.value = res.data.data.last_page ?? 1
+    } else {
+      bankSoal.value = []
+      currentPage.value = 1
+      lastPage.value = 1
+    }
 
     await nextTick()
-
-    // Render KaTeX dengan ref (aman untuk Vue lifecycle)
-    if (bankSoal.value.length > 0 && tableRef.value) {
-      try {
-        // Pastikan element masih ada di DOM
-        if (document.body.contains(tableRef.value)) {
-          renderMathInElement(tableRef.value, {
-            delimiters: [
-              { left: "$$", right: "$$", display: true },
-              { left: "$", right: "$", display: false }
-            ],
-            throwOnError: false
-          })
-        }
-      } catch (e) {
-        console.warn("Render KaTeX error (ignored):", e)
-      }
-    }
   } catch (error) {
     console.error("Gagal mengambil bank soal:", error)
     bankSoal.value = []
   } finally {
     loading.value = false
   }
+}
+
+const goToPage = (page) => {
+  if (page < 1 || page > lastPage.value) return
+  currentPage.value = page
+  fetchBankSoal()
 }
 
 onMounted(() => {
