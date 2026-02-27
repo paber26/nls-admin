@@ -42,15 +42,9 @@
                 <label class="text-sm text-slate-500">Mata Pelajaran</label>
                 <select class="w-full mt-1 px-4 py-2 border rounded-lg" v-model="form.mapel_id">
                   <option value="">Pilih Mata Pelajaran</option>
-                  <option value="1">Matematika</option>
-                  <option value="2">Fisika</option>
-                  <option value="3">Kimia</option>
-                  <option value="4">Biologi</option>
-                  <option value="5">Informatika</option>
-                  <option value="6">Astronomi</option>
-                  <option value="7">Ekonomi</option>
-                  <option value="8">Geografi</option>
-                  <option value="9">Kebumian</option>
+                  <option v-for="mapel in mapels" :key="mapel.id" :value="mapel.id">
+                    {{ mapel.nama }}
+                  </option>
                 </select>
                 <p v-if="errors.mapel_id" class="text-xs text-red-500 mt-1">
                   {{ errors.mapel_id }}
@@ -135,6 +129,18 @@ const form = ref({
 
 const errors = ref({})
 
+const mapels = ref([])
+
+const fetchMapel = async () => {
+  try {
+    const res = await api.get("/mapel")
+    console.log("Response Mapel:", res.data)
+    mapels.value = res.data.data || res.data
+  } catch (err) {
+    console.error("Gagal mengambil data mapel:", err)
+  }
+}
+
 const loadDraftOrApi = () => {
   const draft = localStorage.getItem("draft_tryout")
   if (draft) {
@@ -152,6 +158,7 @@ const loadDraftOrApi = () => {
 
 onMounted(() => {
   loadDraftOrApi()
+  fetchMapel()
 })
 
 const validateForm = () => {

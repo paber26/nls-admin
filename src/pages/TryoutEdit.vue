@@ -50,16 +50,11 @@
 
               <div>
                 <label class="text-sm text-slate-500">Mata Pelajaran</label>
-                <select class="w-full mt-1 px-4 py-2 border rounded-lg" v-model="form.mapel_nama">
-                  <option value="Matematika">Matematika</option>
-                  <option value="Fisika">Fisika</option>
-                  <option value="Kimia">Kimia</option>
-                  <option value="Biologi">Biologi</option>
-                  <option value="Informatika">Informatika</option>
-                  <option value="Astronomi">Astronomi</option>
-                  <option value="Ekonomi">Ekonomi</option>
-                  <option value="Geografi">Geografi</option>
-                  <option value="Kebumian">Kebumian</option>
+                <select class="w-full mt-1 px-4 py-2 border rounded-lg" v-model="form.mapel_id">
+                  <option value="">Pilih Mata Pelajaran</option>
+                  <option v-for="mapel in mapels" :key="mapel.id" :value="mapel.id">
+                    {{ mapel.nama }}
+                  </option>
                 </select>
               </div>
 
@@ -184,12 +179,22 @@ const editorConfig = {
 const form = ref({
   paket: "",
   mapel_id: "",
-  mapel_nama: "",
   durasi_menit: "",
   mulai: "",
   selesai: "",
   ketentuan_khusus: ""
 })
+
+const mapels = ref([])
+
+const fetchMapel = async () => {
+  try {
+    const res = await api.get("/mapel")
+    mapels.value = res.data.data || res.data
+  } catch (err) {
+    console.error("Gagal mengambil data mapel:", err)
+  }
+}
 
 const statusOptions = computed(() => [
   { value: "draft", label: "Draft" },
@@ -198,13 +203,13 @@ const statusOptions = computed(() => [
 ])
 
 onMounted(async () => {
+  fetchMapel()
   try {
     const id = route.params.id
     const { data } = await api.get(`/tryout/${id}`)
     form.value = {
       paket: data.paket ?? "",
       mapel_id: data.mapel_id ?? "",
-      mapel_nama: data.mapel_nama ?? "",
       durasi_menit: data.durasi_menit ?? "",
       mulai: data.mulai ?? "",
       selesai: data.selesai ?? "",
