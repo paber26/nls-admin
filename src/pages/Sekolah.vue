@@ -33,6 +33,12 @@
               <option value="ada">Sudah Ada Peserta</option>
               <option value="kosong">Belum Ada Peserta</option>
             </select>
+
+            <select v-model="perPage" class="px-4 py-2 border rounded-lg text-sm w-full md:w-32">
+              <option :value="20">20</option>
+              <option :value="50">50</option>
+              <option :value="100">100</option>
+            </select>
           </section>
 
           <!-- TABLE SEKOLAH -->
@@ -54,7 +60,7 @@
                 </tr>
 
                 <tr v-for="(school, index) in sekolah" :key="school.id" class="border-t">
-                  <td class="px-4 py-3 text-center">{{ index + 1 }}</td>
+                  <td class="px-4 py-3 text-center">{{ (currentPage - 1) * perPage + index + 1 }}</td>
                   <td class="px-4 py-3 font-medium">{{ school.nama }}</td>
                   <td class="px-4 py-3">{{ school.status || "-" }}</td>
                   <td class="px-4 py-3 text-center">{{ school.jumlah_peserta || 0 }}</td>
@@ -72,6 +78,27 @@
             </table>
           </section>
 
+          <!-- PAGINATION -->
+          <div class="flex justify-between items-center mt-4">
+            <button
+              @click="prevPage"
+              :disabled="currentPage === 1"
+              class="px-3 py-1 text-xs border rounded disabled:opacity-40"
+            >
+              Previous
+            </button>
+
+            <span class="text-xs text-slate-500">Halaman {{ currentPage }} dari {{ totalPages }}</span>
+
+            <button
+              @click="nextPage"
+              :disabled="currentPage === totalPages"
+              class="px-3 py-1 text-xs border rounded disabled:opacity-40"
+            >
+              Next
+            </button>
+          </div>
+
           <!-- INFO -->
           <p class="text-xs text-slate-500 mt-4">*Peringkat sekolah dihitung berdasarkan akumulasi nilai peserta.</p>
         </div>
@@ -87,7 +114,20 @@ import Sidebar from "../components/layout/Sidebar.vue"
 import api from "@/services/api"
 
 const sekolahRaw = ref([])
-const sekolah = computed(() => {
+const loading = ref(false)
+
+const searchQuery = ref("")
+const filterStatus = ref("")
+const filterPeserta = ref("")
+
+const currentPage = ref(1)
+const perPage = ref(20)
+
+const totalPages = computed(() => {
+  return Math.ceil(filteredSekolah.value.length / perPage.value) || 1
+})
+
+const filteredSekolah = computed(() => {
   return sekolahRaw.value.filter((item) => {
     const matchSearch = item.nama.toLowerCase().includes(searchQuery.value.toLowerCase())
 
@@ -101,11 +141,20 @@ const sekolah = computed(() => {
     return matchSearch && matchStatus && matchPeserta
   })
 })
-const loading = ref(false)
 
-const searchQuery = ref("")
-const filterStatus = ref("")
-const filterPeserta = ref("")
+const sekolah = computed(() => {
+  const start = (currentPage.value - 1) * perPage.value
+  const end = start + perPage.value
+  return filteredSekolah.value.slice(start, end)
+})
+
+const nextPage = () => {
+  if (currentPage.value < totalPages.value) currentPage.value++
+}
+
+const prevPage = () => {
+  if (currentPage.value > 1) currentPage.value--
+}
 
 const fetchSchools = async () => {
   loading.value = true
