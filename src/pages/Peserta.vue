@@ -41,6 +41,18 @@
               <option value="Lengkap">Lengkap</option>
               <option value="Belum Lengkap">Belum Lengkap</option>
             </select>
+
+            <select
+              v-model="perPage"
+              @change="handlePerPageChange"
+              class="px-4 py-2 border rounded-lg text-sm w-full md:w-40"
+            >
+              <option :value="10">10 / halaman</option>
+              <option :value="20">20 / halaman</option>
+              <option :value="50">50 / halaman</option>
+              <option :value="100">100 / halaman</option>
+              <option :value="200">200 / halaman</option>
+            </select>
           </section>
 
           <!-- ================= TABLE ================= -->
@@ -59,7 +71,7 @@
               </thead>
 
               <tbody>
-                <tr v-for="(peserta, index) in filteredPeserta" :key="peserta.id" class="border-t">
+                <tr v-for="(peserta, index) in pesertaList" :key="peserta.id" class="border-t">
                   <td class="px-4 py-3 text-center text-slate-500">
                     {{ index + 1 }}
                   </td>
@@ -97,13 +109,47 @@
 
           <!-- ================= PAGINATION ================= -->
           <div class="flex justify-between items-center mt-4 text-sm text-slate-600">
-            <span>Menampilkan 1–10 dari 3.462 peserta</span>
+            <span>
+              Menampilkan {{ (currentPage - 1) * perPage + 1 }}– {{ Math.min(currentPage * perPage, total) }} dari
+              {{ total }} peserta
+            </span>
 
             <div class="flex gap-2">
-              <button class="px-3 py-1 border rounded">Prev</button>
-              <button class="px-3 py-1 border rounded bg-primary text-white">1</button>
-              <button class="px-3 py-1 border rounded">2</button>
-              <button class="px-3 py-1 border rounded">Next</button>
+              <button
+                class="px-3 py-1 border rounded"
+                :disabled="currentPage === 1"
+                @click="changePage(currentPage - 1)"
+              >
+                Prev
+              </button>
+
+              <button v-if="startPage > 1" class="px-3 py-1 border rounded" @click="changePage(1)">1</button>
+
+              <span v-if="startPage > 2" class="px-2">...</span>
+
+              <button
+                v-for="page in visiblePages"
+                :key="page"
+                class="px-3 py-1 border rounded"
+                :class="page === currentPage ? 'bg-primary text-white' : ''"
+                @click="changePage(page)"
+              >
+                {{ page }}
+              </button>
+
+              <span v-if="endPage < lastPage - 1" class="px-2">...</span>
+
+              <button v-if="endPage < lastPage" class="px-3 py-1 border rounded" @click="changePage(lastPage)">
+                {{ lastPage }}
+              </button>
+
+              <button
+                class="px-3 py-1 border rounded"
+                :disabled="currentPage === lastPage"
+                @click="changePage(currentPage + 1)"
+              >
+                Next
+              </button>
             </div>
           </div>
         </div>
@@ -125,32 +171,60 @@ const filterSekolah = ref("")
 const filterKelas = ref("")
 const filterStatus = ref("")
 
-const filteredPeserta = computed(() => {
-  return pesertaList.value.filter((p) => {
-    const matchSearch =
-      !searchQuery.value ||
-      p.nama_lengkap?.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-      p.email?.toLowerCase().includes(searchQuery.value.toLowerCase())
-
-    const matchSekolah =
-      !filterSekolah.value || p.sekolah_nama?.toLowerCase().includes(filterSekolah.value.toLowerCase())
-
-    const matchKelas = !filterKelas.value || p.kelas === filterKelas.value
-
-    const matchStatus = !filterStatus.value || p.status_profil === filterStatus.value
-
-    return matchSearch && matchSekolah && matchKelas && matchStatus
-  })
-})
+const currentPage = ref(1)
+const lastPage = ref(1)
+const total = ref(0)
+const perPage = ref(10)
 
 const fetchPeserta = async () => {
   try {
-    const response = await api.get("/peserta")
-    pesertaList.value = response.data
-    console.log("Data peserta berhasil diambil:", response.data)
+    const response = await api.get("/peserta", {
+      params: {
+        page: currentPage.value,
+        per_page: perPage.value,
+        search: searchQuery.value,
+        sekolah: filterSekolah.value,
+        kelas: filterKelas.value,
+        status: filterStatus.value
+      }
+    })
+
+    pesertaList.value = response.data.data
+    currentPage.value = response.data.current_page
+    lastPage.value = response.data.last_page
+    total.value = response.data.total
   } catch (error) {
     console.error("Gagal mengambil data peserta:", error)
   }
+}
+
+const maxVisible = 5
+
+const startPage = computed(() => {
+  return Math.max(1, currentPage.value - Math.floor(maxVisible / 2))
+})
+
+const endPage = computed(() => {
+  return Math.min(lastPage.value, startPage.value + maxVisible - 1)
+})
+
+const visiblePages = computed(() => {
+  const pages = []
+  for (let i = startPage.value; i <= endPage.value; i++) {
+    pages.push(i)
+  }
+  return pages
+})
+
+const changePage = (page) => {
+  if (page < 1 || page > lastPage.value) return
+  currentPage.value = page
+  fetchPeserta()
+}
+
+const handlePerPageChange = () => {
+  currentPage.value = 1
+  fetchPeserta()
 }
 
 onMounted(() => {
