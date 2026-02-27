@@ -40,12 +40,9 @@
 
               <div>
                 <label class="text-sm text-slate-500">Kategori</label>
-                <select disabled class="w-full mt-1 px-4 py-2 border rounded-lg">
-                  <option selected value="KSN SMA">KSN SMA</option>
-                  <option value="OSN SMA">OSN SMA</option>
-                  <option value="Simulasi Nasional">Simulasi Nasional</option>
-                  <option value="Tryout Sekolah">Tryout Sekolah</option>
-                </select>
+                <div class="w-full mt-1 px-4 py-2 border rounded-lg bg-slate-50 text-slate-700 font-medium">
+                  OSN SMA
+                </div>
               </div>
 
               <div>
@@ -127,8 +124,7 @@ import {
   ImageToolbar,
   ImageStyle,
   ImageUpload,
-  ImageResize,
-  ImageResizeButtons
+  ImageResize
 } from "ckeditor5"
 
 const route = useRoute()
@@ -136,8 +132,27 @@ const router = useRouter()
 
 const editor = ClassicEditor
 
+function MyCustomUploadAdapterPlugin(editor) {
+  editor.plugins.get("FileRepository").createUploadAdapter = (loader) => {
+    return {
+      upload: async () => {
+        const file = await loader.file
+        const data = new FormData()
+        data.append("upload", file)
+
+        const response = await api.post("/upload-image", data)
+
+        return {
+          default: response.data.url
+        }
+      }
+    }
+  }
+}
+
 const editorConfig = {
   licenseKey: "GPL",
+  extraPlugins: [MyCustomUploadAdapterPlugin],
   plugins: [
     Essentials,
     Bold,
