@@ -22,6 +22,7 @@
             <tr>
               <th class="px-4 py-3 text-left">Nama Paket</th>
               <th class="px-4 py-3 text-left">Mapel</th>
+              <th class="px-4 py-3 text-center">Jumlah Soal</th>
               <th class="px-4 py-3 text-center">Periode</th>
               <th class="px-4 py-3 text-center">Status</th>
               <th class="px-4 py-3 text-center">Pembuat</th>
@@ -31,12 +32,15 @@
 
           <tbody>
             <tr v-if="loading">
-              <td colspan="6" class="px-4 py-6 text-center text-slate-400">Memuat data...</td>
+              <td colspan="7" class="px-4 py-6 text-center text-slate-400">Memuat data...</td>
             </tr>
 
             <tr v-for="item in tryouts" :key="item.id" class="border-t">
               <td class="px-4 py-3 font-medium">{{ item.paket }}</td>
               <td class="px-4 py-3">{{ item.mapel }}</td>
+              <td class="px-4 py-3 text-center font-medium">
+                {{ item.total_soal ?? 0 }}
+              </td>
 
               <td class="px-4 py-3 text-center text-xs text-slate-600">
                 <div class="flex flex-col leading-tight">
