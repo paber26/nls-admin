@@ -11,24 +11,89 @@
           <p class="text-sm text-slate-500">Daftar seluruh peserta yang terdaftar di platform</p>
         </header>
 
-        <div class="px-6 py-16 flex items-center justify-center">
-          <div class="max-w-xl w-full bg-white border rounded-2xl shadow-sm p-10 text-center">
-            <div
-              class="w-20 h-20 mx-auto mb-6 flex items-center justify-center rounded-full bg-blue-100 text-blue-600 text-4xl"
-            >
-              👥
-            </div>
+        <!-- Content -->
+        <div class="px-6 py-6">
+          <!-- ================= FILTER ================= -->
+          <section class="bg-white rounded-xl border p-4 mb-6 flex flex-wrap gap-4">
+            <input
+              type="text"
+              placeholder="Cari nama / email"
+              class="px-4 py-2 border rounded-lg text-sm w-full md:w-64"
+            />
 
-            <h2 class="text-xl font-semibold text-slate-800 mb-3">Modul Kelola Peserta Sedang Dikembangkan</h2>
+            <input type="text" placeholder="Sekolah" class="px-4 py-2 border rounded-lg text-sm w-full md:w-56" />
 
-            <p class="text-sm text-slate-500 leading-relaxed mb-6">
-              Fitur manajemen peserta seperti pencarian, filter sekolah, pengaturan status profil, dan monitoring
-              aktivitas akan segera tersedia. Sistem ini akan terintegrasi langsung dengan database peserta secara
-              real-time.
-            </p>
+            <select class="px-4 py-2 border rounded-lg text-sm w-full md:w-32">
+              <option>Kelas</option>
+              <option>X</option>
+              <option>XI</option>
+              <option>XII</option>
+            </select>
 
-            <div class="bg-slate-50 border rounded-lg px-4 py-3 text-xs text-slate-500">
-              🚀 Coming Soon — Manajemen Peserta Terintegrasi
+            <select class="px-4 py-2 border rounded-lg text-sm w-full md:w-40">
+              <option>Status Profil</option>
+              <option>Lengkap</option>
+              <option>Belum Lengkap</option>
+            </select>
+          </section>
+
+          <!-- ================= TABLE ================= -->
+          <section class="bg-white rounded-xl border overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead class="bg-slate-100">
+                <tr>
+                  <th class="px-4 py-3 text-left">Nama</th>
+                  <th class="px-4 py-3 text-left">Sekolah</th>
+                  <th class="px-4 py-3 text-center">Kelas</th>
+                  <th class="px-4 py-3 text-left">WhatsApp</th>
+                  <th class="px-4 py-3 text-center">Status</th>
+                  <th class="px-4 py-3 text-center">Aksi</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                <tr v-for="peserta in pesertaList" :key="peserta.id" class="border-t">
+                  <td class="px-4 py-3 font-medium">
+                    {{ peserta.nama_lengkap }}
+                  </td>
+                  <td class="px-4 py-3">
+                    {{ peserta.sekolah_nama }}
+                  </td>
+                  <td class="px-4 py-3 text-center">
+                    {{ peserta.kelas }}
+                  </td>
+                  <td class="px-4 py-3">
+                    {{ peserta.whatsapp }}
+                  </td>
+                  <td class="px-4 py-3 text-center">
+                    <span
+                      v-if="peserta.status_profil === 'Lengkap'"
+                      class="px-2 py-1 text-xs bg-emerald-100 text-emerald-600 rounded"
+                    >
+                      Lengkap
+                    </span>
+                    <span v-else class="px-2 py-1 text-xs bg-yellow-100 text-yellow-700 rounded">Belum Lengkap</span>
+                  </td>
+                  <td class="px-4 py-3 text-center space-x-2">
+                    <RouterLink :to="`/peserta/detail/${peserta.id}`" class="text-primary text-xs hover:underline">
+                      Detail
+                    </RouterLink>
+                    <a href="#" class="text-red-500 text-xs hover:underline">Nonaktifkan</a>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </section>
+
+          <!-- ================= PAGINATION ================= -->
+          <div class="flex justify-between items-center mt-4 text-sm text-slate-600">
+            <span>Menampilkan 1–10 dari 3.462 peserta</span>
+
+            <div class="flex gap-2">
+              <button class="px-3 py-1 border rounded">Prev</button>
+              <button class="px-3 py-1 border rounded bg-primary text-white">1</button>
+              <button class="px-3 py-1 border rounded">2</button>
+              <button class="px-3 py-1 border rounded">Next</button>
             </div>
           </div>
         </div>
@@ -38,8 +103,25 @@
 </template>
 
 <script setup>
-import { RouterLink, RouterView } from "vue-router"
+import { RouterLink } from "vue-router"
+import { ref, onMounted } from "vue"
+import api from "@/services/api"
 
 import Sidebar from "../components/layout/Sidebar.vue"
-import TopbarDashboard from "../components/layout/TopbarDashboard.vue"
+
+const pesertaList = ref([])
+
+const fetchPeserta = async () => {
+  try {
+    const response = await api.get("/peserta")
+    pesertaList.value = response.data
+    console.log("Data peserta berhasil diambil:", response.data)
+  } catch (error) {
+    console.error("Gagal mengambil data peserta:", error)
+  }
+}
+
+onMounted(() => {
+  fetchPeserta()
+})
 </script>

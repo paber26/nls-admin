@@ -4,13 +4,9 @@
     <div class="w-full max-w-md bg-white rounded-2xl shadow-lg p-8 text-center">
       <!-- Logo -->
       <div class="mb-6">
-        <div
-          class="w-16 h-16 bg-indigo-600 rounded-xl flex items-center justify-center text-white font-bold text-2xl mx-auto mb-4"
-        >
-          KSN
-        </div>
-        <h1 class="text-2xl font-bold text-slate-800">Login Tryout KSN</h1>
-        <p class="text-sm text-slate-500 mt-2">Masuk menggunakan akun Google untuk mulai tryout KSN SMA</p>
+        <img src="/nls-logo.png" alt="Next Level Study" class="w-24 mx-auto mb-4" />
+        <h1 class="text-2xl font-bold text-slate-800">Login Tryout OSN  </h1>
+        <p class="text-sm text-slate-500 mt-2">Masuk menggunakan akun Google untuk mulai tryout Next Level Study</p>
       </div>
 
       <!-- Google Button -->

@@ -41,7 +41,7 @@ const routes = [
     component: Peserta
   },
   {
-    path: "/peserta/detail",
+    path: "/peserta/detail/:id",
     name: "PesertaDetail",
     component: PesertaDetail
   },
