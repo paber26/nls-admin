@@ -20,43 +20,43 @@
         <!-- CONTENT -->
         <div class="px-6 py-6 w-full space-y-6">
           <!-- PROFIL PESERTA -->
-          <section class="bg-white rounded-xl border p-6 grid md:grid-cols-4 gap-6 text-sm">
-            <div>
-              <p class="text-slate-500">Nama</p>
-              <p class="font-medium">Budi Santoso</p>
-            </div>
-            <div>
-              <p class="text-slate-500">Sekolah</p>
-              <p class="font-medium">SMA Negeri 1 Jakarta</p>
-            </div>
-            <div>
-              <p class="text-slate-500">Kelas</p>
-              <p class="font-medium">XI</p>
-            </div>
-            <div>
-              <p class="text-slate-500">WhatsApp</p>
-              <p class="font-medium">0812xxxxxxx</p>
-            </div>
-            <div>
-              <p class="text-slate-500">Asal Daerah</p>
-              <p class="font-medium">DKI Jakarta</p>
-            </div>
-            <div>
-              <p class="text-slate-500">Email</p>
-              <p class="font-medium">budi@email.com</p>
-            </div>
-            <div>
-              <p class="text-slate-500">Tryout Diikuti</p>
-              <p class="font-medium">12</p>
-            </div>
-            <div>
-              <p class="text-slate-500">Status Akun</p>
-              <span class="px-2 py-1 text-xs bg-emerald-100 text-emerald-600 rounded">Aktif</span>
+          <section class="bg-white rounded-xl border p-6 text-sm">
+            <div v-if="loading" class="text-center py-10 text-slate-500">Memuat data peserta...</div>
+
+            <div v-else-if="peserta" class="grid md:grid-cols-4 gap-6">
+              <div>
+                <p class="text-slate-500">Nama</p>
+                <p class="font-medium">{{ peserta.nama_lengkap || peserta.name }}</p>
+              </div>
+              <div>
+                <p class="text-slate-500">Sekolah</p>
+                <p class="font-medium">{{ peserta.sekolah_nama }}</p>
+              </div>
+              <div>
+                <p class="text-slate-500">Kelas</p>
+                <p class="font-medium">{{ peserta.kelas }}</p>
+              </div>
+              <div>
+                <p class="text-slate-500">WhatsApp</p>
+                <p class="font-medium">{{ peserta.whatsapp }}</p>
+              </div>
+              <div>
+                <p class="text-slate-500">Asal Daerah</p>
+                <p class="font-medium">{{ peserta.provinsi }}{{ peserta.kota ? ", " + peserta.kota : "" }}</p>
+              </div>
+              <div>
+                <p class="text-slate-500">Email</p>
+                <p class="font-medium">{{ peserta.email }}</p>
+              </div>
+              <div>
+                <p class="text-slate-500">Tryout Diikuti</p>
+                <p class="font-medium">{{ peserta.total_tryout || 0 }}</p>
+              </div>
             </div>
           </section>
 
           <!-- RINGKASAN -->
-          <section class="grid md:grid-cols-3 gap-6">
+          <!-- <section class="grid md:grid-cols-3 gap-6">
             <div class="bg-white rounded-xl border p-6">
               <p class="text-sm text-slate-500">Nilai Terbaik</p>
               <p class="text-3xl font-semibold text-emerald-600 mt-2">98</p>
@@ -71,43 +71,12 @@
               <p class="text-sm text-slate-500">Peringkat Terbaik</p>
               <p class="text-3xl font-semibold text-indigo-600 mt-2">5</p>
             </div>
-          </section>
+          </section> -->
 
           <!-- RIWAYAT TRYOUT -->
-          <section class="bg-white rounded-xl border overflow-x-auto">
-            <div class="p-4 border-b">
-              <h3 class="font-semibold text-slate-800">Riwayat Tryout</h3>
-            </div>
-
-            <table class="w-full text-sm">
-              <thead class="bg-slate-100">
-                <tr>
-                  <th class="px-4 py-3 text-left">Nama Tryout</th>
-                  <th class="px-4 py-3 text-center">Mapel</th>
-                  <th class="px-4 py-3 text-center">Nilai</th>
-                  <th class="px-4 py-3 text-center">Peringkat</th>
-                  <th class="px-4 py-3 text-center">Tanggal</th>
-                </tr>
-              </thead>
-
-              <tbody>
-                <tr class="border-t">
-                  <td class="px-4 py-3 font-medium">Tryout KSN Matematika #1</td>
-                  <td class="px-4 py-3 text-center">Matematika</td>
-                  <td class="px-4 py-3 text-center font-semibold">98</td>
-                  <td class="px-4 py-3 text-center font-semibold">5</td>
-                  <td class="px-4 py-3 text-center">15 Jan 2026</td>
-                </tr>
-
-                <tr class="border-t bg-slate-50">
-                  <td class="px-4 py-3 font-medium">Tryout KSN Fisika #1</td>
-                  <td class="px-4 py-3 text-center">Fisika</td>
-                  <td class="px-4 py-3 text-center font-semibold">85</td>
-                  <td class="px-4 py-3 text-center font-semibold">12</td>
-                  <td class="px-4 py-3 text-center">12 Jan 2026</td>
-                </tr>
-              </tbody>
-            </table>
+          <section class="bg-white rounded-xl border p-10 text-center">
+            <h3 class="font-semibold text-slate-800 mb-2">Riwayat Tryout</h3>
+            <p class="text-slate-500">Fitur riwayat tryout sedang dalam tahap pengembangan.</p>
           </section>
 
           <p class="text-xs text-slate-500">
@@ -120,8 +89,29 @@
 </template>
 
 <script setup>
-import { RouterLink, RouterView } from "vue-router"
+import { RouterLink, useRoute } from "vue-router"
+import { ref, onMounted } from "vue"
+import api from "@/services/api"
 
 import Sidebar from "../components/layout/Sidebar.vue"
-import TopbarDashboard from "../components/layout/TopbarDashboard.vue"
+
+const route = useRoute()
+const peserta = ref(null)
+const loading = ref(true)
+
+const fetchPeserta = async () => {
+  try {
+    const { data } = await api.get(`/peserta/detail/${route.params.id}`)
+    peserta.value = data
+    console.log("Data peserta berhasil diambil:", data)
+  } catch (error) {
+    console.error("Gagal mengambil detail peserta", error)
+  } finally {
+    loading.value = false
+  }
+}
+
+onMounted(() => {
+  fetchPeserta()
+})
 </script>
