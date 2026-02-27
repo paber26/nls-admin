@@ -57,12 +57,9 @@
               <div v-for="(opsi, index) in opsiJawaban" :key="index" class="flex gap-2 mb-2">
                 <input type="radio" name="jawaban_benar" :checked="opsi.is_correct" @change="setJawabanBenar(index)" />
 
-                <input
-                  v-model="opsi.text"
-                  type="text"
-                  class="flex-1 px-4 py-2 border rounded-lg text-sm"
-                  :placeholder="`Opsi ${index + 1}`"
-                />
+                <div class="flex-1">
+                  <ckeditor :editor="editor" v-model="opsi.text" :config="editorConfig" />
+                </div>
 
                 <input
                   v-model.number="opsi.poin"
@@ -92,12 +89,9 @@
               <div v-for="(item, index) in pernyataanKompleks" :key="index" class="flex items-center gap-3 mb-2">
                 <span class="text-sm w-5">{{ index + 1 }}.</span>
 
-                <input
-                  v-model="item.text"
-                  type="text"
-                  class="flex-1 px-4 py-2 border rounded-lg text-sm"
-                  placeholder="Tulis pernyataan"
-                />
+                <div class="flex-1">
+                  <ckeditor :editor="editor" v-model="item.text" :config="editorConfig" />
+                </div>
 
                 <select v-model="item.jawaban" class="px-3 py-2 border rounded-lg text-sm">
                   <option :value="true">Benar</option>
