@@ -23,7 +23,7 @@
         <!-- Content -->
         <div class="px-6 py-6">
           <!-- ================= FILTER ================= -->
-          <section class="bg-white rounded-xl border p-4 mb-6 flex flex-wrap gap-4">
+          <section class="bg-white rounded-xl border p-4 mb-6 flex flex-wrap gap-4 items-center justify-between">
             <select
               v-model="selectedMapel"
               @change="fetchBankSoal"
@@ -50,6 +50,20 @@
               <option value="draft">Draft</option>
               <option value="aktif">Aktif</option>
             </select>
+
+            <div class="flex items-center gap-2 text-sm">
+              <span class="text-slate-500">Tampilkan:</span>
+              <select
+                v-model.number="perPage"
+                @change="handlePerPageChange"
+                class="px-3 py-2 border rounded-lg text-sm"
+              >
+                <option :value="20">20</option>
+                <option :value="50">50</option>
+                <option :value="100">100</option>
+                <option :value="200">200</option>
+              </select>
+            </div>
           </section>
 
           <!-- ================= TABLE PAKET ================= -->
@@ -97,7 +111,7 @@
           </section>
 
           <!-- ================= PAGINATION ================= -->
-          <div class="flex justify-between items-center mt-4 text-sm">
+          <div class="flex flex-wrap gap-3 justify-between items-center mt-4 text-sm">
             <button
               @click="goToPage(currentPage - 1)"
               :disabled="currentPage === 1"
@@ -222,6 +236,11 @@ const fetchBankSoal = async () => {
 const goToPage = (page) => {
   if (page < 1 || page > lastPage.value) return
   currentPage.value = page
+  fetchBankSoal()
+}
+
+const handlePerPageChange = () => {
+  currentPage.value = 1
   fetchBankSoal()
 }
 
