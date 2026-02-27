@@ -16,24 +16,30 @@
           <!-- ================= FILTER ================= -->
           <section class="bg-white rounded-xl border p-4 mb-6 flex flex-wrap gap-4">
             <input
+              v-model="searchQuery"
               type="text"
               placeholder="Cari nama / email"
               class="px-4 py-2 border rounded-lg text-sm w-full md:w-64"
             />
 
-            <input type="text" placeholder="Sekolah" class="px-4 py-2 border rounded-lg text-sm w-full md:w-56" />
+            <input
+              v-model="filterSekolah"
+              type="text"
+              placeholder="Sekolah"
+              class="px-4 py-2 border rounded-lg text-sm w-full md:w-56"
+            />
 
-            <select class="px-4 py-2 border rounded-lg text-sm w-full md:w-32">
-              <option>Kelas</option>
-              <option>X</option>
-              <option>XI</option>
-              <option>XII</option>
+            <select v-model="filterKelas" class="px-4 py-2 border rounded-lg text-sm w-full md:w-32">
+              <option value="">Kelas</option>
+              <option value="X">X</option>
+              <option value="XI">XI</option>
+              <option value="XII">XII</option>
             </select>
 
-            <select class="px-4 py-2 border rounded-lg text-sm w-full md:w-40">
-              <option>Status Profil</option>
-              <option>Lengkap</option>
-              <option>Belum Lengkap</option>
+            <select v-model="filterStatus" class="px-4 py-2 border rounded-lg text-sm w-full md:w-40">
+              <option value="">Status Profil</option>
+              <option value="Lengkap">Lengkap</option>
+              <option value="Belum Lengkap">Belum Lengkap</option>
             </select>
           </section>
 
@@ -42,6 +48,7 @@
             <table class="w-full text-sm">
               <thead class="bg-slate-100">
                 <tr>
+                  <th class="px-4 py-3 text-center w-12">No</th>
                   <th class="px-4 py-3 text-left">Nama</th>
                   <th class="px-4 py-3 text-left">Sekolah</th>
                   <th class="px-4 py-3 text-center">Kelas</th>
@@ -52,7 +59,10 @@
               </thead>
 
               <tbody>
-                <tr v-for="peserta in pesertaList" :key="peserta.id" class="border-t">
+                <tr v-for="(peserta, index) in filteredPeserta" :key="peserta.id" class="border-t">
+                  <td class="px-4 py-3 text-center text-slate-500">
+                    {{ index + 1 }}
+                  </td>
                   <td class="px-4 py-3 font-medium">
                     {{ peserta.nama_lengkap }}
                   </td>
@@ -103,13 +113,35 @@
 </template>
 
 <script setup>
-import { RouterLink } from "vue-router"
-import { ref, onMounted } from "vue"
+import { ref, onMounted, computed } from "vue"
 import api from "@/services/api"
 
 import Sidebar from "../components/layout/Sidebar.vue"
 
 const pesertaList = ref([])
+
+const searchQuery = ref("")
+const filterSekolah = ref("")
+const filterKelas = ref("")
+const filterStatus = ref("")
+
+const filteredPeserta = computed(() => {
+  return pesertaList.value.filter((p) => {
+    const matchSearch =
+      !searchQuery.value ||
+      p.nama_lengkap?.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
+      p.email?.toLowerCase().includes(searchQuery.value.toLowerCase())
+
+    const matchSekolah =
+      !filterSekolah.value || p.sekolah_nama?.toLowerCase().includes(filterSekolah.value.toLowerCase())
+
+    const matchKelas = !filterKelas.value || p.kelas === filterKelas.value
+
+    const matchStatus = !filterStatus.value || p.status_profil === filterStatus.value
+
+    return matchSearch && matchSekolah && matchKelas && matchStatus
+  })
+})
 
 const fetchPeserta = async () => {
   try {

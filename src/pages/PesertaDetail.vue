@@ -30,7 +30,7 @@
               </div>
               <div>
                 <p class="text-slate-500">Sekolah</p>
-                <p class="font-medium">{{ peserta.sekolah_nama }}</p>
+                <p class="font-medium">{{ peserta.sekolah.nama }}</p>
               </div>
               <div>
                 <p class="text-slate-500">Kelas</p>
