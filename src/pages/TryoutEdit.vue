@@ -77,6 +77,14 @@
               <ckeditor :editor="editor" v-model="form.ketentuan_khusus" :config="editorConfig" class="mt-2" />
             </section>
 
+            <!-- PESAN SETELAH SELESAI -->
+            <section class="bg-white rounded-xl border p-6">
+              <label class="text-sm text-slate-500">
+                Pesan Setelah Selesai (ditampilkan setelah peserta submit tryout)
+              </label>
+              <ckeditor :editor="editor" v-model="form.pesan_selesai" :config="editorConfig" class="mt-2" />
+            </section>
+
             <!-- STATUS -->
             <section class="bg-white rounded-xl border p-6 grid gap-2">
               <label class="text-sm text-slate-500">Status Tryout</label>
@@ -197,7 +205,8 @@ const form = ref({
   durasi_menit: "",
   mulai: "",
   selesai: "",
-  ketentuan_khusus: ""
+  ketentuan_khusus: "",
+  pesan_selesai: ""
 })
 
 const mapels = ref([])
@@ -229,7 +238,8 @@ onMounted(async () => {
       mulai: data.mulai ?? "",
       selesai: data.selesai ?? "",
       status: data.status ?? "",
-      ketentuan_khusus: data.ketentuan_khusus ?? ""
+      ketentuan_khusus: data.ketentuan_khusus ?? "",
+      pesan_selesai: data.pesan_selesai ?? ""
     }
   } catch (err) {
     // handle error, e.g. notify user
@@ -246,7 +256,8 @@ const handleSubmit = async () => {
       mulai: form.value.mulai,
       selesai: form.value.selesai,
       status: form.value.status,
-      ketentuan_khusus: form.value.ketentuan_khusus
+      ketentuan_khusus: form.value.ketentuan_khusus,
+      pesan_selesai: form.value.pesan_selesai
     }
 
     const res = await api.put(`/tryout/${id}`, payload)
