@@ -12,26 +12,61 @@
         </header>
 
         <!-- CONTENT -->
-        <div class="px-6 py-20 flex items-center justify-center bg-gradient-to-b from-white to-slate-50">
-          <div class="max-w-xl w-full bg-white border border-slate-200 rounded-3xl shadow-sm p-12 text-center">
-            <div
-              class="w-24 h-24 mx-auto mb-8 flex items-center justify-center rounded-full bg-indigo-100 text-indigo-600 text-5xl shadow-inner"
-            >
-              🏫
-            </div>
+        <div class="px-6 py-6 w-full">
+          <!-- FILTER -->
+          <section class="bg-white rounded-xl border p-4 mb-6 flex flex-wrap gap-4">
+            <input
+              type="text"
+              placeholder="Cari nama sekolah"
+              class="px-4 py-2 border rounded-lg text-sm w-full md:w-72"
+            />
 
-            <h2 class="text-2xl font-semibold text-slate-800 mb-3">Modul Data Sekolah Sedang Dikembangkan</h2>
+            <select class="px-4 py-2 border rounded-lg text-sm w-full md:w-48">
+              <option>Semua Provinsi</option>
+              <option>DKI Jakarta</option>
+              <option>Jawa Barat</option>
+              <option>Jawa Tengah</option>
+              <option>Sulawesi Utara</option>
+            </select>
+          </section>
 
-            <p class="text-sm text-slate-500 leading-relaxed mb-8">
-              Fitur manajemen sekolah, statistik peserta, serta integrasi peringkat antar sekolah akan segera tersedia
-              dalam versi berikutnya. Nantinya sistem akan menampilkan distribusi peserta, performa rata-rata, dan
-              analisis berbasis data secara real-time.
-            </p>
+          <!-- TABLE SEKOLAH -->
+          <section class="bg-white rounded-xl border overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead class="bg-slate-100">
+                <tr>
+                  <th class="px-4 py-3 text-left">Nama Sekolah</th>
+                  <th class="px-4 py-3 text-left">Status</th>
+                  <th class="px-4 py-3 text-center">Jumlah Peserta</th>
+                  <th class="px-4 py-3 text-center">Aksi</th>
+                </tr>
+              </thead>
 
-            <div class="bg-slate-50 border border-slate-200 rounded-xl px-6 py-4 text-xs text-slate-500">
-              🚀 Coming Soon — Statistik Sekolah & Analitik Peserta
-            </div>
-          </div>
+              <tbody>
+                <tr v-if="loading">
+                  <td colspan="4" class="px-4 py-6 text-center text-slate-500">Memuat data sekolah...</td>
+                </tr>
+
+                <tr v-for="(school, index) in sekolah" :key="school.id" class="border-t">
+                  <td class="px-4 py-3 font-medium">{{ school.nama }}</td>
+                  <td class="px-4 py-3">{{ school.status || "-" }}</td>
+                  <td class="px-4 py-3 text-center">{{ school.jumlah_peserta || 0 }}</td>
+                  <td class="px-4 py-3 text-center">
+                    <RouterLink :to="`/sekolah/detail/${school.id}`" class="text-indigo-500 text-xs hover:underline">
+                      Detail
+                    </RouterLink>
+                  </td>
+                </tr>
+
+                <tr v-if="!loading && sekolah.length === 0">
+                  <td colspan="4" class="px-4 py-6 text-center text-slate-500">Belum ada data sekolah</td>
+                </tr>
+              </tbody>
+            </table>
+          </section>
+
+          <!-- INFO -->
+          <p class="text-xs text-slate-500 mt-4">*Peringkat sekolah dihitung berdasarkan akumulasi nilai peserta.</p>
         </div>
       </main>
     </div>
@@ -39,8 +74,28 @@
 </template>
 
 <script setup>
-import { RouterLink, RouterView } from "vue-router"
-
+import { ref, onMounted } from "vue"
+import { RouterLink } from "vue-router"
 import Sidebar from "../components/layout/Sidebar.vue"
-import TopbarDashboard from "../components/layout/TopbarDashboard.vue"
+import api from "@/services/api"
+
+const sekolah = ref([])
+const loading = ref(false)
+
+const fetchSchools = async () => {
+  loading.value = true
+  try {
+    const res = await api.get("/sekolah")
+    sekolah.value = res.data.data || res.data
+    console.log("Data sekolah:", sekolah.value)
+  } catch (err) {
+    console.error("Gagal mengambil data sekolah:", err)
+  } finally {
+    loading.value = false
+  }
+}
+
+onMounted(() => {
+  fetchSchools()
+})
 </script>
