@@ -13,6 +13,14 @@
 
         <!-- Content -->
         <div class="px-6 py-6">
+          <div class="flex justify-end mb-4">
+            <button
+              @click="showModal = true"
+              class="px-5 py-2.5 bg-indigo-600 text-white text-sm font-semibold rounded-lg shadow-md hover:bg-indigo-700 transition"
+            >
+              + Tambah Peserta
+            </button>
+          </div>
           <!-- ================= FILTER ================= -->
           <section class="bg-white rounded-xl border p-4 mb-6 flex flex-wrap gap-4">
             <input
@@ -97,7 +105,7 @@
                     <span v-else class="px-2 py-1 text-xs bg-yellow-100 text-yellow-700 rounded">Belum Lengkap</span>
                   </td>
                   <td class="px-4 py-3 text-center space-x-2">
-                    <RouterLink :to="`/peserta/detail/${peserta.id}`" class="text-primary text-xs hover:underline">
+                    <RouterLink :to="`/peserta/detail/${peserta.id}`" class="text-indigo-500 text-xs hover:underline">
                       Detail
                     </RouterLink>
                     <a href="#" class="text-red-500 text-xs hover:underline">Nonaktifkan</a>
@@ -131,7 +139,7 @@
                 v-for="page in visiblePages"
                 :key="page"
                 class="px-3 py-1 border rounded"
-                :class="page === currentPage ? 'bg-primary text-white' : ''"
+                :class="page === currentPage ? 'bg-indigo-500 text-white' : ''"
                 @click="changePage(page)"
               >
                 {{ page }}
@@ -149,6 +157,87 @@
                 @click="changePage(currentPage + 1)"
               >
                 Next
+              </button>
+            </div>
+          </div>
+
+          <!-- ================= MODAL TAMBAH PESERTA ================= -->
+          <div v-if="showModal" class="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+            <div class="bg-white w-[500px] rounded-xl p-6 relative">
+              <button @click="closeModal" class="absolute top-3 right-3 text-slate-500">✕</button>
+              <h2 class="text-lg font-semibold mb-4">Tambah Peserta</h2>
+
+              <div class="space-y-3">
+                <div class="relative">
+                  <input
+                    v-model="sekolahSearch"
+                    type="text"
+                    placeholder="Cari & pilih sekolah..."
+                    class="w-full px-4 py-2 border rounded-lg text-sm"
+                    @focus="showSekolahDropdown = true"
+                  />
+
+                  <div
+                    v-if="showSekolahDropdown && filteredSekolah.length"
+                    class="absolute z-10 mt-1 w-full max-h-48 overflow-y-auto bg-white border rounded-lg shadow"
+                  >
+                    <div
+                      v-for="s in filteredSekolah"
+                      :key="s.id"
+                      @click="selectSekolah(s)"
+                      class="px-4 py-2 text-sm hover:bg-indigo-50 cursor-pointer"
+                    >
+                      {{ s.nama }}
+                    </div>
+                  </div>
+                </div>
+
+                <input
+                  v-model="form.nama_lengkap"
+                  type="text"
+                  placeholder="Nama Lengkap"
+                  class="w-full px-4 py-2 border rounded-lg text-sm"
+                />
+
+                <select v-model="form.kelas" class="w-full px-4 py-2 border rounded-lg text-sm">
+                  <option value="">Pilih Kelas</option>
+                  <option value="X">X</option>
+                  <option value="XI">XI</option>
+                  <option value="XII">XII</option>
+                </select>
+
+                <input
+                  v-model="form.email"
+                  type="email"
+                  placeholder="Alamat Email"
+                  class="w-full px-4 py-2 border rounded-lg text-sm"
+                />
+
+                <input
+                  v-model="form.whatsapp"
+                  type="tel"
+                  placeholder="No Whatsapp, Contoh: 08xxxx"
+                  class="w-full px-4 py-2 border rounded-lg text-sm"
+                  @input="form.whatsapp = form.whatsapp.replace(/[^0-9]/g, '')"
+                />
+              </div>
+
+              <div class="flex justify-end gap-2 mt-6">
+                <button @click="closeModal" class="px-4 py-2 border rounded text-sm">Batal</button>
+                <button @click="submitPeserta" class="px-4 py-2 bg-indigo-500 text-white rounded text-sm">
+                  Simpan
+                </button>
+              </div>
+            </div>
+          </div>
+          <div v-if="showPopup" class="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+            <div class="bg-white w-[350px] rounded-xl p-6 text-center">
+              <p class="text-sm text-slate-700 mb-4">{{ popupMessage }}</p>
+              <button
+                @click="showPopup = false"
+                class="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm hover:bg-indigo-700"
+              >
+                OK
               </button>
             </div>
           </div>
@@ -176,6 +265,34 @@ const lastPage = ref(1)
 const total = ref(0)
 const perPage = ref(10)
 
+const showModal = ref(false)
+const showPopup = ref(false)
+const popupMessage = ref("")
+
+const sekolahOptions = ref([])
+
+const sekolahSearch = ref("")
+const showSekolahDropdown = ref(false)
+
+const form = ref({
+  sekolah_id: "",
+  nama_lengkap: "",
+  kelas: "",
+  email: "",
+  whatsapp: ""
+})
+
+const filteredSekolah = computed(() => {
+  if (!sekolahSearch.value) return sekolahOptions.value
+  return sekolahOptions.value.filter((s) => s.nama.toLowerCase().includes(sekolahSearch.value.toLowerCase()))
+})
+
+const selectSekolah = (sekolah) => {
+  form.value.sekolah_id = sekolah.id
+  sekolahSearch.value = sekolah.nama
+  showSekolahDropdown.value = false
+}
+
 watch([searchQuery, filterSekolah, filterKelas, filterStatus], () => {
   currentPage.value = 1
   fetchPeserta()
@@ -200,6 +317,101 @@ const fetchPeserta = async () => {
     total.value = response.data.total
   } catch (error) {
     console.error("Gagal mengambil data peserta:", error)
+  }
+}
+
+const fetchSekolah = async () => {
+  try {
+    const res = await api.get("/sekolah", { params: { per_page: 1000 } })
+    sekolahOptions.value = res.data.data ?? res.data
+  } catch (err) {
+    console.error("Gagal mengambil sekolah:", err)
+  }
+}
+
+const closeModal = () => {
+  showModal.value = false
+  form.value = {
+    sekolah_id: "",
+    nama_lengkap: "",
+    kelas: "",
+    email: "",
+    whatsapp: ""
+  }
+  sekolahSearch.value = ""
+  showSekolahDropdown.value = false
+}
+
+const submitPeserta = async () => {
+  // ===== VALIDASI FRONTEND =====
+  if (!form.value.sekolah_id) {
+    popupMessage.value = "Sekolah wajib dipilih"
+    showPopup.value = true
+    return
+  }
+
+  if (!form.value.nama_lengkap) {
+    popupMessage.value = "Nama lengkap wajib diisi"
+    showPopup.value = true
+    return
+  }
+
+  if (!form.value.kelas) {
+    popupMessage.value = "Kelas wajib dipilih"
+    showPopup.value = true
+    return
+  }
+
+  if (!form.value.email) {
+    popupMessage.value = "Email wajib diisi"
+    showPopup.value = true
+    return
+  }
+
+  // Validasi format email sederhana
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  if (!emailRegex.test(form.value.email)) {
+    popupMessage.value = "Format email tidak valid"
+    showPopup.value = true
+    return
+  }
+
+  if (!form.value.whatsapp) {
+    popupMessage.value = "Nomor WhatsApp wajib diisi"
+    showPopup.value = true
+    return
+  }
+
+  // Validasi nomor Indonesia (harus mulai dengan 08 dan 10–15 digit)
+  const waRegex = /^08[0-9]{8,13}$/
+  if (!waRegex.test(form.value.whatsapp)) {
+    popupMessage.value = "Nomor WhatsApp harus diawali 08 dan hanya berisi angka"
+    showPopup.value = true
+    return
+  }
+
+  try {
+    await api.post("/peserta", form.value)
+
+    popupMessage.value = "Peserta berhasil ditambahkan"
+    showPopup.value = true
+
+    closeModal()
+    fetchPeserta()
+  } catch (err) {
+    console.error("Gagal menambahkan peserta:", err)
+
+    const response = err.response?.data
+
+    // Jika email sudah pernah terdaftar
+    if (response?.errors?.email) {
+      popupMessage.value = "Peserta dengan email tersebut sudah terdaftar"
+      showPopup.value = true
+      return
+    }
+
+    popupMessage.value = "Gagal menambahkan peserta. Periksa kembali data yang diisi."
+    showPopup.value = true
   }
 }
 
@@ -234,5 +446,6 @@ const handlePerPageChange = () => {
 
 onMounted(() => {
   fetchPeserta()
+  fetchSekolah()
 })
 </script>
