@@ -24,23 +24,29 @@
               <th class="px-4 py-3 text-left">Email</th>
               <th class="px-4 py-3 text-left">Sekolah</th>
               <th class="px-4 py-3 text-center">Mulai</th>
+              <th class="px-4 py-3 text-center">Durasi</th>
+              <th class="px-4 py-3 text-center">Detail</th>
             </tr>
           </thead>
           <tbody>
             <tr v-if="loading">
-              <td colspan="5" class="px-4 py-6 text-center text-slate-400">Memuat data peserta...</td>
+              <td colspan="7" class="px-4 py-6 text-center text-slate-400">Memuat data peserta...</td>
             </tr>
             <tr v-for="(item, index) in ongoingParticipants" :key="item.id" class="border-t">
               <td class="px-4 py-3">{{ index + 1 }}</td>
               <td class="px-4 py-3 font-medium">{{ item.name }}</td>
-              <td class="px-4 py-3">{{ item.email }}</td>
+              <td class="px-4 py-3">{{ item.email ?? "-" }}</td>
               <td class="px-4 py-3">{{ item.sekolah_nama ?? "-" }}</td>
-              <td class="px-4 py-3 text-center text-xs">
-                {{ formatDate(item.mulai) }}
+              <td class="px-4 py-3 text-center text-xs">{{ formatDate(item.mulai) }}</td>
+              <td class="px-4 py-3 text-center text-xs">{{ calculateDuration(item.mulai, item.selesai) }}</td>
+              <td class="px-4 py-3 text-center">
+                <button @click="openDetail(item)" class="text-xs bg-slate-200 px-3 py-1 rounded hover:bg-slate-300">
+                  Lihat
+                </button>
               </td>
             </tr>
             <tr v-if="!loading && ongoingParticipants.length === 0">
-              <td colspan="5" class="px-4 py-6 text-center text-slate-400">
+              <td colspan="7" class="px-4 py-6 text-center text-slate-400">
                 Tidak ada peserta yang sedang mengerjakan.
               </td>
             </tr>
@@ -63,29 +69,83 @@
               <th class="px-4 py-3 text-center">Nilai</th>
               <th class="px-4 py-3 text-center">Mulai</th>
               <th class="px-4 py-3 text-center">Selesai</th>
+              <th class="px-4 py-3 text-center">Durasi</th>
+              <th class="px-4 py-3 text-center">Detail</th>
             </tr>
           </thead>
           <tbody>
             <tr v-if="loading">
-              <td colspan="7" class="px-4 py-6 text-center text-slate-400">Memuat data peserta...</td>
+              <td colspan="9" class="px-4 py-6 text-center text-slate-400">Memuat data peserta...</td>
             </tr>
             <tr v-for="(item, index) in finishedParticipants" :key="item.id" class="border-t">
               <td class="px-4 py-3">{{ index + 1 }}</td>
               <td class="px-4 py-3 font-medium">{{ item.name }}</td>
-              <td class="px-4 py-3">{{ item.email }}</td>
+              <td class="px-4 py-3">{{ item.email ?? "-" }}</td>
               <td class="px-4 py-3">{{ item.sekolah_nama ?? "-" }}</td>
               <td class="px-4 py-3 text-center font-semibold">{{ item.nilai ?? "-" }}</td>
               <td class="px-4 py-3 text-center text-xs">{{ formatDate(item.mulai) }}</td>
               <td class="px-4 py-3 text-center text-xs">{{ formatDate(item.selesai) }}</td>
+              <td class="px-4 py-3 text-center text-xs">{{ calculateDuration(item.mulai, item.selesai) }}</td>
+              <td class="px-4 py-3 text-center">
+                <button @click="openDetail(item)" class="text-xs bg-slate-200 px-3 py-1 rounded hover:bg-slate-300">
+                  Lihat
+                </button>
+              </td>
             </tr>
             <tr v-if="!loading && finishedParticipants.length === 0">
-              <td colspan="7" class="px-4 py-6 text-center text-slate-400">
+              <td colspan="9" class="px-4 py-6 text-center text-slate-400">
                 Belum ada peserta yang menyelesaikan tryout.
               </td>
             </tr>
           </tbody>
         </table>
       </section>
+
+      <div v-if="showModal" class="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+        <div class="bg-white w-[420px] rounded-xl p-6 relative">
+          <button @click="showModal = false" class="absolute top-3 right-3 text-slate-500">✕</button>
+          <h3 class="text-lg font-semibold mb-4">Detail Peserta</h3>
+
+          <div class="space-y-2 text-sm">
+            <div>
+              <strong>Nama:</strong>
+              {{ selectedParticipant?.name }}
+            </div>
+            <div>
+              <strong>Email:</strong>
+              {{ selectedParticipant?.email }}
+            </div>
+            <div>
+              <strong>Sekolah:</strong>
+              {{ selectedParticipant?.sekolah_nama }}
+            </div>
+            <div>
+              <strong>WhatsApp:</strong>
+              {{ selectedParticipant?.whatsapp ?? "-" }}
+            </div>
+            <div>
+              <strong>Status:</strong>
+              {{ selectedParticipant?.status }}
+            </div>
+            <div>
+              <strong>Nilai:</strong>
+              {{ selectedParticipant?.nilai ?? "-" }}
+            </div>
+            <div>
+              <strong>Mulai:</strong>
+              {{ formatDate(selectedParticipant?.mulai) }}
+            </div>
+            <div>
+              <strong>Selesai:</strong>
+              {{ formatDate(selectedParticipant?.selesai) }}
+            </div>
+            <div>
+              <strong>Durasi:</strong>
+              {{ calculateDuration(selectedParticipant?.mulai, selectedParticipant?.selesai) }}
+            </div>
+          </div>
+        </div>
+      </div>
     </main>
   </div>
 </template>
@@ -96,6 +156,28 @@ import api from "@/services/api"
 import Sidebar from "@/components/layout/Sidebar.vue"
 
 const participants = ref([])
+
+const showModal = ref(false)
+const selectedParticipant = ref(null)
+
+const openDetail = (item) => {
+  selectedParticipant.value = item
+  showModal.value = true
+}
+
+const calculateDuration = (start, end) => {
+  if (!start) return "-"
+  const startTime = new Date(start)
+  const endTime = end ? new Date(end) : new Date()
+  const diffMs = endTime - startTime
+  const minutes = Math.floor(diffMs / 60000)
+  const hours = Math.floor(minutes / 60)
+  const remainingMinutes = minutes % 60
+  if (hours > 0) {
+    return `${hours}j ${remainingMinutes}m`
+  }
+  return `${remainingMinutes}m`
+}
 
 const ongoingParticipants = computed(() => participants.value.filter((p) => p.status === "ongoing"))
 
