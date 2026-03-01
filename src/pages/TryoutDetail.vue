@@ -160,8 +160,8 @@
               </div>
             </div>
 
-            <!-- OPSI PG -->
-            <ul v-if="item.tipe === 'pg'" class="space-y-2 text-sm">
+            <!-- OPSI PG & PG MAJEMUK -->
+            <ul v-if="item.tipe === 'pg' || item.tipe === 'pg_majemuk'" class="space-y-2 text-sm">
               <li
                 v-for="opsi in item.opsi"
                 :key="opsi.id"
@@ -254,6 +254,9 @@ onMounted(async () => {
 
     tryout.value = tryoutRes.data
     soalList.value = soalRes.data
+
+    console.log("Data Tryout API Response:", tryout.value)
+    console.log("Data Soal API Response:", soalList.value)
 
     // tampilkan dulu kontennya
     loading.value = false
