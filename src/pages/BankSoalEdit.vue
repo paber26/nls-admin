@@ -69,7 +69,7 @@
             </span>
           </label>
 
-          <div v-for="(opsi, i) in opsiJawaban" :key="i" class="flex gap-2 mb-2">
+          <div v-for="(opsi, i) in opsiJawaban" :key="opsi._key" class="flex gap-2 mb-2">
             <!-- Radio for PG -->
             <template v-if="tipeSoal === 'pg'">
               <input type="radio" :checked="opsi.is_correct" @change="setJawabanBenar(i)" />
@@ -88,7 +88,7 @@
               Hapus
             </button>
 
-            <input v-model.number="opsi.poin" type="number" class="w-24 px-2 py-2 border rounded-lg" />
+            <input v-model.number="opsi.poin" type="number" step="0.01" class="w-24 px-2 py-2 border rounded-lg" />
           </div>
 
           <button type="button" class="mt-2 px-4 py-2 border rounded-lg text-sm" @click="tambahOpsi">
@@ -179,7 +179,7 @@ import {
   ImageResize,
   ImageUpload
 } from "ckeditor5"
-import { ref, onMounted } from "vue"
+import { ref, onMounted, nextTick } from "vue"
 import { useRoute, useRouter } from "vue-router"
 import api from "@/services/api"
 import Sidebar from "@/components/layout/Sidebar.vue"
@@ -195,6 +195,7 @@ const pertanyaan = ref("")
 const pembahasan = ref("")
 const jawabanIsian = ref("")
 const opsiJawaban = ref([])
+const generateKey = () => `${Date.now()}-${Math.random()}`
 const pernyataanKompleks = ref([
   { text: "", jawaban: true },
   { text: "", jawaban: true },
@@ -258,6 +259,7 @@ const setJawabanBenar = (index) => {
 
 const tambahOpsi = () => {
   opsiJawaban.value.push({
+    _key: generateKey(),
     text: "",
     poin: 0,
     is_correct: false
@@ -292,10 +294,24 @@ onMounted(async () => {
     opsiJawaban.value = []
     pernyataanKompleks.value = []
   } else if (data.tipe === "pg" || data.tipe === "pg_majemuk") {
-    opsiJawaban.value = data.opsi_jawaban ?? []
+    opsiJawaban.value = (data.opsi_jawaban || []).map((o) => ({
+      _key: generateKey(),
+      text: o.text ?? "",
+      poin: o.poin ?? 0,
+      is_correct: o.is_correct ?? false
+    }))
     pernyataanKompleks.value = []
+    if (!opsiJawaban.value.length) {
+      opsiJawaban.value = [
+        { _key: generateKey(), text: "", poin: 0, is_correct: false },
+        { _key: generateKey(), text: "", poin: 0, is_correct: false }
+      ]
+    }
   } else if (data.tipe === "pg_kompleks") {
-    pernyataanKompleks.value = data.pernyataan ?? []
+    pernyataanKompleks.value = (data.pernyataan || []).map((p) => ({
+      text: p.text ?? "",
+      jawaban: p.jawaban ?? true
+    }))
     opsiJawaban.value = []
   }
 })
@@ -379,15 +395,30 @@ const submitEdit = async () => {
     pernyataan: tipeSoal.value === "pg_kompleks" ? pernyataanKompleks.value : []
   }
 
-  const res = await api.put(`/banksoal/${id}`, payload)
+  try {
+    const res = await api.put(`/banksoal/${id}`, payload)
 
-  loading.value = false
-  successMessage.value = res.data.message || "Soal berhasil diperbarui"
-  showSuccessPopup.value = true
+    successMessage.value = res?.data?.message || "Soal berhasil diperbarui"
+    showSuccessPopup.value = true
+  } catch (err) {
+    console.error("Update error:", err)
+
+    errorMessage.value = err?.response?.data?.message || "Terjadi kesalahan saat menyimpan soal"
+
+    showErrorPopup.value = true
+  } finally {
+    loading.value = false
+  }
 }
 
-const closeSuccessPopup = () => {
+const closeSuccessPopup = async () => {
   showSuccessPopup.value = false
-  router.push("/banksoal")
+
+  // tunggu DOM update dulu supaya CKEditor tidak crash saat unmount
+  await nextTick()
+
+  setTimeout(() => {
+    router.push("/banksoal")
+  }, 50)
 }
 </script>
