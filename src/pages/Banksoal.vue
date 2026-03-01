@@ -14,9 +14,9 @@
 
           <RouterLink
             to="/banksoal/tambah"
-            class="px-4 py-2 rounded-lg bg-primary text-white text-sm hover:bg-indigo-700"
+            class="px-5 py-2.5 bg-indigo-600 text-white text-sm font-semibold rounded-lg shadow-md hover:bg-indigo-700 transition"
           >
-            ➕ Tambah Soal
+            + Tambah Soal
           </RouterLink>
         </header>
 

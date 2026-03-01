@@ -19,6 +19,7 @@
             <span v-if="tipeSoal === 'pg'">Pilihan Ganda</span>
             <span v-else-if="tipeSoal === 'isian'">Isian</span>
             <span v-else-if="tipeSoal === 'pg_kompleks'">PG Kompleks</span>
+            <span v-else-if="tipeSoal === 'pg_majemuk'">PG Majemuk</span>
           </p>
         </div>
 
@@ -46,6 +47,24 @@
             <span class="font-semibold">{{ String.fromCharCode(65 + i) }}.</span>
             <div class="flex-1" v-html="opsi.text"></div>
             <span class="text-xs text-gray-500">Poin: {{ opsi.poin }}</span>
+          </div>
+        </div>
+
+        <!-- PG MAJEMUK -->
+        <div v-if="tipeSoal === 'pg_majemuk'">
+          <p class="text-sm text-gray-500 mb-2">Opsi Jawaban</p>
+          <div
+            v-for="(opsi, i) in opsiJawaban"
+            :key="i"
+            class="flex items-start gap-3 p-3 border rounded-lg mb-2"
+            :class="opsi.is_correct ? 'border-green-500 bg-green-50' : 'border-gray-200'"
+          >
+            <span class="font-semibold">{{ String.fromCharCode(65 + i) }}.</span>
+            <div class="flex-1" v-html="opsi.text"></div>
+            <div class="flex flex-col items-end">
+              <span class="text-xs text-gray-500">Poin: {{ opsi.poin }}</span>
+              <span v-if="opsi.is_correct" class="text-xs text-green-600 font-medium">Jawaban Benar</span>
+            </div>
           </div>
         </div>
 
@@ -123,15 +142,16 @@ const renderKatex = () => {
 onMounted(async () => {
   const res = await api.get(`/banksoal/${id}`)
   const data = res.data
+  console.log("Data Soal API Response:", data)
 
-  mapelNama.value = data.mapel?.nama || "-"
+  mapelNama.value = data.mapel_nama || "-"
   tipeSoal.value = data.tipe
   pertanyaan.value = data.pertanyaan
   pembahasan.value = data.pembahasan
 
   if (data.tipe === "isian") {
     jawabanIsian.value = data.jawaban
-  } else if (data.tipe === "pg") {
+  } else if (data.tipe === "pg" || data.tipe === "pg_majemuk") {
     opsiJawaban.value = data.opsi_jawaban ?? []
   } else if (data.tipe === "pg_kompleks") {
     pernyataanKompleks.value = data.pernyataan ?? []

@@ -30,7 +30,7 @@
         <!-- Pertanyaan -->
         <div>
           <label class="block text-sm font-medium mb-1">Pertanyaan</label>
-          <textarea v-model="pertanyaan" rows="4" class="w-full px-4 py-2 border rounded-lg" />
+          <ckeditor :editor="editor" v-model="pertanyaan" :config="editorConfig" />
         </div>
 
         <!-- ISIAN -->
@@ -46,7 +46,9 @@
           <div v-for="(opsi, i) in opsiJawaban" :key="i" class="flex gap-2 mb-2">
             <input type="radio" :checked="opsi.is_correct" @change="setJawabanBenar(i)" />
 
-            <input v-model="opsi.text" class="flex-1 px-4 py-2 border rounded-lg" />
+            <div class="flex-1">
+              <ckeditor :editor="editor" v-model="opsi.text" :config="editorConfig" />
+            </div>
 
             <button type="button" class="text-red-500 text-xs" @click="hapusOpsi(i)" v-if="opsiJawaban.length > 2">
               Hapus
@@ -65,7 +67,9 @@
           <div v-for="(item, index) in pernyataanKompleks" :key="index" class="flex items-center gap-3 mb-2">
             <span class="text-sm w-5">{{ index + 1 }}.</span>
 
-            <input v-model="item.text" class="flex-1 px-4 py-2 border rounded-lg" placeholder="Tulis pernyataan" />
+            <div class="flex-1">
+              <ckeditor :editor="editor" v-model="item.text" :config="editorConfig" />
+            </div>
 
             <select v-model="item.jawaban" class="px-3 py-2 border rounded-lg text-sm">
               <option :value="true">Benar</option>
@@ -77,7 +81,7 @@
         <!-- Pembahasan -->
         <div>
           <label class="block text-sm font-medium mb-1">Pembahasan</label>
-          <textarea v-model="pembahasan" rows="3" class="w-full px-4 py-2 border rounded-lg" />
+          <ckeditor :editor="editor" v-model="pembahasan" :config="editorConfig" />
         </div>
 
         <button
@@ -93,6 +97,21 @@
 </template>
 
 <script setup>
+import { Ckeditor } from "@ckeditor/ckeditor5-vue"
+import {
+  ClassicEditor,
+  Essentials,
+  Paragraph,
+  Bold,
+  Italic,
+  Underline,
+  Link,
+  List,
+  Image,
+  ImageToolbar,
+  ImageResize,
+  ImageUpload
+} from "ckeditor5"
 import { ref, onMounted } from "vue"
 import { useRoute, useRouter } from "vue-router"
 import api from "@/services/api"
@@ -116,6 +135,48 @@ const pernyataanKompleks = ref([
   { text: "", jawaban: true }
 ])
 const loading = ref(false)
+
+const editor = ClassicEditor
+
+const editorConfig = {
+  licenseKey: "GPL",
+  plugins: [Essentials, Paragraph, Bold, Italic, Underline, Link, List, Image, ImageToolbar, ImageResize, ImageUpload],
+  toolbar: [
+    "undo",
+    "redo",
+    "|",
+    "bold",
+    "italic",
+    "underline",
+    "|",
+    "link",
+    "|",
+    "bulletedList",
+    "numberedList",
+    "|",
+    "imageUpload"
+  ],
+  image: {
+    resizeOptions: [
+      {
+        name: "resizeImage:original",
+        label: "Original",
+        value: null
+      },
+      {
+        name: "resizeImage:50",
+        label: "50%",
+        value: "50"
+      },
+      {
+        name: "resizeImage:75",
+        label: "75%",
+        value: "75"
+      }
+    ],
+    toolbar: ["resizeImage:original", "resizeImage:50", "resizeImage:75"]
+  }
+}
 
 const setJawabanBenar = (index) => {
   opsiJawaban.value.forEach((o, i) => {

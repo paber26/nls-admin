@@ -18,6 +18,17 @@
         </RouterLink>
       </div>
 
+      <!-- Filter Mapel -->
+      <div class="mb-4 flex items-center gap-3">
+        <label class="text-sm font-medium">Mapel:</label>
+        <select v-model="selectedMapel" @change="fetchTryout" class="px-3 py-2 border rounded-lg text-sm">
+          <option value="">Semua</option>
+          <option v-for="m in mapelList" :key="m.id" :value="m.id">
+            {{ m.nama }}
+          </option>
+        </select>
+      </div>
+
       <!-- Table -->
       <section class="bg-white rounded-xl border overflow-x-auto">
         <table class="w-full text-sm">
@@ -90,6 +101,8 @@ import Sidebar from "@/components/layout/Sidebar.vue"
 
 const tryouts = ref([])
 const loading = ref(true)
+const selectedMapel = ref("")
+const mapelList = ref([])
 
 const formatDate = (datetime) => {
   if (!datetime) return "-"
@@ -103,10 +116,27 @@ const formatDate = (datetime) => {
   })
 }
 
-onMounted(async () => {
-  const res = await api.get("/tryout")
-  console.log("Tes Tryout API Response:", res.data)
+const fetchTryout = async () => {
+  loading.value = true
+
+  const res = await api.get("/tryout", {
+    params: {
+      mapel_id: selectedMapel.value || undefined
+    }
+  })
+
   tryouts.value = res.data
   loading.value = false
+}
+
+const fetchMapel = async () => {
+  const res = await api.get("/mapel")
+  mapelList.value = res.data
+  console.log("Mapel List:", mapelList.value)
+}
+
+onMounted(async () => {
+  await fetchMapel()
+  await fetchTryout()
 })
 </script>
