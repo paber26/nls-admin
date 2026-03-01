@@ -24,6 +24,7 @@
             <option value="pg">Pilihan Ganda</option>
             <option value="isian">Isian</option>
             <option value="pg_kompleks">PG Kompleks (Benar / Salah)</option>
+            <option value="pg_majemuk">PG Majemuk (Lebih dari 1 jawaban benar)</option>
           </select>
         </div>
 
@@ -39,12 +40,25 @@
           <input v-model="jawabanIsian" class="w-full px-4 py-2 border rounded-lg" />
         </div>
 
-        <!-- PG -->
-        <div v-if="tipeSoal === 'pg'">
-          <label class="block text-sm font-medium mb-2">Opsi Jawaban</label>
+        <!-- PG and PG Majemuk -->
+        <div v-if="tipeSoal === 'pg' || tipeSoal === 'pg_majemuk'">
+          <label class="block text-sm font-medium mb-2">
+            Opsi Jawaban
+            <span v-if="tipeSoal === 'pg_majemuk'" class="text-xs text-indigo-600 ml-2">
+              (Bisa lebih dari satu jawaban benar)
+            </span>
+          </label>
 
           <div v-for="(opsi, i) in opsiJawaban" :key="i" class="flex gap-2 mb-2">
-            <input type="radio" :checked="opsi.is_correct" @change="setJawabanBenar(i)" />
+            <!-- Radio for PG -->
+            <template v-if="tipeSoal === 'pg'">
+              <input type="radio" :checked="opsi.is_correct" @change="setJawabanBenar(i)" />
+            </template>
+
+            <!-- Checkbox for PG Majemuk -->
+            <template v-else>
+              <input type="checkbox" v-model="opsi.is_correct" />
+            </template>
 
             <div class="flex-1">
               <ckeditor :editor="editor" v-model="opsi.text" :config="editorConfig" />
@@ -56,6 +70,7 @@
 
             <input v-model.number="opsi.poin" type="number" class="w-24 px-2 py-2 border rounded-lg" />
           </div>
+
           <button type="button" class="mt-2 px-4 py-2 border rounded-lg text-sm" @click="tambahOpsi">
             + Tambah Opsi
           </button>
@@ -219,7 +234,7 @@ onMounted(async () => {
     jawabanIsian.value = data.jawaban
     opsiJawaban.value = []
     pernyataanKompleks.value = []
-  } else if (data.tipe === "pg") {
+  } else if (data.tipe === "pg" || data.tipe === "pg_majemuk") {
     opsiJawaban.value = data.opsi_jawaban ?? []
     pernyataanKompleks.value = []
   } else if (data.tipe === "pg_kompleks") {
@@ -237,7 +252,7 @@ const submitEdit = async () => {
     pertanyaan: pertanyaan.value,
     pembahasan: pembahasan.value,
     jawaban_isian: tipeSoal.value === "isian" ? jawabanIsian.value : null,
-    opsi_jawaban: tipeSoal.value === "pg" ? opsiJawaban.value : [],
+    opsi_jawaban: tipeSoal.value === "pg" || tipeSoal.value === "pg_majemuk" ? opsiJawaban.value : [],
     pernyataan: tipeSoal.value === "pg_kompleks" ? pernyataanKompleks.value : []
   }
   console.log("Submit Edit Payload:", payload)
