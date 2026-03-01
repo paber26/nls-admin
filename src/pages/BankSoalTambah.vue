@@ -32,7 +32,37 @@
                 <option value="pg">Pilihan Ganda</option>
                 <option value="isian">Isian</option>
                 <option value="pg_kompleks">PG Kompleks (Benar / Salah)</option>
+                <option value="pg_majemuk">PG Majemuk (Lebih dari 1 jawaban benar)</option>
               </select>
+              <div class="mt-2">
+                <span
+                  v-if="tipeSoal === 'pg'"
+                  class="px-3 py-1 text-xs rounded-full bg-blue-100 text-blue-700 font-medium"
+                >
+                  Pilihan Ganda
+                </span>
+
+                <span
+                  v-if="tipeSoal === 'pg_majemuk'"
+                  class="px-3 py-1 text-xs rounded-full bg-purple-100 text-purple-700 font-medium"
+                >
+                  PG Majemuk
+                </span>
+
+                <span
+                  v-if="tipeSoal === 'pg_kompleks'"
+                  class="px-3 py-1 text-xs rounded-full bg-orange-100 text-orange-700 font-medium"
+                >
+                  PG Kompleks
+                </span>
+
+                <span
+                  v-if="tipeSoal === 'isian'"
+                  class="px-3 py-1 text-xs rounded-full bg-green-100 text-green-700 font-medium"
+                >
+                  Isian
+                </span>
+              </div>
             </div>
 
             <!-- Pertanyaan -->
@@ -41,8 +71,8 @@
               <ckeditor :editor="editor" v-model="pertanyaan" :config="editorConfig" />
             </div>
 
-            <div v-if="tipeSoal === 'isian'">
-              <label class="block text-sm font-medium mb-1">Jawaban</label>
+            <div v-if="tipeSoal === 'isian'" class="p-4 rounded-xl border bg-green-50 border-green-200">
+              <label class="block text-sm font-medium mb-1 text-slate-800 font-semibold">Jawaban</label>
               <input
                 v-model="jawabanIsian"
                 type="text"
@@ -51,8 +81,8 @@
               />
             </div>
 
-            <div v-if="tipeSoal === 'pg'">
-              <label class="block text-sm font-medium mb-2">Opsi Jawaban</label>
+            <div v-if="tipeSoal === 'pg'" class="p-4 rounded-xl border bg-blue-50 border-blue-200">
+              <label class="block text-sm font-medium mb-2 text-slate-800 font-semibold">Opsi Jawaban</label>
 
               <div v-for="(opsi, index) in opsiJawaban" :key="index" class="flex gap-2 mb-2">
                 <input type="radio" name="jawaban_benar" :checked="opsi.is_correct" @change="setJawabanBenar(index)" />
@@ -83,8 +113,44 @@
               </button>
             </div>
 
-            <div v-if="tipeSoal === 'pg_kompleks'">
-              <label class="block text-sm font-medium mb-2">Pernyataan</label>
+            <div v-if="tipeSoal === 'pg_majemuk'" class="p-4 rounded-xl border bg-purple-50 border-purple-200">
+              <label class="block text-sm font-medium mb-2 text-slate-800 font-semibold">
+                Opsi Jawaban (Bisa lebih dari satu benar)
+              </label>
+
+              <div v-for="(opsi, index) in opsiJawaban" :key="index" class="flex gap-2 mb-2">
+                <input type="checkbox" v-model="opsi.is_correct" />
+
+                <div class="flex-1">
+                  <ckeditor :editor="editor" v-model="opsi.text" :config="editorConfig" />
+                </div>
+
+                <input
+                  v-model.number="opsi.poin"
+                  type="number"
+                  class="w-24 px-3 py-2 border rounded-lg text-sm"
+                  placeholder="Poin"
+                />
+
+                <button
+                  type="button"
+                  @click="hapusOpsi(index)"
+                  class="px-3 py-2 text-sm border rounded-lg text-red-500"
+                  v-if="opsiJawaban.length > 2"
+                >
+                  Hapus
+                </button>
+              </div>
+
+              <button type="button" @click="tambahOpsi" class="mt-2 px-4 py-2 border rounded-lg text-sm">
+                + Tambah Opsi
+              </button>
+
+              <p class="text-xs text-slate-600 mt-2">⚠️ Minimal 3 opsi dan minimal 2 jawaban benar harus dipilih.</p>
+            </div>
+
+            <div v-if="tipeSoal === 'pg_kompleks'" class="p-4 rounded-xl border bg-orange-50 border-orange-200">
+              <label class="block text-sm font-medium mb-2 text-slate-800 font-semibold">Pernyataan</label>
 
               <div v-for="(item, index) in pernyataanKompleks" :key="index" class="flex items-center gap-3 mb-2">
                 <span class="text-sm w-5">{{ index + 1 }}.</span>
@@ -123,6 +189,17 @@
           </form>
         </div>
       </main>
+    </div>
+
+    <!-- Popup -->
+    <div v-if="showPopup" class="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+      <div class="bg-white rounded-xl shadow-lg w-[90%] max-w-md p-6 text-center">
+        <h2 class="text-lg font-semibold text-slate-800 mb-3">Informasi</h2>
+        <p class="text-sm text-slate-600 mb-6">{{ popupMessage }}</p>
+        <button @click="closePopup" class="px-5 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 text-sm">
+          Tutup
+        </button>
+      </div>
     </div>
   </body>
 </template>
@@ -270,6 +347,18 @@ const pertanyaan = ref("")
 const pembahasan = ref("")
 const loading = ref(false)
 
+const showPopup = ref(false)
+const popupMessage = ref("")
+
+const openPopup = (message) => {
+  popupMessage.value = message
+  showPopup.value = true
+}
+
+const closePopup = () => {
+  showPopup.value = false
+}
+
 onMounted(async () => {
   try {
     const res = await api.get("/mapel")
@@ -308,25 +397,53 @@ onMounted(async () => {
 
 const submitSoal = async () => {
   if (!mapelId.value) {
-    alert("Mapel wajib dipilih")
+    openPopup("Mapel wajib dipilih")
     return
   }
 
   if (!pertanyaan.value.trim()) {
-    alert("Pertanyaan wajib diisi")
+    openPopup("Pertanyaan wajib diisi")
     return
   }
 
   // validasi khusus PG
   if (tipeSoal.value === "pg") {
+    // 🔥 validasi teks opsi tidak boleh kosong
+    const adaKosong = opsiJawaban.value.some((o) => !o.text || !o.text.trim())
+    if (adaKosong) {
+      openPopup("Semua opsi jawaban harus diisi")
+      return
+    }
+
     if (opsiJawaban.value.length < 2) {
-      alert("Minimal 2 opsi jawaban")
+      openPopup("Minimal 2 opsi jawaban")
       return
     }
 
     const adaBenar = opsiJawaban.value.some((o) => o.is_correct)
     if (!adaBenar) {
-      alert("Pilih satu jawaban benar")
+      openPopup("Pilih satu jawaban benar")
+      return
+    }
+  }
+
+  if (tipeSoal.value === "pg_majemuk") {
+    // 🔥 validasi teks opsi tidak boleh kosong
+    const adaKosong = opsiJawaban.value.some((o) => !o.text || !o.text.trim())
+    if (adaKosong) {
+      openPopup("Semua opsi jawaban PG Majemuk harus diisi")
+      return
+    }
+
+    if (opsiJawaban.value.length < 3) {
+      openPopup("PG Majemuk minimal memiliki 3 opsi jawaban")
+      return
+    }
+
+    const jumlahBenar = opsiJawaban.value.filter((o) => o.is_correct).length
+
+    if (jumlahBenar < 2) {
+      openPopup("PG Majemuk minimal harus memiliki 2 jawaban benar")
       return
     }
   }
@@ -334,7 +451,7 @@ const submitSoal = async () => {
   if (tipeSoal.value === "pg_kompleks") {
     const kosong = pernyataanKompleks.value.some((p) => !p.text.trim())
     if (kosong) {
-      alert("Semua pernyataan wajib diisi")
+      openPopup("Semua pernyataan wajib diisi")
       return
     }
   }
@@ -348,7 +465,7 @@ const submitSoal = async () => {
       pertanyaan: pertanyaan.value,
       pembahasan: pembahasan.value,
       jawaban_isian: tipeSoal.value === "isian" ? jawabanIsian.value : null,
-      opsi_jawaban: tipeSoal.value === "pg" ? opsiJawaban.value : [],
+      opsi_jawaban: tipeSoal.value === "pg" || tipeSoal.value === "pg_majemuk" ? opsiJawaban.value : [],
       pernyataan: tipeSoal.value === "pg_kompleks" ? pernyataanKompleks.value : []
     }
 
@@ -369,7 +486,7 @@ const submitSoal = async () => {
     console.log("isi res adalah", res)
 
     if (res.data && res.data.success) {
-      alert(res.data.message || "Soal berhasil disimpan")
+      openPopup(res.data.message || "Soal berhasil disimpan")
 
       // Hapus draft setelah berhasil disimpan ke server
       localStorage.removeItem("draft_banksoal")
@@ -377,14 +494,14 @@ const submitSoal = async () => {
 
       router.push("/banksoal")
     } else {
-      alert("Soal tersimpan di localStorage, tapi gagal dikirim ke server")
+      openPopup("Soal tersimpan di localStorage, tapi gagal dikirim ke server")
     }
   } catch (err) {
     console.error(err)
 
     const msg = err.response?.data?.message || "Gagal menyimpan soal"
 
-    alert(err)
+    openPopup(err)
   }
 }
 </script>
