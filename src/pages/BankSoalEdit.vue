@@ -35,13 +35,33 @@
         </div>
 
         <!-- ISIAN -->
-        <div v-if="tipeSoal === 'isian'">
+        <div v-if="tipeSoal === 'isian'" class="bg-green-50 border border-green-200 rounded-xl p-4">
+          <div class="mb-3">
+            <span class="inline-block px-3 py-1 text-xs font-semibold bg-green-600 text-white rounded-full">
+              Tipe: Isian Singkat
+            </span>
+          </div>
           <label class="block text-sm font-medium mb-1">Jawaban</label>
           <input v-model="jawabanIsian" class="w-full px-4 py-2 border rounded-lg" />
         </div>
 
         <!-- PG and PG Majemuk -->
-        <div v-if="tipeSoal === 'pg' || tipeSoal === 'pg_majemuk'">
+        <div
+          v-if="tipeSoal === 'pg' || tipeSoal === 'pg_majemuk'"
+          :class="[
+            'rounded-xl p-4 border',
+            tipeSoal === 'pg' ? 'bg-blue-50 border-blue-200' : 'bg-purple-50 border-purple-200'
+          ]"
+        >
+          <div class="mb-3">
+            <span
+              class="inline-block px-3 py-1 text-xs font-semibold text-white rounded-full"
+              :class="tipeSoal === 'pg' ? 'bg-blue-600' : 'bg-purple-600'"
+            >
+              {{ tipeSoal === "pg" ? "Tipe: Pilihan Ganda" : "Tipe: Pilihan Ganda Majemuk" }}
+            </span>
+          </div>
+
           <label class="block text-sm font-medium mb-2">
             Opsi Jawaban
             <span v-if="tipeSoal === 'pg_majemuk'" class="text-xs text-indigo-600 ml-2">
@@ -76,7 +96,12 @@
           </button>
         </div>
 
-        <div v-if="tipeSoal === 'pg_kompleks'">
+        <div v-if="tipeSoal === 'pg_kompleks'" class="bg-orange-50 border border-orange-200 rounded-xl p-4">
+          <div class="mb-3">
+            <span class="inline-block px-3 py-1 text-xs font-semibold bg-orange-600 text-white rounded-full">
+              Tipe: PG Kompleks (Benar / Salah)
+            </span>
+          </div>
           <label class="block text-sm font-medium mb-2">Pernyataan</label>
 
           <div v-for="(item, index) in pernyataanKompleks" :key="index" class="flex items-center gap-3 mb-2">
@@ -107,6 +132,33 @@
           {{ loading ? "Menyimpan..." : "Simpan Soal" }}
         </button>
       </form>
+      <!-- Success Popup -->
+      <div v-if="showSuccessPopup" class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+        <div class="bg-white rounded-xl shadow-lg p-6 w-96 text-center">
+          <h2 class="text-lg font-semibold text-gray-800 mb-2">Berhasil</h2>
+          <p class="text-sm text-gray-600 mb-4">{{ successMessage }}</p>
+          <button
+            @click="closeSuccessPopup"
+            class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 text-sm"
+          >
+            OK
+          </button>
+        </div>
+      </div>
+
+      <!-- Error Popup -->
+      <div v-if="showErrorPopup" class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+        <div class="bg-white rounded-xl shadow-lg p-6 w-96 text-center border border-red-200">
+          <h2 class="text-lg font-semibold text-red-600 mb-2">Validasi Gagal</h2>
+          <p class="text-sm text-gray-600 mb-4">{{ errorMessage }}</p>
+          <button
+            @click="showErrorPopup = false"
+            class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 text-sm"
+          >
+            Tutup
+          </button>
+        </div>
+      </div>
     </main>
   </div>
 </template>
@@ -150,6 +202,11 @@ const pernyataanKompleks = ref([
   { text: "", jawaban: true }
 ])
 const loading = ref(false)
+
+const showSuccessPopup = ref(false)
+const successMessage = ref("")
+const showErrorPopup = ref(false)
+const errorMessage = ref("")
 
 const editor = ClassicEditor
 
@@ -244,6 +301,72 @@ onMounted(async () => {
 })
 
 const submitEdit = async () => {
+  // === VALIDASI ===
+  if (!mapelId.value) {
+    errorMessage.value = "Mapel wajib dipilih"
+    showErrorPopup.value = true
+    return
+  }
+
+  if (!pertanyaan.value || pertanyaan.value.trim() === "") {
+    errorMessage.value = "Pertanyaan tidak boleh kosong"
+    showErrorPopup.value = true
+    return
+  }
+
+  if (tipeSoal.value === "isian") {
+    if (!jawabanIsian.value || jawabanIsian.value.trim() === "") {
+      errorMessage.value = "Jawaban isian tidak boleh kosong"
+      showErrorPopup.value = true
+      return
+    }
+  }
+
+  if (tipeSoal.value === "pg" || tipeSoal.value === "pg_majemuk") {
+    if (opsiJawaban.value.length < 2) {
+      errorMessage.value = "Minimal harus ada 2 opsi jawaban"
+      showErrorPopup.value = true
+      return
+    }
+
+    const kosong = opsiJawaban.value.some((o) => !o.text || o.text.trim() === "")
+    if (kosong) {
+      errorMessage.value = "Semua opsi jawaban harus diisi"
+      showErrorPopup.value = true
+      return
+    }
+
+    const jumlahBenar = opsiJawaban.value.filter((o) => o.is_correct).length
+
+    if (tipeSoal.value === "pg" && jumlahBenar !== 1) {
+      errorMessage.value = "Pilihan ganda harus memiliki tepat 1 jawaban benar"
+      showErrorPopup.value = true
+      return
+    }
+
+    if (tipeSoal.value === "pg_majemuk" && jumlahBenar < 2) {
+      errorMessage.value = "PG Majemuk minimal memiliki 2 jawaban benar"
+      showErrorPopup.value = true
+      return
+    }
+  }
+
+  if (tipeSoal.value === "pg_kompleks") {
+    if (!pernyataanKompleks.value.length) {
+      errorMessage.value = "Minimal harus ada 1 pernyataan"
+      showErrorPopup.value = true
+      return
+    }
+
+    const kosong = pernyataanKompleks.value.some((p) => !p.text || p.text.trim() === "")
+    if (kosong) {
+      errorMessage.value = "Semua pernyataan harus diisi"
+      showErrorPopup.value = true
+      return
+    }
+  }
+
+  // === KIRIM DATA ===
   loading.value = true
 
   const payload = {
@@ -255,11 +378,16 @@ const submitEdit = async () => {
     opsi_jawaban: tipeSoal.value === "pg" || tipeSoal.value === "pg_majemuk" ? opsiJawaban.value : [],
     pernyataan: tipeSoal.value === "pg_kompleks" ? pernyataanKompleks.value : []
   }
-  console.log("Submit Edit Payload:", payload)
 
   const res = await api.put(`/banksoal/${id}`, payload)
 
-  alert(res.data.message || "Soal berhasil diperbarui")
+  loading.value = false
+  successMessage.value = res.data.message || "Soal berhasil diperbarui"
+  showSuccessPopup.value = true
+}
+
+const closeSuccessPopup = () => {
+  showSuccessPopup.value = false
   router.push("/banksoal")
 }
 </script>

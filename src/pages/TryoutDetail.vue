@@ -87,28 +87,58 @@
         <!-- KETENTUAN KHUSUS -->
         <section v-if="tryout?.ketentuan_khusus" class="bg-white rounded-xl border p-6 mb-6">
           <h2 class="text-sm font-semibold mb-3 text-slate-700">Ketentuan Khusus</h2>
-
           <div class="text-sm leading-relaxed" v-html="tryout.ketentuan_khusus"></div>
+        </section>
+
+        <!-- PESAN SELESAI -->
+        <section v-if="tryout?.pesan_selesai" class="bg-white rounded-xl border p-6 mb-6">
+          <h2 class="text-sm font-semibold mb-3 text-slate-700">Pesan Setelah Selesai</h2>
+          <div class="text-sm leading-relaxed" v-html="tryout.pesan_selesai"></div>
         </section>
 
         <!-- PREVIEW SOAL -->
         <section class="space-y-6">
-          <div v-for="(item, index) in soalList" :key="item.id" class="bg-white rounded-xl border p-6">
+          <div
+            v-for="(item, index) in soalList"
+            :key="item.id"
+            :class="[
+              'rounded-xl border p-6',
+              item.tipe === 'pg' && 'bg-blue-50 border-blue-200',
+              item.tipe === 'pg_majemuk' && 'bg-purple-50 border-purple-200',
+              item.tipe === 'pg_kompleks' && 'bg-orange-50 border-orange-200',
+              item.tipe === 'isian' && 'bg-green-50 border-green-200'
+            ]"
+          >
             <div class="flex justify-between items-center mb-3">
               <h3 class="font-semibold">
                 Soal {{ index + 1 }}
-                <span class="text-xs text-slate-500">
-                  (
+                <span
+                  class="text-xs px-2 py-1 rounded-full font-medium"
+                  :class="{
+                    'bg-blue-100 text-blue-700': item.tipe === 'pg',
+                    'bg-purple-100 text-purple-700': item.tipe === 'pg_kompleks',
+                    'bg-rose-100 text-rose-700': item.tipe === 'pg_majemuk',
+                    'bg-slate-100 text-slate-600': item.tipe === 'isian'
+                  }"
+                >
                   {{
                     item.tipe === "pg"
                       ? "Pilihan Ganda"
                       : item.tipe === "pg_kompleks"
-                        ? "Pilihan Ganda Kompleks"
-                        : "Isian Singkat"
+                        ? "PG Kompleks"
+                        : item.tipe === "pg_majemuk"
+                          ? "PG Majemuk"
+                          : "Isian Singkat"
                   }}
-                  )
                 </span>
               </h3>
+
+              <RouterLink
+                :to="`/banksoal/edit/${item.id}`"
+                class="text-xs px-3 py-1 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 transition"
+              >
+                Edit Banksoal
+              </RouterLink>
             </div>
 
             <div class="mb-4 leading-relaxed" v-html="item.pertanyaan"></div>
@@ -143,20 +173,6 @@
                 <span class="text-xs px-2 py-0.5 rounded bg-slate-100 text-slate-600">{{ opsi.poin }} poin</span>
               </li>
             </ul>
-
-            <!-- JAWABAN / KUNCI -->
-            <div class="mb-3 text-sm">
-              <span
-                v-if="item.tipe === 'pg' || item.tipe === 'pg_kompleks'"
-                class="inline-block bg-slate-100 px-3 py-1 rounded font-medium"
-              >
-                Kunci: {{ item.jawaban_label }}
-              </span>
-
-              <span v-else class="inline-block bg-slate-100 px-3 py-1 rounded font-medium">
-                Jawaban: {{ item.jawaban }}
-              </span>
-            </div>
 
             <!-- POIN -->
             <div class="mb-2 text-sm">
