@@ -47,24 +47,21 @@
             <tr>
               <th class="px-4 py-3 text-left">No</th>
               <th class="px-4 py-3 text-left">Nama</th>
-              <th class="px-4 py-3 text-left">Email</th>
               <th class="px-4 py-3 text-left">Sekolah</th>
-              <th class="px-4 py-3 text-center">Mulai</th>
               <th class="px-4 py-3 text-center">Durasi</th>
               <th class="px-4 py-3 text-center">Jawaban</th>
               <th class="px-4 py-3 text-center">Detail</th>
+              <th class="px-4 py-3 text-center">Aksi</th>
             </tr>
           </thead>
           <tbody>
             <tr v-if="loading">
-              <td colspan="8" class="px-4 py-6 text-center text-slate-400">Memuat data peserta...</td>
+              <td colspan="7" class="px-4 py-6 text-center text-slate-400">Memuat data peserta...</td>
             </tr>
             <tr v-for="(item, index) in ongoingParticipants" :key="item.id" class="border-t">
               <td class="px-4 py-3">{{ index + 1 }}</td>
               <td class="px-4 py-3 font-medium">{{ item.name }}</td>
-              <td class="px-4 py-3">{{ item.email ?? "-" }}</td>
               <td class="px-4 py-3">{{ item.sekolah_nama ?? "-" }}</td>
-              <td class="px-4 py-3 text-center text-xs">{{ formatDate(item.mulai) }}</td>
               <td class="px-4 py-3 text-center text-xs">{{ calculateDuration(item.mulai, item.selesai) }}</td>
               <td class="px-4 py-3 text-center text-xs font-semibold">
                 {{ item.jawaban_count ?? 0 }}
@@ -74,9 +71,17 @@
                   Lihat
                 </button>
               </td>
+              <td class="px-4 py-3 text-center">
+                <button
+                  @click="forceFinish(item)"
+                  class="text-xs bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+                >
+                  Akhiri
+                </button>
+              </td>
             </tr>
             <tr v-if="!loading && ongoingParticipants.length === 0">
-              <td colspan="8" class="px-4 py-6 text-center text-slate-400">
+              <td colspan="7" class="px-4 py-6 text-center text-slate-400">
                 Tidak ada peserta yang sedang mengerjakan.
               </td>
             </tr>
@@ -94,10 +99,8 @@
             <tr>
               <th class="px-4 py-3 text-left">No</th>
               <th class="px-4 py-3 text-left">Nama</th>
-              <th class="px-4 py-3 text-left">Email</th>
               <th class="px-4 py-3 text-left">Sekolah</th>
               <th class="px-4 py-3 text-center">Nilai</th>
-              <th class="px-4 py-3 text-center">Mulai</th>
               <th class="px-4 py-3 text-center">Selesai</th>
               <th class="px-4 py-3 text-center">Durasi</th>
               <th class="px-4 py-3 text-center">Jawaban</th>
@@ -106,15 +109,13 @@
           </thead>
           <tbody>
             <tr v-if="loading">
-              <td colspan="10" class="px-4 py-6 text-center text-slate-400">Memuat data peserta...</td>
+              <td colspan="8" class="px-4 py-6 text-center text-slate-400">Memuat data peserta...</td>
             </tr>
             <tr v-for="(item, index) in finishedParticipants" :key="item.id" class="border-t">
               <td class="px-4 py-3">{{ index + 1 }}</td>
               <td class="px-4 py-3 font-medium">{{ item.name }}</td>
-              <td class="px-4 py-3">{{ item.email ?? "-" }}</td>
               <td class="px-4 py-3">{{ item.sekolah_nama ?? "-" }}</td>
               <td class="px-4 py-3 text-center font-semibold">{{ item.nilai ?? "-" }}</td>
-              <td class="px-4 py-3 text-center text-xs">{{ formatDate(item.mulai) }}</td>
               <td class="px-4 py-3 text-center text-xs">{{ formatDate(item.selesai) }}</td>
               <td class="px-4 py-3 text-center text-xs">{{ calculateDuration(item.mulai, item.selesai) }}</td>
               <td class="px-4 py-3 text-center text-xs font-semibold">
@@ -127,7 +128,7 @@
               </td>
             </tr>
             <tr v-if="!loading && finishedParticipants.length === 0">
-              <td colspan="10" class="px-4 py-6 text-center text-slate-400">
+              <td colspan="8" class="px-4 py-6 text-center text-slate-400">
                 Belum ada peserta yang menyelesaikan tryout.
               </td>
             </tr>
@@ -165,6 +166,18 @@
               <strong>Jumlah Jawaban Tersimpan:</strong>
               {{ selectedParticipant?.jawaban_count ?? 0 }}
             </div>
+            <div v-if="selectedParticipant?.answered_numbers?.length">
+              <strong>Nomor Soal Dijawab:</strong>
+              <div class="flex flex-wrap gap-1 mt-1">
+                <span
+                  v-for="num in selectedParticipant.answered_numbers"
+                  :key="num"
+                  class="text-xs bg-indigo-100 text-indigo-700 px-2 py-1 rounded"
+                >
+                  {{ num }}
+                </span>
+              </div>
+            </div>
             <div>
               <strong>Nilai:</strong>
               {{ selectedParticipant?.nilai ?? "-" }}
@@ -184,6 +197,46 @@
           </div>
         </div>
       </div>
+
+      <!-- Confirm Modal -->
+      <div v-if="showConfirmModal" class="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+        <div class="bg-white w-[360px] rounded-xl p-6 text-center">
+          <h3 class="text-lg font-semibold mb-4 text-red-600">Konfirmasi</h3>
+          <p class="text-sm text-slate-600 mb-6">
+            Yakin ingin mengakhiri tryout peserta
+            <strong>{{ confirmTarget?.name }}</strong>
+            ?
+          </p>
+          <div class="flex justify-center gap-3">
+            <button
+              @click="showConfirmModal = false"
+              class="px-4 py-2 text-sm rounded-lg bg-slate-200 hover:bg-slate-300"
+            >
+              Batal
+            </button>
+            <button
+              @click="confirmForceFinish"
+              class="px-4 py-2 text-sm rounded-lg bg-red-600 text-white hover:bg-red-700"
+            >
+              Ya, Akhiri
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Success Modal -->
+      <div v-if="showSuccessModal" class="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+        <div class="bg-white w-[360px] rounded-xl p-6 text-center">
+          <h3 class="text-lg font-semibold mb-4 text-emerald-600">Berhasil</h3>
+          <p class="text-sm text-slate-600 mb-6">Tryout berhasil diakhiri.</p>
+          <button
+            @click="showSuccessModal = false"
+            class="px-4 py-2 text-sm rounded-lg bg-emerald-600 text-white hover:bg-emerald-700"
+          >
+            Tutup
+          </button>
+        </div>
+      </div>
     </main>
   </div>
 </template>
@@ -201,9 +254,37 @@ const showFinished = ref(true)
 const showModal = ref(false)
 const selectedParticipant = ref(null)
 
+const showConfirmModal = ref(false)
+const confirmTarget = ref(null)
+const showSuccessModal = ref(false)
+
 const openDetail = (item) => {
   selectedParticipant.value = item
   showModal.value = true
+}
+
+const forceFinish = (item) => {
+  confirmTarget.value = item
+  showConfirmModal.value = true
+}
+
+const confirmForceFinish = async () => {
+  if (!confirmTarget.value) return
+
+  try {
+    console.log("Mengirim permintaan akhiri tryout untuk peserta:", confirmTarget.value.id)
+    await api.post(`/monitoring-tryout/${confirmTarget.value.id}/force-finish`)
+    console.log("Tryout berhasil diakhiri:", confirmTarget.value.id)
+
+    confirmTarget.value.status = "submitted"
+    confirmTarget.value.selesai = new Date().toISOString()
+
+    showConfirmModal.value = false
+    showSuccessModal.value = true
+  } catch (error) {
+    console.error("Gagal mengakhiri tryout:", error)
+    showConfirmModal.value = false
+  }
 }
 
 const calculateDuration = (start, end) => {
