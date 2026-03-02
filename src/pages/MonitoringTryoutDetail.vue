@@ -9,10 +9,36 @@
           <h1 class="text-lg font-semibold">Daftar Peserta Tryout</h1>
           <p class="text-sm text-slate-500">Menampilkan peserta yang mengikuti tryout ini</p>
         </div>
+
+        <button
+          @click="exportToExcel"
+          class="bg-emerald-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-emerald-700 shadow"
+        >
+          Export Excel
+        </button>
+      </div>
+
+      <!-- Toggle Section -->
+      <div class="flex gap-3 mb-6">
+        <button
+          @click="showOngoing = !showOngoing"
+          class="px-4 py-2 rounded-lg text-sm font-medium"
+          :class="showOngoing ? 'bg-amber-500 text-white' : 'bg-slate-200 text-slate-700'"
+        >
+          {{ showOngoing ? "Sembunyikan" : "Tampilkan" }} Peserta Sedang Mengerjakan
+        </button>
+
+        <button
+          @click="showFinished = !showFinished"
+          class="px-4 py-2 rounded-lg text-sm font-medium"
+          :class="showFinished ? 'bg-emerald-600 text-white' : 'bg-slate-200 text-slate-700'"
+        >
+          {{ showFinished ? "Sembunyikan" : "Tampilkan" }} Peserta Sudah Selesai
+        </button>
       </div>
 
       <!-- Peserta Sedang Mengerjakan -->
-      <section class="bg-white rounded-xl border overflow-x-auto mb-8">
+      <section v-if="showOngoing" class="bg-white rounded-xl border overflow-x-auto mb-8">
         <div class="px-4 py-3 border-b bg-amber-50">
           <h2 class="text-sm font-semibold text-amber-700">Peserta Sedang Mengerjakan</h2>
         </div>
@@ -59,7 +85,7 @@
       </section>
 
       <!-- Peserta Sudah Selesai -->
-      <section class="bg-white rounded-xl border overflow-x-auto">
+      <section v-if="showFinished" class="bg-white rounded-xl border overflow-x-auto">
         <div class="px-4 py-3 border-b bg-emerald-50">
           <h2 class="text-sm font-semibold text-emerald-700">Peserta Sudah Selesai</h2>
         </div>
@@ -166,8 +192,11 @@
 import { ref, onMounted, computed } from "vue"
 import api from "@/services/api"
 import Sidebar from "@/components/layout/Sidebar.vue"
+import * as XLSX from "xlsx"
 
 const participants = ref([])
+const showOngoing = ref(true)
+const showFinished = ref(true)
 
 const showModal = ref(false)
 const selectedParticipant = ref(null)
@@ -219,4 +248,26 @@ onMounted(async () => {
   console.log("Tes Monitoring Tryout API Response:", res.data)
   loading.value = false
 })
+
+const exportToExcel = () => {
+  const formattedData = participants.value.map((p, index) => ({
+    No: index + 1,
+    Nama: p.name,
+    Email: p.email ?? "-",
+    Sekolah: p.sekolah_nama ?? "-",
+    WhatsApp: p.whatsapp ?? "-",
+    Status: p.status,
+    Nilai: p.nilai ?? "-",
+    Mulai: formatDate(p.mulai),
+    Selesai: formatDate(p.selesai),
+    Durasi: calculateDuration(p.mulai, p.selesai),
+    "Jumlah Jawaban": p.jawaban_count ?? 0
+  }))
+
+  const worksheet = XLSX.utils.json_to_sheet(formattedData)
+  const workbook = XLSX.utils.book_new()
+  XLSX.utils.book_append_sheet(workbook, worksheet, "Monitoring Tryout")
+
+  XLSX.writeFile(workbook, "monitoring_tryout.xlsx")
+}
 </script>
