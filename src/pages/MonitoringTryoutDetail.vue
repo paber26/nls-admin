@@ -25,12 +25,13 @@
               <th class="px-4 py-3 text-left">Sekolah</th>
               <th class="px-4 py-3 text-center">Mulai</th>
               <th class="px-4 py-3 text-center">Durasi</th>
+              <th class="px-4 py-3 text-center">Jawaban</th>
               <th class="px-4 py-3 text-center">Detail</th>
             </tr>
           </thead>
           <tbody>
             <tr v-if="loading">
-              <td colspan="7" class="px-4 py-6 text-center text-slate-400">Memuat data peserta...</td>
+              <td colspan="8" class="px-4 py-6 text-center text-slate-400">Memuat data peserta...</td>
             </tr>
             <tr v-for="(item, index) in ongoingParticipants" :key="item.id" class="border-t">
               <td class="px-4 py-3">{{ index + 1 }}</td>
@@ -39,6 +40,9 @@
               <td class="px-4 py-3">{{ item.sekolah_nama ?? "-" }}</td>
               <td class="px-4 py-3 text-center text-xs">{{ formatDate(item.mulai) }}</td>
               <td class="px-4 py-3 text-center text-xs">{{ calculateDuration(item.mulai, item.selesai) }}</td>
+              <td class="px-4 py-3 text-center text-xs font-semibold">
+                {{ item.jawaban_count ?? 0 }}
+              </td>
               <td class="px-4 py-3 text-center">
                 <button @click="openDetail(item)" class="text-xs bg-slate-200 px-3 py-1 rounded hover:bg-slate-300">
                   Lihat
@@ -46,7 +50,7 @@
               </td>
             </tr>
             <tr v-if="!loading && ongoingParticipants.length === 0">
-              <td colspan="7" class="px-4 py-6 text-center text-slate-400">
+              <td colspan="8" class="px-4 py-6 text-center text-slate-400">
                 Tidak ada peserta yang sedang mengerjakan.
               </td>
             </tr>
@@ -70,12 +74,13 @@
               <th class="px-4 py-3 text-center">Mulai</th>
               <th class="px-4 py-3 text-center">Selesai</th>
               <th class="px-4 py-3 text-center">Durasi</th>
+              <th class="px-4 py-3 text-center">Jawaban</th>
               <th class="px-4 py-3 text-center">Detail</th>
             </tr>
           </thead>
           <tbody>
             <tr v-if="loading">
-              <td colspan="9" class="px-4 py-6 text-center text-slate-400">Memuat data peserta...</td>
+              <td colspan="10" class="px-4 py-6 text-center text-slate-400">Memuat data peserta...</td>
             </tr>
             <tr v-for="(item, index) in finishedParticipants" :key="item.id" class="border-t">
               <td class="px-4 py-3">{{ index + 1 }}</td>
@@ -86,6 +91,9 @@
               <td class="px-4 py-3 text-center text-xs">{{ formatDate(item.mulai) }}</td>
               <td class="px-4 py-3 text-center text-xs">{{ formatDate(item.selesai) }}</td>
               <td class="px-4 py-3 text-center text-xs">{{ calculateDuration(item.mulai, item.selesai) }}</td>
+              <td class="px-4 py-3 text-center text-xs font-semibold">
+                {{ item.jawaban_count ?? 0 }}
+              </td>
               <td class="px-4 py-3 text-center">
                 <button @click="openDetail(item)" class="text-xs bg-slate-200 px-3 py-1 rounded hover:bg-slate-300">
                   Lihat
@@ -93,7 +101,7 @@
               </td>
             </tr>
             <tr v-if="!loading && finishedParticipants.length === 0">
-              <td colspan="9" class="px-4 py-6 text-center text-slate-400">
+              <td colspan="10" class="px-4 py-6 text-center text-slate-400">
                 Belum ada peserta yang menyelesaikan tryout.
               </td>
             </tr>
@@ -126,6 +134,10 @@
             <div>
               <strong>Status:</strong>
               {{ selectedParticipant?.status }}
+            </div>
+            <div>
+              <strong>Jumlah Jawaban Tersimpan:</strong>
+              {{ selectedParticipant?.jawaban_count ?? 0 }}
             </div>
             <div>
               <strong>Nilai:</strong>
