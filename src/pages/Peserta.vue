@@ -70,6 +70,7 @@
                 <tr>
                   <th class="px-4 py-3 text-center w-12">No</th>
                   <th class="px-4 py-3 text-left">Nama</th>
+                  <th class="px-4 py-3 text-left">Email</th>
                   <th class="px-4 py-3 text-left">Sekolah</th>
                   <th class="px-4 py-3 text-center">Kelas</th>
                   <th class="px-4 py-3 text-left">WhatsApp</th>
@@ -85,6 +86,9 @@
                   </td>
                   <td class="px-4 py-3 font-medium">
                     {{ peserta.nama_lengkap }}
+                  </td>
+                  <td class="px-4 py-3 text-slate-600">
+                    {{ peserta.email }}
                   </td>
                   <td class="px-4 py-3">
                     {{ peserta.sekolah_nama }}
