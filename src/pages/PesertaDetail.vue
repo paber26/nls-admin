@@ -55,6 +55,27 @@
             </div>
           </section>
 
+          <!-- STATUS EVENT -->
+          <section class="bg-white rounded-xl border p-6 text-sm">
+            <h3 class="font-semibold text-slate-800 mb-4">Status Event</h3>
+
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-slate-600">Terdaftar Event</p>
+                <p class="text-xs text-slate-500">Mengontrol akses peserta ke event (kolom is_event_registered)</p>
+              </div>
+
+              <select
+                @change="toggleEventStatus($event.target.value)"
+                :value="peserta?.is_event_registered ? 1 : 0"
+                class="px-4 py-2 text-xs rounded-lg border bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              >
+                <option :value="1">Aktif</option>
+                <option :value="0">Nonaktif</option>
+              </select>
+            </div>
+          </section>
+
           <!-- RINGKASAN -->
           <!-- <section class="grid md:grid-cols-3 gap-6">
             <div class="bg-white rounded-xl border p-6">
@@ -73,10 +94,32 @@
             </div>
           </section> -->
 
-          <!-- RIWAYAT TRYOUT -->
-          <section class="bg-white rounded-xl border p-10 text-center">
-            <h3 class="font-semibold text-slate-800 mb-2">Riwayat Tryout</h3>
-            <p class="text-slate-500">Fitur riwayat tryout sedang dalam tahap pengembangan.</p>
+          <!-- KELOLA TRYOUT & EVENT -->
+          <section class="bg-white rounded-xl border p-6 space-y-6 text-sm">
+            <div>
+              <h3 class="font-semibold text-slate-800 mb-4">Kelola Tryout Peserta</h3>
+
+              <div v-if="peserta?.tryouts?.length" class="space-y-2">
+                <div
+                  v-for="item in peserta.tryouts"
+                  :key="item.id"
+                  class="flex justify-between items-center border rounded-lg px-4 py-2"
+                >
+                  <div>
+                    <p class="font-medium text-slate-700">{{ item.nama }}</p>
+                    <p class="text-xs text-slate-500">Status: {{ item.status }}</p>
+                  </div>
+                  <button
+                    @click="removeTryout(item.id)"
+                    class="px-3 py-1 text-xs rounded bg-red-100 text-red-600 hover:bg-red-200"
+                  >
+                    Hapus
+                  </button>
+                </div>
+              </div>
+
+              <div v-else class="text-slate-500 text-sm">Belum ada tryout yang diikuti.</div>
+            </div>
           </section>
 
           <p class="text-xs text-slate-500">
@@ -108,6 +151,28 @@ const fetchPeserta = async () => {
     console.error("Gagal mengambil detail peserta", error)
   } finally {
     loading.value = false
+  }
+}
+
+const toggleEventStatus = async (value) => {
+  try {
+    const { data } = await api.patch(`/peserta/toggle-event/${route.params.id}`, { is_event_registered: Number(value) })
+
+    peserta.value.is_event_registered = data.is_event_registered
+  } catch (error) {
+    console.error("Gagal mengubah status event", error)
+  }
+}
+
+const removeTryout = async (tryoutId) => {
+  if (!confirm("Yakin ingin menghapus peserta dari tryout ini?")) return
+
+  try {
+    await api.delete(`/peserta/remove-tryout/${route.params.id}/${tryoutId}`)
+
+    peserta.value.tryouts = peserta.value.tryouts.filter((t) => t.id !== tryoutId)
+  } catch (error) {
+    console.error("Gagal menghapus tryout peserta", error)
   }
 }
 
