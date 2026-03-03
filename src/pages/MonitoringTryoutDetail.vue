@@ -19,22 +19,75 @@
       </div>
 
       <!-- Toggle Section -->
-      <div class="flex gap-3 mb-6">
-        <button
-          @click="showOngoing = !showOngoing"
-          class="px-4 py-2 rounded-lg text-sm font-medium"
-          :class="showOngoing ? 'bg-amber-500 text-white' : 'bg-slate-200 text-slate-700'"
-        >
-          {{ showOngoing ? "Sembunyikan" : "Tampilkan" }} Peserta Sedang Mengerjakan
-        </button>
+      <div class="flex flex-wrap justify-between items-center gap-3 mb-6">
+        <div class="flex flex-wrap gap-3 items-center">
+          <div class="relative">
+            <svg
+              class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M21 21l-4.35-4.35m2.35-5.65a7 7 0 11-14 0 7 7 0 0114 0z"
+              />
+            </svg>
+            <input
+              v-model="searchName"
+              type="text"
+              placeholder="Cari Nama..."
+              class="pl-9 pr-4 py-2 w-56 text-sm rounded-lg border border-slate-200 bg-slate-50 focus:bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none transition"
+            />
+          </div>
 
-        <button
-          @click="showFinished = !showFinished"
-          class="px-4 py-2 rounded-lg text-sm font-medium"
-          :class="showFinished ? 'bg-emerald-600 text-white' : 'bg-slate-200 text-slate-700'"
-        >
-          {{ showFinished ? "Sembunyikan" : "Tampilkan" }} Peserta Sudah Selesai
-        </button>
+          <div class="relative">
+            <svg
+              class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+            >
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3 7h18M3 12h18M3 17h18" />
+            </svg>
+            <input
+              v-model="searchSchool"
+              type="text"
+              placeholder="Cari Sekolah..."
+              class="pl-9 pr-4 py-2 w-56 text-sm rounded-lg border border-slate-200 bg-slate-50 focus:bg-white focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none transition"
+            />
+          </div>
+        </div>
+        <div class="flex items-center gap-2 text-sm ml-auto">
+          <span>Tampilkan:</span>
+          <select v-model="perPage" class="border rounded px-3 py-2 text-sm bg-white">
+            <option :value="50">50</option>
+            <option :value="100">100</option>
+            <option :value="200">200</option>
+          </select>
+          <span>data</span>
+        </div>
+
+        <div class="flex flex-wrap gap-3 mt-3">
+          <button
+            @click="showOngoing = !showOngoing"
+            class="px-4 py-2 rounded-lg text-sm font-medium transition"
+            :class="showOngoing ? 'bg-amber-500 text-white shadow' : 'bg-slate-200 text-slate-700'"
+          >
+            {{ showOngoing ? "Sembunyikan" : "Tampilkan" }} Peserta Sedang Mengerjakan
+          </button>
+
+          <button
+            @click="showFinished = !showFinished"
+            class="px-4 py-2 rounded-lg text-sm font-medium transition"
+            :class="showFinished ? 'bg-emerald-600 text-white shadow' : 'bg-slate-200 text-slate-700'"
+          >
+            {{ showFinished ? "Sembunyikan" : "Tampilkan" }} Peserta Sudah Selesai
+          </button>
+        </div>
       </div>
 
       <!-- Peserta Sedang Mengerjakan -->
@@ -58,7 +111,7 @@
             <tr v-if="loading">
               <td colspan="7" class="px-4 py-6 text-center text-slate-400">Memuat data peserta...</td>
             </tr>
-            <tr v-for="(item, index) in ongoingParticipants" :key="item.id" class="border-t">
+            <tr v-for="(item, index) in paginatedOngoing" :key="item.id" class="border-t">
               <td class="px-4 py-3">{{ index + 1 }}</td>
               <td class="px-4 py-3 font-medium">{{ item.name }}</td>
               <td class="px-4 py-3">{{ item.sekolah_nama ?? "-" }}</td>
@@ -87,6 +140,25 @@
             </tr>
           </tbody>
         </table>
+        <div class="flex justify-between items-center px-4 py-3 border-t text-sm">
+          <div>Halaman {{ ongoingPage }} dari {{ totalOngoingPages }}</div>
+          <div class="flex gap-2">
+            <button
+              @click="changeOngoingPage(ongoingPage - 1)"
+              :disabled="ongoingPage === 1"
+              class="px-3 py-1 border rounded disabled:opacity-50"
+            >
+              Prev
+            </button>
+            <button
+              @click="changeOngoingPage(ongoingPage + 1)"
+              :disabled="ongoingPage === totalOngoingPages"
+              class="px-3 py-1 border rounded disabled:opacity-50"
+            >
+              Next
+            </button>
+          </div>
+        </div>
       </section>
 
       <!-- Peserta Sudah Selesai -->
@@ -111,7 +183,7 @@
             <tr v-if="loading">
               <td colspan="8" class="px-4 py-6 text-center text-slate-400">Memuat data peserta...</td>
             </tr>
-            <tr v-for="(item, index) in finishedParticipants" :key="item.id" class="border-t">
+            <tr v-for="(item, index) in paginatedFinished" :key="item.id" class="border-t">
               <td class="px-4 py-3">{{ index + 1 }}</td>
               <td class="px-4 py-3 font-medium">{{ item.name }}</td>
               <td class="px-4 py-3">{{ item.sekolah_nama ?? "-" }}</td>
@@ -134,6 +206,25 @@
             </tr>
           </tbody>
         </table>
+        <div class="flex justify-between items-center px-4 py-3 border-t text-sm">
+          <div>Halaman {{ finishedPage }} dari {{ totalFinishedPages }}</div>
+          <div class="flex gap-2">
+            <button
+              @click="changeFinishedPage(finishedPage - 1)"
+              :disabled="finishedPage === 1"
+              class="px-3 py-1 border rounded disabled:opacity-50"
+            >
+              Prev
+            </button>
+            <button
+              @click="changeFinishedPage(finishedPage + 1)"
+              :disabled="finishedPage === totalFinishedPages"
+              class="px-3 py-1 border rounded disabled:opacity-50"
+            >
+              Next
+            </button>
+          </div>
+        </div>
       </section>
 
       <div v-if="showModal" class="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
@@ -248,6 +339,13 @@ import Sidebar from "@/components/layout/Sidebar.vue"
 import * as XLSX from "xlsx"
 
 const participants = ref([])
+
+const ongoingPage = ref(1)
+const finishedPage = ref(1)
+const perPage = ref(50)
+const searchName = ref("")
+const searchSchool = ref("")
+
 const showOngoing = ref(true)
 const showFinished = ref(true)
 
@@ -301,9 +399,49 @@ const calculateDuration = (start, end) => {
   return `${remainingMinutes}m`
 }
 
-const ongoingParticipants = computed(() => participants.value.filter((p) => p.status === "ongoing"))
+const filteredParticipants = computed(() => {
+  return participants.value.filter((p) => {
+    const matchName = searchName.value ? p.name?.toLowerCase().includes(searchName.value.toLowerCase()) : true
 
-const finishedParticipants = computed(() => participants.value.filter((p) => p.status === "submitted"))
+    const matchSchool = searchSchool.value
+      ? p.sekolah_nama?.toLowerCase().includes(searchSchool.value.toLowerCase())
+      : true
+
+    return matchName && matchSchool
+  })
+})
+
+const ongoingParticipants = computed(() => filteredParticipants.value.filter((p) => p.status === "ongoing"))
+
+const finishedParticipants = computed(() => filteredParticipants.value.filter((p) => p.status === "submitted"))
+
+const paginatedOngoing = computed(() => {
+  const start = (ongoingPage.value - 1) * perPage.value
+  const end = start + perPage.value
+  return ongoingParticipants.value.slice(start, end)
+})
+
+const paginatedFinished = computed(() => {
+  const start = (finishedPage.value - 1) * perPage.value
+  const end = start + perPage.value
+  return finishedParticipants.value.slice(start, end)
+})
+
+const totalOngoingPages = computed(() => Math.ceil(ongoingParticipants.value.length / perPage.value) || 1)
+
+const totalFinishedPages = computed(() => Math.ceil(finishedParticipants.value.length / perPage.value) || 1)
+
+const changeOngoingPage = (page) => {
+  if (page >= 1 && page <= totalOngoingPages.value) {
+    ongoingPage.value = page
+  }
+}
+
+const changeFinishedPage = (page) => {
+  if (page >= 1 && page <= totalFinishedPages.value) {
+    finishedPage.value = page
+  }
+}
 
 const loading = ref(true)
 
