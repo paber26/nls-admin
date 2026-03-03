@@ -56,19 +56,33 @@
           </section>
 
           <!-- STATUS EVENT -->
-          <section class="bg-white rounded-xl border p-6 text-sm">
-            <h3 class="font-semibold text-slate-800 mb-4">Status Event</h3>
+          <section
+            :class="[
+              'rounded-xl border p-6 text-sm transition-all duration-300',
+              peserta?.is_event_registered ? 'bg-emerald-50 border-emerald-300' : 'bg-rose-50 border-rose-300'
+            ]"
+          >
+            <h3 class="font-semibold mb-4" :class="peserta?.is_event_registered ? 'text-emerald-700' : 'text-rose-700'">
+              Status Event
+            </h3>
 
             <div class="flex items-center justify-between">
               <div>
-                <p class="text-slate-600">Terdaftar Event</p>
+                <p class="font-medium" :class="peserta?.is_event_registered ? 'text-emerald-700' : 'text-rose-700'">
+                  {{ peserta?.is_event_registered ? "Peserta Aktif di Event" : "Peserta Tidak Aktif di Event" }}
+                </p>
                 <p class="text-xs text-slate-500">Mengontrol akses peserta ke event (kolom is_event_registered)</p>
               </div>
 
               <select
                 @change="toggleEventStatus($event.target.value)"
                 :value="peserta?.is_event_registered ? 1 : 0"
-                class="px-4 py-2 text-xs rounded-lg border bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                :class="[
+                  'px-4 py-2 text-xs rounded-lg border focus:outline-none focus:ring-2',
+                  peserta?.is_event_registered
+                    ? 'bg-emerald-100 border-emerald-400 focus:ring-emerald-400'
+                    : 'bg-rose-100 border-rose-400 focus:ring-rose-400'
+                ]"
               >
                 <option :value="1">Aktif</option>
                 <option :value="0">Nonaktif</option>
@@ -97,34 +111,66 @@
           <!-- KELOLA TRYOUT & EVENT -->
           <section class="bg-white rounded-xl border p-6 space-y-6 text-sm">
             <div>
-              <h3 class="font-semibold text-slate-800 mb-4">Kelola Tryout Peserta</h3>
+              <h3 class="font-semibold text-slate-800 mb-4">Riwayat Tryout Peserta</h3>
 
-              <div v-if="peserta?.tryouts?.length" class="space-y-2">
-                <div
-                  v-for="item in peserta.tryouts"
-                  :key="item.id"
-                  class="flex justify-between items-center border rounded-lg px-4 py-2"
-                >
-                  <div>
-                    <p class="font-medium text-slate-700">{{ item.nama }}</p>
-                    <p class="text-xs text-slate-500">Status: {{ item.status }}</p>
-                  </div>
-                  <button
-                    @click="removeTryout(item.id)"
-                    class="px-3 py-1 text-xs rounded bg-red-100 text-red-600 hover:bg-red-200"
-                  >
-                    Hapus
-                  </button>
-                </div>
+              <div v-if="peserta?.tryouts?.length" class="overflow-x-auto">
+                <table class="w-full text-sm border rounded-lg overflow-hidden">
+                  <thead class="bg-slate-100">
+                    <tr>
+                      <th class="px-4 py-3 text-left">No</th>
+                      <th class="px-4 py-3 text-left">Nama Tryout</th>
+                      <th class="px-4 py-3 text-center">Status</th>
+                      <th class="px-4 py-3 text-center">Nilai</th>
+                      <th class="px-4 py-3 text-center">Tanggal Selesai</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr
+                      v-for="(item, index) in peserta.tryouts"
+                      :key="item.id"
+                      class="border-t hover:bg-slate-50 transition"
+                    >
+                      <td class="px-4 py-3">{{ index + 1 }}</td>
+                      <td class="px-4 py-3 font-medium text-slate-700">
+                        {{ item.nama }}
+                      </td>
+                      <td class="px-4 py-3 text-center">
+                        <span
+                          class="text-xs px-3 py-1 rounded-full font-medium"
+                          :class="
+                            item.status === 'submitted'
+                              ? 'bg-emerald-100 text-emerald-700'
+                              : 'bg-amber-100 text-amber-700'
+                          "
+                        >
+                          {{ item.status }}
+                        </span>
+                      </td>
+                      <td class="px-4 py-3 text-center font-semibold">
+                        {{ item.nilai ?? "-" }}
+                      </td>
+                      <td class="px-4 py-3 text-center text-xs text-slate-600">
+                        {{ formatTanggal(item.selesai) }}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
 
-              <div v-else class="text-slate-500 text-sm">Belum ada tryout yang diikuti.</div>
+              <div v-else class="text-slate-500 text-sm">Peserta belum memiliki riwayat tryout.</div>
             </div>
           </section>
 
           <p class="text-xs text-slate-500">
             *Data ditampilkan berdasarkan seluruh tryout yang telah diselesaikan peserta.
           </p>
+        </div>
+        <!-- SUCCESS POPUP -->
+        <div v-if="showSuccessPopup" class="fixed inset-0 flex items-center justify-center bg-black/40 z-50">
+          <div class="bg-white rounded-xl shadow-lg px-6 py-5 text-center w-[320px]">
+            <p class="text-sm font-semibold text-emerald-600 mb-2">Berhasil</p>
+            <p class="text-xs text-slate-600">Status event peserta berhasil diperbarui.</p>
+          </div>
         </div>
       </main>
     </div>
@@ -141,16 +187,48 @@ import Sidebar from "../components/layout/Sidebar.vue"
 const route = useRoute()
 const peserta = ref(null)
 const loading = ref(true)
+const showSuccessPopup = ref(false)
 
-const fetchPeserta = async () => {
+const formatTanggal = (datetime) => {
+  if (!datetime) return "-"
+  const date = new Date(datetime)
+  return date.toLocaleString("id-ID", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit"
+  })
+}
+
+const fetchDetailPeserta = async () => {
   try {
     const { data } = await api.get(`/peserta/detail/${route.params.id}`)
-    peserta.value = data
-    console.log("Data peserta berhasil diambil:", data)
+    peserta.value = {
+      ...data,
+      tryouts: [] // siapkan array kosong dulu
+    }
   } catch (error) {
     console.error("Gagal mengambil detail peserta", error)
-  } finally {
-    loading.value = false
+  }
+}
+
+const fetchRiwayatTryout = async () => {
+  try {
+    const { data } = await api.get(`/peserta/${route.params.id}/riwayat`)
+
+    if (!peserta.value) return
+
+    peserta.value.tryouts = data.riwayat.map((item) => ({
+      id: item.attempt_id,
+      nama: item.nama_tryout,
+      status: item.status,
+      nilai: item.nilai,
+      selesai: item.selesai
+    }))
+    console.log("Riwayat tryout peserta:", peserta.value.tryouts)
+  } catch (error) {
+    console.error("Gagal mengambil riwayat tryout", error)
   }
 }
 
@@ -159,24 +237,19 @@ const toggleEventStatus = async (value) => {
     const { data } = await api.patch(`/peserta/toggle-event/${route.params.id}`, { is_event_registered: Number(value) })
 
     peserta.value.is_event_registered = data.is_event_registered
+    showSuccessPopup.value = true
+    setTimeout(() => {
+      showSuccessPopup.value = false
+    }, 2000)
   } catch (error) {
     console.error("Gagal mengubah status event", error)
   }
 }
 
-const removeTryout = async (tryoutId) => {
-  if (!confirm("Yakin ingin menghapus peserta dari tryout ini?")) return
-
-  try {
-    await api.delete(`/peserta/remove-tryout/${route.params.id}/${tryoutId}`)
-
-    peserta.value.tryouts = peserta.value.tryouts.filter((t) => t.id !== tryoutId)
-  } catch (error) {
-    console.error("Gagal menghapus tryout peserta", error)
-  }
-}
-
-onMounted(() => {
-  fetchPeserta()
+onMounted(async () => {
+  loading.value = true
+  await fetchDetailPeserta()
+  await fetchRiwayatTryout()
+  loading.value = false
 })
 </script>
