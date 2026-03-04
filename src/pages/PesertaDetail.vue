@@ -23,34 +23,40 @@
           <section class="bg-white rounded-xl border p-6 text-sm">
             <div v-if="loading" class="text-center py-10 text-slate-500">Memuat data peserta...</div>
 
-            <div v-else-if="peserta" class="grid md:grid-cols-4 gap-6">
+            <div v-else-if="peserta" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-8 gap-y-6">
               <div>
                 <p class="text-slate-500">Nama</p>
-                <p class="font-medium">{{ peserta.nama_lengkap || peserta.name }}</p>
+                <p class="font-medium">{{ peserta?.nama_lengkap || peserta?.name || "-" }}</p>
               </div>
               <div>
                 <p class="text-slate-500">Sekolah</p>
-                <p class="font-medium">{{ peserta.sekolah.nama }}</p>
+                <p class="font-medium">{{ peserta?.sekolah?.nama ? peserta.sekolah.nama : "-" }}</p>
               </div>
               <div>
                 <p class="text-slate-500">Kelas</p>
-                <p class="font-medium">{{ peserta.kelas }}</p>
+                <p class="font-medium">{{ peserta?.kelas || "-" }}</p>
               </div>
               <div>
                 <p class="text-slate-500">WhatsApp</p>
-                <p class="font-medium">{{ peserta.whatsapp }}</p>
+                <p class="font-medium">{{ peserta?.whatsapp || "-" }}</p>
               </div>
               <div>
                 <p class="text-slate-500">Asal Daerah</p>
-                <p class="font-medium">{{ peserta.provinsi }}{{ peserta.kota ? ", " + peserta.kota : "" }}</p>
+                <p class="font-medium">
+                  {{ peserta?.provinsi ? peserta.provinsi + (peserta?.kota ? ", " + peserta.kota : "") : "-" }}
+                </p>
               </div>
               <div>
                 <p class="text-slate-500">Email</p>
-                <p class="font-medium">{{ peserta.email }}</p>
+                <p class="font-medium">{{ peserta?.email || "-" }}</p>
+              </div>
+              <div>
+                <p class="text-slate-500">Terdaftar Pada</p>
+                <p class="font-medium">{{ peserta?.created_at ? formatTanggal(peserta.created_at) : "-" }}</p>
               </div>
               <div>
                 <p class="text-slate-500">Tryout Diikuti</p>
-                <p class="font-medium">{{ peserta.total_tryout || 0 }}</p>
+                <p class="font-medium">{{ peserta?.total_tryout ?? 0 }}</p>
               </div>
             </div>
           </section>
@@ -90,23 +96,24 @@
             </div>
           </section>
 
-          <!-- RINGKASAN -->
-          <!-- <section class="grid md:grid-cols-3 gap-6">
-            <div class="bg-white rounded-xl border p-6">
-              <p class="text-sm text-slate-500">Nilai Terbaik</p>
-              <p class="text-3xl font-semibold text-emerald-600 mt-2">98</p>
-            </div>
+          <!-- RESET PASSWORD -->
+          <section class="bg-white rounded-xl border p-6 text-sm">
+            <h3 class="font-semibold text-slate-800 mb-4">Ubah Password Peserta</h3>
 
-            <div class="bg-white rounded-xl border p-6">
-              <p class="text-sm text-slate-500">Rata-rata Nilai</p>
-              <p class="text-3xl font-semibold text-slate-800 mt-2">82,4</p>
-            </div>
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="font-medium text-slate-700">Admin dapat mengatur password baru untuk peserta</p>
+                <p class="text-xs text-slate-500">Password akan langsung diperbarui dan di-hash oleh sistem.</p>
+              </div>
 
-            <div class="bg-white rounded-xl border p-6">
-              <p class="text-sm text-slate-500">Peringkat Terbaik</p>
-              <p class="text-3xl font-semibold text-indigo-600 mt-2">5</p>
+              <button
+                @click="confirmResetPassword"
+                class="px-4 py-2 text-xs rounded-lg bg-rose-600 text-white hover:bg-rose-700 transition"
+              >
+                Ubah Password
+              </button>
             </div>
-          </section> -->
+          </section>
 
           <!-- KELOLA TRYOUT & EVENT -->
           <section class="bg-white rounded-xl border p-6 space-y-6 text-sm">
@@ -165,11 +172,43 @@
             *Data ditampilkan berdasarkan seluruh tryout yang telah diselesaikan peserta.
           </p>
         </div>
+        <!-- UBAH PASSWORD MODAL -->
+        <div v-if="showResetConfirm" class="fixed inset-0 flex items-center justify-center bg-black/40 z-50">
+          <div class="bg-white rounded-xl shadow-lg px-6 py-6 w-[360px]">
+            <h3 class="text-sm font-semibold text-slate-800 mb-4 text-center">Ubah Password Peserta</h3>
+
+            <input
+              v-model="newPassword"
+              type="password"
+              placeholder="Masukkan password baru"
+              class="w-full px-3 py-2 text-sm border rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+            />
+
+            <div class="flex justify-end gap-3">
+              <button @click="showResetConfirm = false" class="px-4 py-2 text-xs rounded-lg border hover:bg-slate-100">
+                Batal
+              </button>
+              <button
+                @click="updatePassword"
+                class="px-4 py-2 text-xs rounded-lg bg-indigo-600 text-white hover:bg-indigo-700"
+              >
+                Simpan
+              </button>
+            </div>
+          </div>
+        </div>
         <!-- SUCCESS POPUP -->
         <div v-if="showSuccessPopup" class="fixed inset-0 flex items-center justify-center bg-black/40 z-50">
           <div class="bg-white rounded-xl shadow-lg px-6 py-5 text-center w-[320px]">
             <p class="text-sm font-semibold text-emerald-600 mb-2">Berhasil</p>
-            <p class="text-xs text-slate-600">Status event peserta berhasil diperbarui.</p>
+            <p class="text-xs text-slate-600">{{ successMessage }}</p>
+          </div>
+        </div>
+        <!-- ERROR POPUP -->
+        <div v-if="showErrorPopup" class="fixed inset-0 flex items-center justify-center bg-black/40 z-50">
+          <div class="bg-white rounded-xl shadow-lg px-6 py-5 text-center w-[320px]">
+            <p class="text-sm font-semibold text-rose-600 mb-2">Gagal</p>
+            <p class="text-xs text-slate-600">{{ errorMessage }}</p>
           </div>
         </div>
       </main>
@@ -188,6 +227,11 @@ const route = useRoute()
 const peserta = ref(null)
 const loading = ref(true)
 const showSuccessPopup = ref(false)
+const successMessage = ref("")
+const showErrorPopup = ref(false)
+const errorMessage = ref("")
+const showResetConfirm = ref(false)
+const newPassword = ref("")
 
 const formatTanggal = (datetime) => {
   if (!datetime) return "-"
@@ -208,6 +252,7 @@ const fetchDetailPeserta = async () => {
       ...data,
       tryouts: [] // siapkan array kosong dulu
     }
+    console.log("Detail peserta:", peserta.value)
   } catch (error) {
     console.error("Gagal mengambil detail peserta", error)
   }
@@ -237,12 +282,52 @@ const toggleEventStatus = async (value) => {
     const { data } = await api.patch(`/peserta/toggle-event/${route.params.id}`, { is_event_registered: Number(value) })
 
     peserta.value.is_event_registered = data.is_event_registered
+    successMessage.value = "Status event peserta berhasil diperbarui."
     showSuccessPopup.value = true
     setTimeout(() => {
       showSuccessPopup.value = false
     }, 2000)
   } catch (error) {
     console.error("Gagal mengubah status event", error)
+  }
+}
+
+const confirmResetPassword = () => {
+  showResetConfirm.value = true
+}
+
+const updatePassword = async () => {
+  if (!newPassword.value) {
+    errorMessage.value = "Gagal memperbarui password: password baru harus diisi."
+    showErrorPopup.value = true
+    setTimeout(() => {
+      showErrorPopup.value = false
+    }, 2000)
+    return
+  }
+
+  try {
+    await api.post(`/peserta/${route.params.id}/update-password`, {
+      password: newPassword.value
+    })
+
+    newPassword.value = ""
+    showResetConfirm.value = false
+    successMessage.value = "Password peserta berhasil diperbarui."
+    showSuccessPopup.value = true
+
+    setTimeout(() => {
+      showSuccessPopup.value = false
+    }, 2000)
+  } catch (error) {
+    console.error("Gagal mengubah password", error)
+
+    errorMessage.value = error?.response?.data?.message || "Terjadi kesalahan saat memperbarui password"
+
+    showErrorPopup.value = true
+    setTimeout(() => {
+      showErrorPopup.value = false
+    }, 2500)
   }
 }
 
