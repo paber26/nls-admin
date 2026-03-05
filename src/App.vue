@@ -14,7 +14,7 @@
 <script setup>
 import { ref, onMounted } from "vue"
 import { RouterView } from "vue-router"
-import Login from "./pages/autentifikasi/login.vue"
+import Login from "./pages/autentifikasi/Login.vue"
 import Isiformawal from "./pages/autentifikasi/Isiformawal.vue"
 import api from "@/services/api"
 
