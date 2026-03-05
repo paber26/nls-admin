@@ -17,6 +17,12 @@
         peserta yang sedang mengerjakan, sudah selesai, maupun total peserta.
       </div>
       <div class="flex flex-wrap gap-3 mb-4 items-center">
+        <input
+          v-model="searchName"
+          type="text"
+          placeholder="Cari nama tryout..."
+          class="border rounded px-3 py-2 text-sm w-56"
+        />
         <select v-model="filterStatus" class="border rounded px-3 py-2 text-sm">
           <option value="">Semua Tryout</option>
           <option value="ongoing">Masih Ada Peserta Mengerjakan</option>
@@ -120,6 +126,7 @@ const loading = ref(true)
 const sortKey = ref("")
 const sortOrder = ref("desc")
 const filterStatus = ref("")
+const searchName = ref("")
 
 const formatDate = (datetime) => {
   if (!datetime) return "-"
@@ -144,6 +151,10 @@ const setSort = (key) => {
 
 const filteredTryouts = computed(() => {
   let data = [...tryouts.value]
+
+  if (searchName.value) {
+    data = data.filter((t) => (t.paket ?? "").toLowerCase().includes(searchName.value.toLowerCase()))
+  }
 
   if (filterStatus.value === "ongoing") {
     data = data.filter((t) => (t.sedang_mengerjakan ?? 0) > 0)

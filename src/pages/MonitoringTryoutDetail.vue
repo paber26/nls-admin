@@ -10,12 +10,21 @@
           <p class="text-sm text-slate-500">Menampilkan peserta yang mengikuti tryout ini</p>
         </div>
 
-        <button
-          @click="exportToExcel"
-          class="bg-emerald-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-emerald-700 shadow"
-        >
-          Export Excel
-        </button>
+        <div class="flex gap-2">
+          <button
+            @click="exportToExcel"
+            class="bg-emerald-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-emerald-700 shadow"
+          >
+            Export Excel
+          </button>
+
+          <button
+            @click="forceFinishAll"
+            class="bg-red-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-red-700 shadow"
+          >
+            Akhiri Semua
+          </button>
+        </div>
       </div>
 
       <!-- Toggle Section -->
@@ -382,6 +391,32 @@ const confirmForceFinish = async () => {
   } catch (error) {
     console.error("Gagal mengakhiri tryout:", error)
     showConfirmModal.value = false
+  }
+}
+
+const forceFinishAll = async () => {
+  const ongoing = participants.value.filter((p) => p.status === "ongoing")
+
+  if (!ongoing.length) {
+    alert("Tidak ada peserta yang sedang mengerjakan.")
+    return
+  }
+
+  const confirmAction = confirm(`Yakin ingin mengakhiri ${ongoing.length} peserta yang sedang mengerjakan?`)
+
+  if (!confirmAction) return
+
+  try {
+    for (const p of ongoing) {
+      await api.post(`/monitoring-tryout/${p.id}/force-finish`)
+      p.status = "submitted"
+      p.selesai = new Date().toISOString()
+    }
+
+    alert("Semua peserta berhasil diakhiri.")
+  } catch (error) {
+    console.error(error)
+    alert("Terjadi kesalahan saat mengakhiri peserta.")
   }
 }
 
