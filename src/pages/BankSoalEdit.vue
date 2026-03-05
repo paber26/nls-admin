@@ -30,7 +30,6 @@
 
         <!-- Pertanyaan -->
         <div>
-          <label class="block text-sm font-medium mb-1">Pertanyaan</label>
           <ckeditor :editor="editor" v-model="pertanyaan" :config="editorConfig" />
         </div>
 
@@ -211,9 +210,39 @@ const errorMessage = ref("")
 
 const editor = ClassicEditor
 
+function MyUploadAdapter(loader) {
+  this.loader = loader
+}
+
+MyUploadAdapter.prototype.upload = function () {
+  return this.loader.file.then((file) => {
+    const data = new FormData()
+    data.append("upload", file)
+
+    return api
+      .post("/upload-image", data, {
+        headers: {
+          "Content-Type": "multipart/form-data"
+        }
+      })
+      .then((res) => {
+        return {
+          default: res.data.url
+        }
+      })
+  })
+}
+
+function MyCustomUploadAdapterPlugin(editor) {
+  editor.plugins.get("FileRepository").createUploadAdapter = (loader) => {
+    return new MyUploadAdapter(loader)
+  }
+}
+
 const editorConfig = {
   licenseKey: "GPL",
   plugins: [Essentials, Paragraph, Bold, Italic, Underline, Link, List, Image, ImageToolbar, ImageResize, ImageUpload],
+  extraPlugins: [MyCustomUploadAdapterPlugin],
   toolbar: [
     "undo",
     "redo",
