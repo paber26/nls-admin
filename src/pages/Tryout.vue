@@ -30,15 +30,10 @@
 
         <input
           v-model="searchNama"
-          @keyup.enter="applySearch"
           type="text"
           placeholder="Cari nama tryout..."
           class="px-3 py-2 border rounded-lg text-sm w-64"
         />
-
-        <button @click="applySearch" class="px-4 py-2 text-xs bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">
-          Cari
-        </button>
       </div>
 
       <!-- Table -->
@@ -106,7 +101,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue"
+import { ref, onMounted, watch } from "vue"
 import { RouterLink } from "vue-router"
 import api from "@/services/api"
 import Sidebar from "@/components/layout/Sidebar.vue"
@@ -154,10 +149,14 @@ const applySearch = () => {
     return
   }
 
-  const keyword = searchNama.value.toLowerCase()
+  const keyword = (searchNama.value || "").toString().toLowerCase().trim()
 
   tryouts.value = allTryouts.value.filter((t) => (t.paket || "").toLowerCase().includes(keyword))
 }
+
+watch(searchNama, () => {
+  applySearch()
+})
 
 const fetchMapel = async () => {
   const res = await api.get("/mapel")
