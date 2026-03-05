@@ -108,10 +108,42 @@
           <thead class="bg-slate-100">
             <tr>
               <th class="px-4 py-3 text-left">No</th>
-              <th class="px-4 py-3 text-left">Nama</th>
-              <th class="px-4 py-3 text-left">Sekolah</th>
+              <th @click="setSort('name')" class="px-4 py-3 text-left cursor-pointer select-none">
+                <span class="flex items-center gap-1">
+                  Nama
+                  <span class="text-xs">
+                    <span :class="sortKey === 'name' && sortDir === 'asc' ? 'text-black' : 'text-slate-300'">▲</span>
+                    <span :class="sortKey === 'name' && sortDir === 'desc' ? 'text-black' : 'text-slate-300'">▼</span>
+                  </span>
+                </span>
+              </th>
+              <th @click="setSort('sekolah_nama')" class="px-4 py-3 text-left cursor-pointer select-none">
+                <span class="flex items-center gap-1">
+                  Sekolah
+                  <span class="text-xs">
+                    <span :class="sortKey === 'sekolah_nama' && sortDir === 'asc' ? 'text-black' : 'text-slate-300'">
+                      ▲
+                    </span>
+                    <span :class="sortKey === 'sekolah_nama' && sortDir === 'desc' ? 'text-black' : 'text-slate-300'">
+                      ▼
+                    </span>
+                  </span>
+                </span>
+              </th>
               <th class="px-4 py-3 text-center">Durasi</th>
-              <th class="px-4 py-3 text-center">Jawaban</th>
+              <th @click="setSort('jawaban_count')" class="px-4 py-3 text-center cursor-pointer select-none">
+                <span class="flex items-center justify-center gap-1">
+                  Jawaban
+                  <span class="text-xs">
+                    <span :class="sortKey === 'jawaban_count' && sortDir === 'asc' ? 'text-black' : 'text-slate-300'">
+                      ▲
+                    </span>
+                    <span :class="sortKey === 'jawaban_count' && sortDir === 'desc' ? 'text-black' : 'text-slate-300'">
+                      ▼
+                    </span>
+                  </span>
+                </span>
+              </th>
               <th class="px-4 py-3 text-center">Detail</th>
               <th class="px-4 py-3 text-center">Aksi</th>
             </tr>
@@ -179,12 +211,52 @@
           <thead class="bg-slate-100">
             <tr>
               <th class="px-4 py-3 text-left">No</th>
-              <th class="px-4 py-3 text-left">Nama</th>
-              <th class="px-4 py-3 text-left">Sekolah</th>
-              <th class="px-4 py-3 text-center">Nilai</th>
+              <th @click="setSort('name')" class="px-4 py-3 text-left cursor-pointer select-none">
+                <span class="flex items-center gap-1">
+                  Nama
+                  <span class="text-xs">
+                    <span :class="sortKey === 'name' && sortDir === 'asc' ? 'text-black' : 'text-slate-300'">▲</span>
+                    <span :class="sortKey === 'name' && sortDir === 'desc' ? 'text-black' : 'text-slate-300'">▼</span>
+                  </span>
+                </span>
+              </th>
+              <th @click="setSort('sekolah_nama')" class="px-4 py-3 text-left cursor-pointer select-none">
+                <span class="flex items-center gap-1">
+                  Sekolah
+                  <span class="text-xs">
+                    <span :class="sortKey === 'sekolah_nama' && sortDir === 'asc' ? 'text-black' : 'text-slate-300'">
+                      ▲
+                    </span>
+                    <span :class="sortKey === 'sekolah_nama' && sortDir === 'desc' ? 'text-black' : 'text-slate-300'">
+                      ▼
+                    </span>
+                  </span>
+                </span>
+              </th>
+              <th @click="setSort('nilai')" class="px-4 py-3 text-center cursor-pointer select-none">
+                <span class="flex items-center justify-center gap-1">
+                  Nilai
+                  <span class="text-xs">
+                    <span :class="sortKey === 'nilai' && sortDir === 'asc' ? 'text-black' : 'text-slate-300'">▲</span>
+                    <span :class="sortKey === 'nilai' && sortDir === 'desc' ? 'text-black' : 'text-slate-300'">▼</span>
+                  </span>
+                </span>
+              </th>
               <th class="px-4 py-3 text-center">Selesai</th>
               <th class="px-4 py-3 text-center">Durasi</th>
-              <th class="px-4 py-3 text-center">Jawaban</th>
+              <th @click="setSort('jawaban_count')" class="px-4 py-3 text-center cursor-pointer select-none">
+                <span class="flex items-center justify-center gap-1">
+                  Jawaban
+                  <span class="text-xs">
+                    <span :class="sortKey === 'jawaban_count' && sortDir === 'asc' ? 'text-black' : 'text-slate-300'">
+                      ▲
+                    </span>
+                    <span :class="sortKey === 'jawaban_count' && sortDir === 'desc' ? 'text-black' : 'text-slate-300'">
+                      ▼
+                    </span>
+                  </span>
+                </span>
+              </th>
               <th class="px-4 py-3 text-center">Detail</th>
             </tr>
           </thead>
@@ -328,7 +400,7 @@
       <div v-if="showSuccessModal" class="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
         <div class="bg-white w-[360px] rounded-xl p-6 text-center">
           <h3 class="text-lg font-semibold mb-4 text-emerald-600">Berhasil</h3>
-          <p class="text-sm text-slate-600 mb-6">Tryout berhasil diakhiri.</p>
+          <p class="text-sm text-slate-600 mb-6">{{ successMessage }}</p>
           <button
             @click="showSuccessModal = false"
             class="px-4 py-2 text-sm rounded-lg bg-emerald-600 text-white hover:bg-emerald-700"
@@ -354,6 +426,17 @@ const finishedPage = ref(1)
 const perPage = ref(50)
 const searchName = ref("")
 const searchSchool = ref("")
+const sortKey = ref("")
+const sortDir = ref("asc")
+
+const setSort = (key) => {
+  if (sortKey.value === key) {
+    sortDir.value = sortDir.value === "asc" ? "desc" : "asc"
+  } else {
+    sortKey.value = key
+    sortDir.value = "asc"
+  }
+}
 
 const showOngoing = ref(true)
 const showFinished = ref(true)
@@ -364,6 +447,7 @@ const selectedParticipant = ref(null)
 const showConfirmModal = ref(false)
 const confirmTarget = ref(null)
 const showSuccessModal = ref(false)
+const successMessage = ref("")
 
 const openDetail = (item) => {
   selectedParticipant.value = item
@@ -387,6 +471,7 @@ const confirmForceFinish = async () => {
     confirmTarget.value.selesai = new Date().toISOString()
 
     showConfirmModal.value = false
+    successMessage.value = "Tryout peserta berhasil diakhiri."
     showSuccessModal.value = true
   } catch (error) {
     console.error("Gagal mengakhiri tryout:", error)
@@ -398,7 +483,8 @@ const forceFinishAll = async () => {
   const ongoing = participants.value.filter((p) => p.status === "ongoing")
 
   if (!ongoing.length) {
-    alert("Tidak ada peserta yang sedang mengerjakan.")
+    successMessage.value = "Tidak ada peserta yang sedang mengerjakan."
+    showSuccessModal.value = true
     return
   }
 
@@ -413,10 +499,12 @@ const forceFinishAll = async () => {
       p.selesai = new Date().toISOString()
     }
 
-    alert("Semua peserta berhasil diakhiri.")
+    successMessage.value = "Semua peserta yang sedang mengerjakan berhasil diakhiri."
+    showSuccessModal.value = true
   } catch (error) {
     console.error(error)
-    alert("Terjadi kesalahan saat mengakhiri peserta.")
+    successMessage.value = "Terjadi kesalahan saat mengakhiri peserta."
+    showSuccessModal.value = true
   }
 }
 
@@ -446,9 +534,22 @@ const filteredParticipants = computed(() => {
   })
 })
 
-const ongoingParticipants = computed(() => filteredParticipants.value.filter((p) => p.status === "ongoing"))
+const sortedParticipants = computed(() => {
+  if (!sortKey.value) return filteredParticipants.value
 
-const finishedParticipants = computed(() => filteredParticipants.value.filter((p) => p.status === "submitted"))
+  return [...filteredParticipants.value].sort((a, b) => {
+    const A = a[sortKey.value] ?? ""
+    const B = b[sortKey.value] ?? ""
+
+    if (A < B) return sortDir.value === "asc" ? -1 : 1
+    if (A > B) return sortDir.value === "asc" ? 1 : -1
+    return 0
+  })
+})
+
+const ongoingParticipants = computed(() => sortedParticipants.value.filter((p) => p.status === "ongoing"))
+
+const finishedParticipants = computed(() => sortedParticipants.value.filter((p) => p.status === "submitted"))
 
 const paginatedOngoing = computed(() => {
   const start = (ongoingPage.value - 1) * perPage.value
