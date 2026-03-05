@@ -19,7 +19,7 @@
       </div>
 
       <!-- Filter Mapel -->
-      <div class="mb-4 flex items-center gap-3">
+      <div class="mb-4 flex flex-wrap items-center gap-3">
         <label class="text-sm font-medium">Mapel:</label>
         <select v-model="selectedMapel" @change="fetchTryout" class="px-3 py-2 border rounded-lg text-sm">
           <option value="">Semua</option>
@@ -27,6 +27,18 @@
             {{ m.nama }}
           </option>
         </select>
+
+        <input
+          v-model="searchNama"
+          @keyup.enter="applySearch"
+          type="text"
+          placeholder="Cari nama tryout..."
+          class="px-3 py-2 border rounded-lg text-sm w-64"
+        />
+
+        <button @click="applySearch" class="px-4 py-2 text-xs bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">
+          Cari
+        </button>
       </div>
 
       <!-- Table -->
@@ -100,8 +112,10 @@ import api from "@/services/api"
 import Sidebar from "@/components/layout/Sidebar.vue"
 
 const tryouts = ref([])
+const allTryouts = ref([])
 const loading = ref(true)
 const selectedMapel = ref("")
+const searchNama = ref("")
 const mapelList = ref([])
 
 const formatDate = (datetime) => {
@@ -118,15 +132,31 @@ const formatDate = (datetime) => {
 
 const fetchTryout = async () => {
   loading.value = true
+  try {
+    const res = await api.get("/tryout", {
+      params: {
+        mapel_id: selectedMapel.value || undefined
+      }
+    })
 
-  const res = await api.get("/tryout", {
-    params: {
-      mapel_id: selectedMapel.value || undefined
-    }
-  })
+    allTryouts.value = res.data
+    applySearch()
+  } catch (error) {
+    console.error("Gagal mengambil data tryout:", error)
+  } finally {
+    loading.value = false
+  }
+}
 
-  tryouts.value = res.data
-  loading.value = false
+const applySearch = () => {
+  if (!searchNama.value) {
+    tryouts.value = allTryouts.value
+    return
+  }
+
+  const keyword = searchNama.value.toLowerCase()
+
+  tryouts.value = allTryouts.value.filter((t) => (t.paket || "").toLowerCase().includes(keyword))
 }
 
 const fetchMapel = async () => {
