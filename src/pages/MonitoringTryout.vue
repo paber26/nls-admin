@@ -13,8 +13,7 @@
 
       <!-- Filter & Sorting -->
       <div class="mb-2 text-xs text-slate-500">
-        Gunakan filter dan tombol urutkan di bawah ini untuk menyaring serta mengurutkan data tryout berdasarkan jumlah
-        peserta yang sedang mengerjakan, sudah selesai, maupun total peserta.
+        Gunakan filter dan klik header tabel untuk mengurutkan data tryout.
       </div>
       <div class="flex flex-wrap gap-3 mb-4 items-center">
         <input
@@ -28,18 +27,6 @@
           <option value="ongoing">Masih Ada Peserta Mengerjakan</option>
           <option value="finished">Semua Sudah Selesai</option>
         </select>
-
-        <button @click="setSort('sedang_mengerjakan')" class="px-3 py-2 text-xs bg-amber-100 text-amber-700 rounded">
-          Urutkan: Sedang Mengerjakan
-        </button>
-
-        <button @click="setSort('sudah_selesai')" class="px-3 py-2 text-xs bg-emerald-100 text-emerald-700 rounded">
-          Urutkan: Sudah Selesai
-        </button>
-
-        <button @click="setSort('total_peserta')" class="px-3 py-2 text-xs bg-slate-200 text-slate-700 rounded">
-          Urutkan: Total Peserta
-        </button>
       </div>
 
       <!-- Table -->
@@ -47,11 +34,79 @@
         <table class="w-full text-sm">
           <thead class="bg-slate-100">
             <tr>
-              <th class="px-4 py-3 text-left">Nama Tryout</th>
+              <th class="px-4 py-3 text-left">No</th>
+              <th @click="setSort('paket')" class="px-4 py-3 text-left cursor-pointer select-none hover:bg-slate-200">
+                <span class="inline-flex items-center gap-1">
+                  Nama Tryout
+                  <span class="text-[10px] leading-none">
+                    <span :class="sortKey === 'paket' && sortOrder === 'asc' ? 'text-slate-800' : 'text-slate-400'">
+                      ▲
+                    </span>
+                    <span :class="sortKey === 'paket' && sortOrder === 'desc' ? 'text-slate-800' : 'text-slate-400'">
+                      ▼
+                    </span>
+                  </span>
+                </span>
+              </th>
               <th class="px-4 py-3 text-center">Periode</th>
-              <th class="px-4 py-3 text-center">Sedang Mengerjakan</th>
-              <th class="px-4 py-3 text-center">Sudah Selesai</th>
-              <th class="px-4 py-3 text-center">Total Peserta</th>
+              <th
+                @click="setSort('sedang_mengerjakan')"
+                class="px-4 py-3 text-center cursor-pointer select-none hover:bg-slate-200"
+              >
+                <span class="inline-flex items-center gap-1">
+                  Sedang Mengerjakan
+                  <span class="text-[10px] leading-none">
+                    <span
+                      :class="sortKey === 'sedang_mengerjakan' && sortOrder === 'asc' ? 'text-slate-800' : 'text-slate-400'"
+                    >
+                      ▲
+                    </span>
+                    <span
+                      :class="sortKey === 'sedang_mengerjakan' && sortOrder === 'desc' ? 'text-slate-800' : 'text-slate-400'"
+                    >
+                      ▼
+                    </span>
+                  </span>
+                </span>
+              </th>
+              <th
+                @click="setSort('sudah_selesai')"
+                class="px-4 py-3 text-center cursor-pointer select-none hover:bg-slate-200"
+              >
+                <span class="inline-flex items-center gap-1">
+                  Sudah Selesai
+                  <span class="text-[10px] leading-none">
+                    <span
+                      :class="sortKey === 'sudah_selesai' && sortOrder === 'asc' ? 'text-slate-800' : 'text-slate-400'"
+                    >
+                      ▲
+                    </span>
+                    <span
+                      :class="sortKey === 'sudah_selesai' && sortOrder === 'desc' ? 'text-slate-800' : 'text-slate-400'"
+                    >
+                      ▼
+                    </span>
+                  </span>
+                </span>
+              </th>
+              <th
+                @click="setSort('total_peserta')"
+                class="px-4 py-3 text-center cursor-pointer select-none hover:bg-slate-200"
+              >
+                <span class="inline-flex items-center gap-1">
+                  Total Peserta
+                  <span class="text-[10px] leading-none">
+                    <span :class="sortKey === 'total_peserta' && sortOrder === 'asc' ? 'text-slate-800' : 'text-slate-400'">
+                      ▲
+                    </span>
+                    <span
+                      :class="sortKey === 'total_peserta' && sortOrder === 'desc' ? 'text-slate-800' : 'text-slate-400'"
+                    >
+                      ▼
+                    </span>
+                  </span>
+                </span>
+              </th>
               <th class="px-4 py-3 text-center">Status</th>
               <th class="px-4 py-3 text-center">Detail</th>
             </tr>
@@ -59,10 +114,11 @@
 
           <tbody>
             <tr v-if="loading">
-              <td colspan="7" class="px-4 py-6 text-center text-slate-400">Memuat data...</td>
+              <td colspan="8" class="px-4 py-6 text-center text-slate-400">Memuat data...</td>
             </tr>
 
-            <tr v-for="item in filteredTryouts" :key="item.id" class="border-t">
+            <tr v-for="(item, index) in filteredTryouts" :key="item.id" class="border-t">
+              <td class="px-4 py-3">{{ index + 1 }}</td>
               <td class="px-4 py-3 font-medium">{{ item.paket }}</td>
 
               <td class="px-4 py-3 text-center text-xs text-slate-600">
@@ -145,7 +201,7 @@ const setSort = (key) => {
     sortOrder.value = sortOrder.value === "asc" ? "desc" : "asc"
   } else {
     sortKey.value = key
-    sortOrder.value = "desc"
+    sortOrder.value = key === "paket" ? "asc" : "desc"
   }
 }
 
@@ -166,9 +222,20 @@ const filteredTryouts = computed(() => {
 
   if (sortKey.value) {
     data.sort((a, b) => {
-      const aVal = a[sortKey.value] ?? 0
-      const bVal = b[sortKey.value] ?? 0
-      return sortOrder.value === "asc" ? aVal - bVal : bVal - aVal
+      const aVal = a[sortKey.value]
+      const bVal = b[sortKey.value]
+
+      if (typeof aVal === "string" || typeof bVal === "string") {
+        const A = String(aVal ?? "").toLowerCase()
+        const B = String(bVal ?? "").toLowerCase()
+        if (A < B) return sortOrder.value === "asc" ? -1 : 1
+        if (A > B) return sortOrder.value === "asc" ? 1 : -1
+        return 0
+      }
+
+      const A = Number(aVal ?? 0)
+      const B = Number(bVal ?? 0)
+      return sortOrder.value === "asc" ? A - B : B - A
     })
   }
 

@@ -41,8 +41,39 @@
         <table class="w-full text-sm">
           <thead class="bg-slate-100">
             <tr>
-              <th class="px-4 py-3 text-left">Nama Paket</th>
-              <th class="px-4 py-3 text-left">Mapel</th>
+              <th class="px-4 py-3 text-left">No</th>
+              <th
+                @click="setSort('paket')"
+                class="px-4 py-3 text-left cursor-pointer select-none hover:bg-slate-200 transition"
+              >
+                <span class="inline-flex items-center gap-1">
+                  Nama Paket
+                  <span class="text-[10px] leading-none">
+                    <span :class="sortKey === 'paket' && sortDir === 'asc' ? 'text-slate-800' : 'text-slate-400'">
+                      ▲
+                    </span>
+                    <span :class="sortKey === 'paket' && sortDir === 'desc' ? 'text-slate-800' : 'text-slate-400'">
+                      ▼
+                    </span>
+                  </span>
+                </span>
+              </th>
+              <th
+                @click="setSort('mapel')"
+                class="px-4 py-3 text-left cursor-pointer select-none hover:bg-slate-200 transition"
+              >
+                <span class="inline-flex items-center gap-1">
+                  Mapel
+                  <span class="text-[10px] leading-none">
+                    <span :class="sortKey === 'mapel' && sortDir === 'asc' ? 'text-slate-800' : 'text-slate-400'">
+                      ▲
+                    </span>
+                    <span :class="sortKey === 'mapel' && sortDir === 'desc' ? 'text-slate-800' : 'text-slate-400'">
+                      ▼
+                    </span>
+                  </span>
+                </span>
+              </th>
               <th class="px-4 py-3 text-center">Jumlah Soal</th>
               <th class="px-4 py-3 text-center">Periode</th>
               <th class="px-4 py-3 text-center">Status</th>
@@ -56,7 +87,8 @@
               <td colspan="7" class="px-4 py-6 text-center text-slate-400">Memuat data...</td>
             </tr>
 
-            <tr v-for="item in tryouts" :key="item.id" class="border-t">
+            <tr v-for="(item, index) in tryouts" :key="item.id" class="border-t">
+              <td class="px-4 py-3">{{ index + 1 }}</td>
               <td class="px-4 py-3 font-medium">{{ item.paket }}</td>
               <td class="px-4 py-3">{{ item.mapel }}</td>
               <td class="px-4 py-3 text-center font-medium">
@@ -112,6 +144,8 @@ const loading = ref(true)
 const selectedMapel = ref("")
 const searchNama = ref("")
 const mapelList = ref([])
+const sortKey = ref("")
+const sortDir = ref("asc")
 
 const formatDate = (datetime) => {
   if (!datetime) return "-"
@@ -143,15 +177,38 @@ const fetchTryout = async () => {
   }
 }
 
-const applySearch = () => {
-  if (!searchNama.value) {
-    tryouts.value = allTryouts.value
-    return
+const setSort = (key) => {
+  if (sortKey.value === key) {
+    sortDir.value = sortDir.value === "asc" ? "desc" : "asc"
+  } else {
+    sortKey.value = key
+    sortDir.value = "asc"
   }
+  applySearch()
+}
 
+const applySort = (list) => {
+  if (!sortKey.value) return list
+
+  return [...list].sort((a, b) => {
+    const A = (a?.[sortKey.value] ?? "").toString().toLowerCase()
+    const B = (b?.[sortKey.value] ?? "").toString().toLowerCase()
+
+    if (A < B) return sortDir.value === "asc" ? -1 : 1
+    if (A > B) return sortDir.value === "asc" ? 1 : -1
+    return 0
+  })
+}
+
+const applySearch = () => {
+  let filtered = [...allTryouts.value]
   const keyword = (searchNama.value || "").toString().toLowerCase().trim()
 
-  tryouts.value = allTryouts.value.filter((t) => (t.paket || "").toLowerCase().includes(keyword))
+  if (keyword) {
+    filtered = filtered.filter((t) => (t.paket || "").toLowerCase().includes(keyword))
+  }
+
+  tryouts.value = applySort(filtered)
 }
 
 watch(searchNama, () => {
