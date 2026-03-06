@@ -28,6 +28,7 @@ import MonitoringTryoutDetail from "../pages/MonitoringTryoutDetail.vue"
 import MonitoringTryoutHasil from "../pages/MonitoringTryoutHasil.vue"
 
 import Peringkat from "../pages/Peringkat.vue"
+import PeringkatDetail from "../pages/PeringkatDetail.vue"
 import Persiapan from "../pages/TryoutPersiapan.vue"
 import TryoutHasil from "../pages/TryoutHasil.vue"
 
@@ -118,6 +119,11 @@ const routes = [
     path: "/peringkat",
     name: "Peringkat",
     component: Peringkat
+  },
+  {
+    path: "/peringkat/:id",
+    name: "PeringkatDetail",
+    component: PeringkatDetail
   },
   {
     path: "/sekolah",
