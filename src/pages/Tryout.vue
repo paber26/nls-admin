@@ -161,7 +161,6 @@ watch(searchNama, () => {
 const fetchMapel = async () => {
   const res = await api.get("/mapel")
   mapelList.value = res.data
-  console.log("Mapel List:", mapelList.value)
 }
 
 onMounted(async () => {

@@ -258,11 +258,12 @@
                 </span>
               </th>
               <th class="px-4 py-3 text-center">Detail</th>
+              <th class="px-4 py-3 text-center">Hasil</th>
             </tr>
           </thead>
           <tbody>
             <tr v-if="loading">
-              <td colspan="8" class="px-4 py-6 text-center text-slate-400">Memuat data peserta...</td>
+              <td colspan="9" class="px-4 py-6 text-center text-slate-400">Memuat data peserta...</td>
             </tr>
             <tr v-for="(item, index) in paginatedFinished" :key="item.id" class="border-t">
               <td class="px-4 py-3">{{ index + 1 }}</td>
@@ -279,9 +280,20 @@
                   Lihat
                 </button>
               </td>
+              <td class="px-4 py-3 text-center">
+                <RouterLink
+                  :to="{
+                    name: 'MonitoringTryoutHasil',
+                    params: { tryoutId: route.params.id, participantId: item.id }
+                  }"
+                  class="text-xs bg-indigo-600 text-white px-3 py-1 rounded hover:bg-indigo-700"
+                >
+                  Lihat Hasil
+                </RouterLink>
+              </td>
             </tr>
             <tr v-if="!loading && finishedParticipants.length === 0">
-              <td colspan="8" class="px-4 py-6 text-center text-slate-400">
+              <td colspan="9" class="px-4 py-6 text-center text-slate-400">
                 Belum ada peserta yang menyelesaikan tryout.
               </td>
             </tr>
@@ -581,7 +593,7 @@ const changeFinishedPage = (page) => {
 
 const loading = ref(true)
 
-import { useRoute } from "vue-router"
+import { RouterLink, useRoute } from "vue-router"
 const route = useRoute()
 
 const formatDate = (datetime) => {

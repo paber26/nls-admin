@@ -25,6 +25,7 @@ import TryoutTambah from "../pages/TryoutTambah.vue"
 
 import MonitoringTryout from "../pages/MonitoringTryout.vue"
 import MonitoringTryoutDetail from "../pages/MonitoringTryoutDetail.vue"
+import MonitoringTryoutHasil from "../pages/MonitoringTryoutHasil.vue"
 
 import Peringkat from "../pages/Peringkat.vue"
 import Persiapan from "../pages/TryoutPersiapan.vue"
@@ -87,6 +88,11 @@ const routes = [
     path: "/monitoring-tryout/:id",
     name: "MonitoringTryoutDetail",
     component: MonitoringTryoutDetail
+  },
+  {
+    path: "/monitoring-tryout/:tryoutId/hasil/:participantId",
+    name: "MonitoringTryoutHasil",
+    component: MonitoringTryoutHasil
   },
   {
     path: "/banksoal",
