@@ -550,11 +550,21 @@ const sortedParticipants = computed(() => {
   if (!sortKey.value) return filteredParticipants.value
 
   return [...filteredParticipants.value].sort((a, b) => {
-    const A = a[sortKey.value] ?? ""
-    const B = b[sortKey.value] ?? ""
+    const numericKeys = new Set(["nilai", "jawaban_count"])
+    const A = a[sortKey.value]
+    const B = b[sortKey.value]
 
-    if (A < B) return sortDir.value === "asc" ? -1 : 1
-    if (A > B) return sortDir.value === "asc" ? 1 : -1
+    if (numericKeys.has(sortKey.value)) {
+      const numA = Number(A ?? 0)
+      const numB = Number(B ?? 0)
+      return sortDir.value === "asc" ? numA - numB : numB - numA
+    }
+
+    const textA = String(A ?? "").toLowerCase()
+    const textB = String(B ?? "").toLowerCase()
+
+    if (textA < textB) return sortDir.value === "asc" ? -1 : 1
+    if (textA > textB) return sortDir.value === "asc" ? 1 : -1
     return 0
   })
 })
