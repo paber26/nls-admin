@@ -255,8 +255,6 @@ onMounted(async () => {
     tryout.value = tryoutRes.data
     soalList.value = soalRes.data
 
-    console.log("Data Tryout API Response:", tryout.value)
-    console.log("Data Soal API Response:", soalList.value)
 
     // tampilkan dulu kontennya
     loading.value = false

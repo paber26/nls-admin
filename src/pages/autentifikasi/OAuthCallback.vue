@@ -16,7 +16,6 @@ import { useRouter } from "vue-router"
 
 const router = useRouter()
 
-console.log("OAuthCallback Mounted")
 onMounted(() => {
   const params = new URLSearchParams(window.location.search)
   const token = params.get("token")

@@ -225,7 +225,6 @@ const updatePoin = async (soal) => {
     const tes = await api.put(`/tryout/${route.params.id}/soal/${soal.id}/poin`, {
       poin: soal.poin
     })
-    console.log("Update Poin Response:", tes)
   } catch (e) {
     console.error("Gagal update poin", e)
   }

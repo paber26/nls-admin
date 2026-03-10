@@ -244,7 +244,6 @@ const filteredTryouts = computed(() => {
 
 onMounted(async () => {
   const res = await api.get("/monitoring-tryout")
-  console.log("Tes Tryout API Response:", res.data)
   tryouts.value = res.data
   loading.value = false
 })

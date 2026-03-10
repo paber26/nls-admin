@@ -383,7 +383,6 @@ const mapPayload = (payload) => {
 const fetchResult = async () => {
   try {
     const res = await api.get(endpoint.value)
-    console.log("Data hasil pengerjaan user:", res.data)
     mapPayload(res.data)
     renderKatex()
   } catch (error) {

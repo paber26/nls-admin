@@ -252,7 +252,6 @@ const fetchDetailPeserta = async () => {
       ...data,
       tryouts: [] // siapkan array kosong dulu
     }
-    console.log("Detail peserta:", peserta.value)
   } catch (error) {
     console.error("Gagal mengambil detail peserta", error)
   }
@@ -271,7 +270,6 @@ const fetchRiwayatTryout = async () => {
       nilai: item.nilai,
       selesai: item.selesai
     }))
-    console.log("Riwayat tryout peserta:", peserta.value.tryouts)
   } catch (error) {
     console.error("Gagal mengambil riwayat tryout", error)
   }
