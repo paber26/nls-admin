@@ -475,9 +475,7 @@ const confirmForceFinish = async () => {
   if (!confirmTarget.value) return
 
   try {
-    console.log("Mengirim permintaan akhiri tryout untuk peserta:", confirmTarget.value.id)
     await api.post(`/monitoring-tryout/${confirmTarget.value.id}/force-finish`)
-    console.log("Tryout berhasil diakhiri:", confirmTarget.value.id)
 
     confirmTarget.value.status = "submitted"
     confirmTarget.value.selesai = new Date().toISOString()
@@ -622,7 +620,6 @@ onMounted(async () => {
   const tryoutId = route.params.id
   const res = await api.get(`/monitoring-tryout/${tryoutId}`)
   participants.value = res.data
-  console.log("Tes Monitoring Tryout API Response:", res.data)
   loading.value = false
 })
 

@@ -22,7 +22,6 @@ const isAuthenticated = ref(false)
 const profileComplete = ref(false)
 const loading = ref(true)
 
-console.log("API URL:", import.meta.env.VITE_API_URL)
 
 onMounted(async () => {
   // 🔁 Handle OAuth callback token
@@ -58,7 +57,6 @@ onMounted(async () => {
       profileComplete.value = !!res.data.sekolah_id
     }
   } catch (err) {
-    console.log("TOKEN INVALID / BELUM LOGIN")
     isAuthenticated.value = false
   } finally {
     loading.value = false

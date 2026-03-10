@@ -201,7 +201,6 @@ const fetchBankSoal = async () => {
     params.per_page = perPage.value
 
     const res = await api.get("/banksoal", { params })
-    console.log("API Bank Soal Response:", res.data)
 
     // Support array, normal pagination, or nested resource pagination
     if (Array.isArray(res.data)) {

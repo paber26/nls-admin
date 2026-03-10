@@ -73,7 +73,6 @@ const users = ref([])
 
 onMounted(async () => {
   const res = await api.get("/users")
-  console.log("User data:", res)
   users.value = res.data
 })
 

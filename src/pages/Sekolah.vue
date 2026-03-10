@@ -229,7 +229,6 @@ const fetchSchools = async () => {
   try {
     const res = await api.get("/sekolah")
     sekolahRaw.value = res.data.data || res.data
-    console.log("Data sekolah:", sekolahRaw.value)
   } catch (err) {
     console.error("Gagal mengambil data sekolah:", err)
   } finally {

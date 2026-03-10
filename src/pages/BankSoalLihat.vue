@@ -142,7 +142,6 @@ const renderKatex = () => {
 onMounted(async () => {
   const res = await api.get(`/banksoal/${id}`)
   const data = res.data
-  console.log("Data Soal API Response:", data)
 
   mapelNama.value = data.mapel_nama || "-"
   tipeSoal.value = data.tipe

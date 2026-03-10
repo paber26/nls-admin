@@ -142,7 +142,6 @@ const route = useRoute()
 const isTryoutRoute = computed(() => route.path.startsWith("/tryout")).value
 const isSekolahRoute = computed(() => route.path.startsWith("/sekolah")).value
 const isPesertaRoute = computed(() => route.path.startsWith("/peserta")).value
-console.log(isPesertaRoute)
 
 const user = ref(null)
 

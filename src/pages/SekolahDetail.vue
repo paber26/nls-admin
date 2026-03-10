@@ -110,7 +110,6 @@ const fetchPeserta = async () => {
   try {
     const res = await api.get(`/sekolah/${route.params.id}/peserta`)
     peserta.value = res.data.data.data || []
-    console.log("Peserta sekolah:", res.data)
   } catch (err) {
     console.error("Gagal mengambil peserta sekolah:", err)
   }

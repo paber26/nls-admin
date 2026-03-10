@@ -471,7 +471,6 @@ const submitSoal = async () => {
 
     const existing = localStorage.getItem("draft_banksoal")
     const drafts = existing ? JSON.parse(existing) : []
-    console.log("Drafts Sebelumnya:", drafts)
 
     draftSoal.value.push({
       ...payload,
@@ -481,9 +480,7 @@ const submitSoal = async () => {
     localStorage.setItem("draft_banksoal", JSON.stringify(draftSoal.value))
 
     // Kirim draft ke backend
-    console.log("Mengirim soal ke API:", payload)
     const res = await api.post("/banksoal", payload)
-    console.log("isi res adalah", res)
 
     if (res.data && res.data.success) {
       openPopup(res.data.message || "Soal berhasil disimpan")

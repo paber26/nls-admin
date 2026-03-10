@@ -134,7 +134,6 @@ const mapels = ref([])
 const fetchMapel = async () => {
   try {
     const res = await api.get("/mapel")
-    console.log("Response Mapel:", res.data)
     mapels.value = res.data.data || res.data
   } catch (err) {
     console.error("Gagal mengambil data mapel:", err)
@@ -212,7 +211,6 @@ const submitTryout = async () => {
     // kirim ke backend
     const res = await api.post("/tryout", form.value)
 
-    console.log("Response Tryout Submission:", res.data)
 
     if (res.data?.success) {
       alert(res.data.message)
