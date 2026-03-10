@@ -153,10 +153,13 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from "vue"
+import { computed, nextTick, onMounted, ref } from "vue"
 import { RouterLink, useRoute } from "vue-router"
 import api from "@/services/api"
 import Sidebar from "@/components/layout/Sidebar.vue"
+import katex from "katex"
+import renderMathInElement from "katex/contrib/auto-render"
+import "katex/dist/katex.min.css"
 
 const route = useRoute()
 
@@ -200,6 +203,18 @@ const formatDate = (datetime) => {
   })
 }
 
+const renderKatex = () => {
+  nextTick(() => {
+    renderMathInElement(document.body, {
+      delimiters: [
+        { left: "$$", right: "$$", display: true },
+        { left: "$", right: "$", display: false }
+      ],
+      throwOnError: false
+    })
+  })
+}
+
 const durationText = computed(() => {
   if (!startedAt.value) return "-"
   const start = new Date(startedAt.value)
@@ -239,7 +254,10 @@ const parseAnswerValue = (value) => {
   }
 
   if (raw.includes(",")) {
-    return raw.split(",").map((part) => part.trim()).filter(Boolean)
+    return raw
+      .split(",")
+      .map((part) => part.trim())
+      .filter(Boolean)
   }
 
   return [raw]
@@ -302,8 +320,12 @@ const answersWithDisplay = computed(() =>
   })
 )
 
-const nomorBenar = computed(() => answersWithDisplay.value.filter((item) => item.benar === true).map((item) => item.nomor))
-const nomorSalah = computed(() => answersWithDisplay.value.filter((item) => item.benar === false).map((item) => item.nomor))
+const nomorBenar = computed(() =>
+  answersWithDisplay.value.filter((item) => item.benar === true).map((item) => item.nomor)
+)
+const nomorSalah = computed(() =>
+  answersWithDisplay.value.filter((item) => item.benar === false).map((item) => item.nomor)
+)
 const nomorTidakDijawab = computed(() =>
   answersWithDisplay.value
     .filter((item) => item.isAnswered === false || item.jawabanUserRaw === null)
@@ -363,6 +385,7 @@ const fetchResult = async () => {
     const res = await api.get(endpoint.value)
     console.log("Data hasil pengerjaan user:", res.data)
     mapPayload(res.data)
+    renderKatex()
   } catch (error) {
     console.error("Gagal mengambil hasil pengerjaan user:", error)
     errorMessage.value = "Data hasil belum tersedia atau endpoint hasil belum terhubung."
