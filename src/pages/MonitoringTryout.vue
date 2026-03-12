@@ -12,9 +12,7 @@
       </div>
 
       <!-- Filter & Sorting -->
-      <div class="mb-2 text-xs text-slate-500">
-        Gunakan filter dan klik header tabel untuk mengurutkan data tryout.
-      </div>
+      <div class="mb-2 text-xs text-slate-500">Gunakan filter dan klik header tabel untuk mengurutkan data tryout.</div>
       <div class="flex flex-wrap gap-3 mb-4 items-center">
         <input
           v-model="searchName"
@@ -57,12 +55,16 @@
                   Sedang Mengerjakan
                   <span class="text-[10px] leading-none">
                     <span
-                      :class="sortKey === 'sedang_mengerjakan' && sortOrder === 'asc' ? 'text-slate-800' : 'text-slate-400'"
+                      :class="
+                        sortKey === 'sedang_mengerjakan' && sortOrder === 'asc' ? 'text-slate-800' : 'text-slate-400'
+                      "
                     >
                       ▲
                     </span>
                     <span
-                      :class="sortKey === 'sedang_mengerjakan' && sortOrder === 'desc' ? 'text-slate-800' : 'text-slate-400'"
+                      :class="
+                        sortKey === 'sedang_mengerjakan' && sortOrder === 'desc' ? 'text-slate-800' : 'text-slate-400'
+                      "
                     >
                       ▼
                     </span>
@@ -96,7 +98,9 @@
                 <span class="inline-flex items-center gap-1">
                   Total Peserta
                   <span class="text-[10px] leading-none">
-                    <span :class="sortKey === 'total_peserta' && sortOrder === 'asc' ? 'text-slate-800' : 'text-slate-400'">
+                    <span
+                      :class="sortKey === 'total_peserta' && sortOrder === 'asc' ? 'text-slate-800' : 'text-slate-400'"
+                    >
                       ▲
                     </span>
                     <span
@@ -108,13 +112,14 @@
                 </span>
               </th>
               <th class="px-4 py-3 text-center">Status</th>
+              <th class="px-4 py-3 text-center">Pembahasan User</th>
               <th class="px-4 py-3 text-center">Detail</th>
             </tr>
           </thead>
 
           <tbody>
             <tr v-if="loading">
-              <td colspan="8" class="px-4 py-6 text-center text-slate-400">Memuat data...</td>
+              <td colspan="9" class="px-4 py-6 text-center text-slate-400">Memuat data...</td>
             </tr>
 
             <tr v-for="(item, index) in filteredTryouts" :key="item.id" class="border-t">
@@ -155,6 +160,28 @@
               </td>
 
               <td class="px-4 py-3 text-center">
+                <button
+                  type="button"
+                  class="text-xs px-3 py-2 rounded-lg font-medium transition disabled:opacity-60"
+                  :class="
+                    item.show_pembahasan
+                      ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200'
+                      : 'bg-slate-200 text-slate-700 hover:bg-slate-300'
+                  "
+                  :disabled="Boolean(item.togglingPembahasan)"
+                  @click="togglePembahasanUser(item)"
+                >
+                  {{
+                    item.togglingPembahasan
+                      ? "Memproses..."
+                      : item.show_pembahasan
+                        ? "Tutup Pembahasan"
+                        : "Tampilkan Pembahasan"
+                  }}
+                </button>
+              </td>
+
+              <td class="px-4 py-3 text-center">
                 <RouterLink
                   :to="`/monitoring-tryout/${item.id}`"
                   class="text-primary text-xs font-medium hover:underline"
@@ -178,6 +205,7 @@ import Sidebar from "@/components/layout/Sidebar.vue"
 
 const tryouts = ref([])
 const loading = ref(true)
+const pembahasanVisibilityEndpoint = (tryoutId) => `/monitoring-tryout/${tryoutId}/pembahasan-visibility`
 
 const sortKey = ref("")
 const sortOrder = ref("desc")
@@ -242,9 +270,31 @@ const filteredTryouts = computed(() => {
   return data
 })
 
+const normalizeTryout = (item) => ({
+  ...item,
+  show_pembahasan: Boolean(item?.show_pembahasan),
+  togglingPembahasan: false
+})
+
+const togglePembahasanUser = async (item) => {
+  const nextValue = !item.show_pembahasan
+  item.togglingPembahasan = true
+
+  try {
+    await api.patch(pembahasanVisibilityEndpoint(item.id), {
+      show_pembahasan: nextValue
+    })
+    item.show_pembahasan = nextValue
+  } catch (error) {
+    console.error("Gagal mengubah visibilitas pembahasan user:", error)
+  } finally {
+    item.togglingPembahasan = false
+  }
+}
+
 onMounted(async () => {
   const res = await api.get("/monitoring-tryout")
-  tryouts.value = res.data
+  tryouts.value = Array.isArray(res.data) ? res.data.map(normalizeTryout) : []
   loading.value = false
 })
 </script>
