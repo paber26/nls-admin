@@ -4,9 +4,9 @@
     <div class="w-full max-w-md bg-white rounded-2xl shadow-lg p-8 text-center">
       <!-- Logo -->
       <div class="mb-6">
-        <img src="/nls-logo-300.png" alt="Next Level Study" class="w-24 mx-auto mb-4" />
+        <img src="/nls-logo-300.png" alt="NLS OSN" class="w-24 mx-auto mb-4" />
         <h1 class="text-2xl font-bold text-slate-800">Login Tryout OSN</h1>
-        <p class="text-sm text-slate-500 mt-2">Masuk menggunakan akun Google untuk mulai tryout Next Level Study</p>
+        <p class="text-sm text-slate-500 mt-2">Masuk menggunakan akun Google untuk mengakses panel admin NLS OSN</p>
       </div>
 
       <!-- Google Button -->

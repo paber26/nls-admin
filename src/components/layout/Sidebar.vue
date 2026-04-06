@@ -2,7 +2,7 @@
   <!-- ================= SIDEBAR ================= -->
   <aside class="w-64 bg-slate-900 text-slate-200 flex flex-col">
     <!-- Logo -->
-    <div class="px-6 py-5 text-lg font-semibold border-b border-slate-800">Next Level Study</div>
+    <div class="px-6 py-5 text-lg font-semibold border-b border-slate-800">NLS OSN Admin</div>
 
     <!-- User Info -->
     <div class="px-6 py-4 border-b border-slate-800" v-if="user">
