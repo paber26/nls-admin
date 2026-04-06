@@ -1,10 +1,8 @@
 <template>
-  <div class="flex min-h-screen bg-bgsoft font-poppins">
-    <Sidebar />
 
-    <main class="flex-1 px-6 py-6">
-      <!-- Header -->
-      <div class="flex justify-between items-center mb-6">
+    <AppShell>
+    <template #header>
+      <div class="flex justify-between items-center w-full">
         <div>
           <h1 class="text-lg font-semibold">Daftar Peserta Tryout</h1>
           <p class="text-sm text-slate-500">Menampilkan peserta yang mengikuti tryout ini</p>
@@ -26,6 +24,9 @@
           </button>
         </div>
       </div>
+    </template>
+
+    <div class="px-6 py-6">
 
       <!-- Toggle Section -->
       <div class="flex flex-wrap justify-between items-center gap-3 mb-6">
@@ -421,11 +422,11 @@
           </button>
         </div>
       </div>
-    </main>
-  </div>
-</template>
+    
+    </div>  </AppShell></template>
 
 <script setup>
+import AppShell from "@/components/layout/AppShell.vue"
 import { ref, onMounted, computed } from "vue"
 import api from "@/services/api"
 import Sidebar from "@/components/layout/Sidebar.vue"

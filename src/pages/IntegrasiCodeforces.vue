@@ -1,16 +1,15 @@
 <template>
-  <div class="bg-bgsoft font-poppins min-h-screen">
-    <div class="flex min-h-screen">
-      <!-- Sidebar Navigation -->
-      <Sidebar />
 
-      <!-- Main Content Area -->
-      <main class="flex-1">
-        <!-- Top Header as standard for pages -->
-        <header class="bg-white border-b px-6 py-4">
+    <AppShell>
+    <template #header>
+      <div>
           <h1 class="text-lg font-semibold text-slate-800">Integrasi Codeforces</h1>
           <p class="text-sm text-slate-500">Pengaturan sinkronisasi sistem judge otomatis</p>
-        </header>
+              </div>
+    </template>
+
+        <!-- Top Header as standard for pages -->
+        
 
         <!-- Page Specific Content -->
         <div class="p-6 max-w-7xl mx-auto space-y-6 text-slate-800">
@@ -177,12 +176,12 @@
           </div>
         </div>
 
-      </main>
-    </div>
-  </div>
+        </AppShell>
+  
 </template>
 
 <script setup>
+import AppShell from "@/components/layout/AppShell.vue"
 import { ref } from 'vue'
 import Sidebar from "../components/layout/Sidebar.vue"
 

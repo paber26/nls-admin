@@ -1,13 +1,15 @@
 <template>
-  <div class="flex min-h-screen bg-bgsoft font-poppins">
-    <Sidebar />
 
-    <main class="flex-1">
-      <!-- Topbar -->
-      <header class="bg-white border-b px-6 py-4">
+    <AppShell>
+    <template #header>
+      <div>
         <h1 class="text-lg font-semibold text-slate-800">Peringkat</h1>
         <p class="text-sm text-slate-500">Lihat peringkat berdasarkan hasil tryout</p>
-      </header>
+            </div>
+    </template>
+
+      <!-- Topbar -->
+      
 
       <div class="px-6 py-8">
         <div v-if="loadingTryouts" class="text-center text-slate-500 py-20">Memuat daftar tryout...</div>
@@ -77,11 +79,10 @@
           <div v-if="!tryouts.length" class="text-center text-slate-400 py-20">Belum ada tryout tersedia.</div>
         </div>
       </div>
-    </main>
-  </div>
-</template>
+      </AppShell></template>
 
 <script setup>
+import AppShell from "@/components/layout/AppShell.vue"
 import { ref, onMounted, watch } from "vue"
 import { RouterLink } from "vue-router"
 import api from "@/services/api"

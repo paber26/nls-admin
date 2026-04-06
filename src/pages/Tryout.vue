@@ -1,10 +1,8 @@
 <template>
-  <div class="flex min-h-screen bg-bgsoft font-poppins">
-    <Sidebar />
 
-    <main class="flex-1 px-6 py-6">
-      <!-- Header -->
-      <div class="flex justify-between items-center mb-6">
+    <AppShell>
+    <template #header>
+      <div class="flex justify-between items-center w-full">
         <div>
           <h1 class="text-lg font-semibold">Tryout</h1>
           <p class="text-sm text-slate-500">Daftar tryout yang tersedia</p>
@@ -17,6 +15,9 @@
           + Tambah Tryout
         </RouterLink>
       </div>
+    </template>
+
+    <div class="px-6 py-6">
 
       <!-- Filter Mapel -->
       <div class="mb-4 flex flex-wrap items-center gap-3">
@@ -128,11 +129,11 @@
           </tbody>
         </table>
       </section>
-    </main>
-  </div>
-</template>
+    
+    </div>  </AppShell></template>
 
 <script setup>
+import AppShell from "@/components/layout/AppShell.vue"
 import { ref, onMounted, watch } from "vue"
 import { RouterLink } from "vue-router"
 import api from "@/services/api"

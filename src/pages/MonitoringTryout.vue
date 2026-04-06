@@ -1,15 +1,16 @@
 <template>
-  <div class="flex min-h-screen bg-bgsoft font-poppins">
-    <Sidebar />
 
-    <main class="flex-1 px-6 py-6">
-      <!-- Header -->
-      <div class="flex justify-between items-center mb-6">
+    <AppShell>
+    <template #header>
+      <div class="flex justify-between items-center w-full">
         <div>
           <h1 class="text-lg font-semibold">Monitoring Tryout</h1>
           <p class="text-sm text-slate-500">Monitoring periode dan aktivitas peserta</p>
         </div>
       </div>
+    </template>
+
+    <div class="px-6 py-6">
 
       <!-- Filter & Sorting -->
       <div class="mb-2 text-xs text-slate-500">Gunakan filter dan klik header tabel untuk mengurutkan data tryout.</div>
@@ -193,11 +194,11 @@
           </tbody>
         </table>
       </section>
-    </main>
-  </div>
-</template>
+    
+    </div>  </AppShell></template>
 
 <script setup>
+import AppShell from "@/components/layout/AppShell.vue"
 import { ref, onMounted, computed } from "vue"
 import { RouterLink } from "vue-router"
 import api from "@/services/api"

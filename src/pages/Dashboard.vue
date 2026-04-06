@@ -1,13 +1,14 @@
 <template>
-  <div class="bg-bgsoft font-poppins min-h-screen">
-    <div class="flex min-h-screen">
-      <Sidebar />
 
-      <main class="flex-1">
-        <header class="bg-white border-b px-6 py-4">
+    <AppShell>
+    <template #header>
+      <div>
           <h1 class="text-lg font-semibold text-slate-800">Dashboard Admin</h1>
           <p class="text-sm text-slate-500">Ringkasan data utama platform</p>
-        </header>
+              </div>
+    </template>
+
+        
 
         <div class="px-6 py-6 space-y-6">
           <section v-if="loading" class="bg-white rounded-xl border p-8 text-center text-slate-500">
@@ -134,12 +135,12 @@
             </section>
           </section>
         </div>
-      </main>
-    </div>
-  </div>
+        </AppShell>
+  
 </template>
 
 <script setup>
+import AppShell from "@/components/layout/AppShell.vue"
 import { computed, onMounted, ref } from "vue"
 import { RouterLink } from "vue-router"
 import api from "@/services/api"

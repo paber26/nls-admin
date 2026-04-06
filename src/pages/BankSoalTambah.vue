@@ -1,14 +1,15 @@
 <template>
-  <body class="bg-bgsoft font-poppins">
-    <div class="flex min-h-screen">
-      <Sidebar />
 
-      <main class="flex-1">
-        <!-- Header -->
-        <header class="bg-white border-b px-6 py-4">
+    <AppShell>
+    <template #header>
+      <div>
           <h1 class="text-lg font-semibold text-slate-800">Tambah Soal</h1>
           <p class="text-sm text-slate-500">Tambahkan soal baru ke bank soal</p>
-        </header>
+              </div>
+    </template>
+
+        <!-- Header -->
+        
 
         <!-- Form -->
         <div class="px-6 py-6 w-full">
@@ -188,8 +189,7 @@
             </div>
           </form>
         </div>
-      </main>
-    </div>
+        </AppShell>
 
     <!-- Popup -->
     <div v-if="showPopup" class="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
@@ -201,10 +201,11 @@
         </button>
       </div>
     </div>
-  </body>
+  
 </template>
 
 <script setup>
+import AppShell from "@/components/layout/AppShell.vue"
 import Sidebar from "@/components/layout/Sidebar.vue"
 import { ref, onMounted } from "vue"
 import {

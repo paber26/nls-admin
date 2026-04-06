@@ -1,10 +1,8 @@
 <template>
-  <div class="bg-bgsoft font-poppins min-h-screen flex">
-    <Sidebar />
 
-    <main class="flex-1">
-      <!-- TOPBAR -->
-      <header class="bg-white border-b px-6 py-4 flex justify-between items-center">
+    <AppShell>
+    <template #header>
+      <div>
         <div>
           <h1 class="text-lg font-semibold">Detail Tryout</h1>
           <p class="text-sm text-slate-500">Preview soal sebelum tryout dibuka ke peserta</p>
@@ -25,7 +23,11 @@
             Edit Tryout
           </RouterLink>
         </div>
-      </header>
+            </div>
+    </template>
+
+      <!-- TOPBAR -->
+      
 
       <!-- CONTENT -->
       <div v-if="loading" class="px-6 py-6 text-slate-500">Memuat detail tryout...</div>
@@ -189,11 +191,10 @@
           </div>
         </section>
       </div>
-    </main>
-  </div>
-</template>
+      </AppShell></template>
 
 <script setup>
+import AppShell from "@/components/layout/AppShell.vue"
 import { ref, onMounted, computed, watch, nextTick } from "vue"
 import { RouterLink, useRoute } from "vue-router"
 import api from "@/services/api"

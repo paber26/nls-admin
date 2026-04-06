@@ -1,15 +1,15 @@
 <template>
-  <body class="bg-bgsoft font-poppins">
-    <div class="flex min-h-screen">
-      <Sidebar></Sidebar>
 
-      <!-- ================= MAIN ================= -->
-      <main class="flex-1">
-        <!-- Topbar -->
-        <header class="bg-white border-b px-6 py-4">
+    <AppShell>
+    <template #header>
+      <div>
           <h1 class="text-lg font-semibold text-slate-800">Persiapan Tryout</h1>
           <p class="text-sm text-slate-500">Harap baca ketentuan sebelum memulai tryout</p>
-        </header>
+              </div>
+    </template>
+
+        <!-- Topbar -->
+        
 
         <!-- Content -->
         <div class="px-6 py-8 w-full">
@@ -102,12 +102,12 @@
             </div>
           </div>
         </div>
-      </main>
-    </div>
-  </body>
+        </AppShell>
+  
 </template>
 
 <script setup>
+import AppShell from "@/components/layout/AppShell.vue"
 import { RouterLink, RouterView } from "vue-router"
 
 import Sidebar from "../components/layout/Sidebar.vue"

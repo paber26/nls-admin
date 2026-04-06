@@ -1,10 +1,8 @@
 <template>
-  <div class="flex min-h-screen bg-bgsoft font-poppins">
-    <Sidebar />
 
-    <main class="flex-1 px-6 py-6 space-y-6">
-      <!-- Header -->
-      <div class="flex justify-between items-center">
+    <AppShell>
+    <template #header>
+      <div class="flex justify-between items-center w-full">
         <div>
           <h1 class="text-lg font-semibold">Kelola Soal Tryout</h1>
           <p class="text-sm text-slate-500">Paket: {{ tryout?.paket || "-" }}</p>
@@ -14,6 +12,9 @@
           ← Kembali ke Detail
         </RouterLink>
       </div>
+    </template>
+
+    <div class="px-6 py-6 space-y-6">
 
       <!-- Soal dalam Tryout -->
       <section class="bg-white rounded-xl border p-6">
@@ -123,11 +124,11 @@
           </tbody>
         </table>
       </section>
-    </main>
-  </div>
-</template>
+    
+    </div>  </AppShell></template>
 
 <script setup>
+import AppShell from "@/components/layout/AppShell.vue"
 import { ref, onMounted } from "vue"
 import { useRoute, RouterLink } from "vue-router"
 import api from "@/services/api"

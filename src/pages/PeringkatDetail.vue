@@ -1,12 +1,14 @@
 <template>
-  <div class="flex min-h-screen bg-bgsoft font-poppins">
-    <Sidebar />
 
-    <main class="flex-1">
-      <header class="bg-white border-b px-6 py-4">
+    <AppShell>
+    <template #header>
+      <div>
         <h1 class="text-lg font-semibold text-slate-800">Detail Peringkat</h1>
         <p class="text-sm text-slate-500">Leaderboard berdasarkan hasil tryout</p>
-      </header>
+            </div>
+    </template>
+
+      
 
       <div class="px-6 py-8">
         <div class="flex justify-between items-center mb-6">
@@ -66,11 +68,10 @@
           </div>
         </div>
       </div>
-    </main>
-  </div>
-</template>
+      </AppShell></template>
 
 <script setup>
+import AppShell from "@/components/layout/AppShell.vue"
 import { computed, onMounted, ref } from "vue"
 import { RouterLink, useRoute } from "vue-router"
 import api from "@/services/api"

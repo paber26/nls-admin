@@ -1,15 +1,15 @@
 <template>
-  <body class="bg-bgsoft font-poppins">
-    <div class="flex min-h-screen">
-      <Sidebar></Sidebar>
 
-      <!-- MAIN -->
-      <main class="flex-1">
-        <!-- TOPBAR -->
-        <header class="bg-white border-b px-6 py-4">
+    <AppShell>
+    <template #header>
+      <div>
           <h1 class="text-lg font-semibold text-slate-800">Data Sekolah</h1>
           <p class="text-sm text-slate-500">Daftar sekolah dan statistik peserta</p>
-        </header>
+              </div>
+    </template>
+
+        <!-- TOPBAR -->
+        
 
         <!-- CONTENT -->
         <div class="px-6 py-6 w-full">
@@ -150,12 +150,12 @@
             </div>
           </div>
         </div>
-      </main>
-    </div>
-  </body>
+        </AppShell>
+  
 </template>
 
 <script setup>
+import AppShell from "@/components/layout/AppShell.vue"
 import { ref, onMounted, computed } from "vue"
 import { RouterLink } from "vue-router"
 import Sidebar from "../components/layout/Sidebar.vue"

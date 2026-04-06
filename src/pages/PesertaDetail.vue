@@ -1,12 +1,8 @@
 <template>
-  <body class="bg-bgsoft font-poppins">
-    <div class="flex min-h-screen">
-      <Sidebar></Sidebar>
 
-      <!-- MAIN -->
-      <main class="flex-1">
-        <!-- TOPBAR -->
-        <header class="bg-white border-b px-6 py-4 flex justify-between items-center">
+    <AppShell>
+    <template #header>
+      <div>
           <div>
             <h1 class="text-lg font-semibold text-slate-800">Detail Peserta</h1>
             <p class="text-sm text-slate-500">Informasi lengkap peserta tryout</p>
@@ -15,7 +11,11 @@
           <RouterLink to="/peserta" class="px-4 py-2 rounded-lg border text-sm hover:bg-slate-100">
             ← Kembali
           </RouterLink>
-        </header>
+              </div>
+    </template>
+
+        <!-- TOPBAR -->
+        
 
         <!-- CONTENT -->
         <div class="px-6 py-6 w-full space-y-6">
@@ -211,12 +211,12 @@
             <p class="text-xs text-slate-600">{{ errorMessage }}</p>
           </div>
         </div>
-      </main>
-    </div>
-  </body>
+        </AppShell>
+  
 </template>
 
 <script setup>
+import AppShell from "@/components/layout/AppShell.vue"
 import { RouterLink, useRoute } from "vue-router"
 import { ref, onMounted } from "vue"
 import api from "@/services/api"

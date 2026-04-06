@@ -1,9 +1,8 @@
 <template>
-  <div class="flex min-h-screen bg-bgsoft font-poppins">
-    <Sidebar />
 
-    <main class="flex-1 px-6 py-6">
-      <div class="flex flex-wrap items-center justify-between gap-3 mb-6">
+    <AppShell>
+    <template #header>
+      <div class="flex flex-wrap items-center justify-between gap-3 w-full">
         <div>
           <h1 class="text-lg font-semibold">Hasil Pengerjaan User</h1>
           <p class="text-sm text-slate-500">Detail jawaban peserta pada tryout</p>
@@ -19,6 +18,9 @@
           Kembali
         </RouterLink>
       </div>
+    </template>
+
+    <div class="px-6 py-6">
 
       <section class="bg-white rounded-xl border p-5 mb-6">
         <div v-if="loading" class="text-sm text-slate-500">Memuat data hasil...</div>
@@ -132,9 +134,8 @@
           </article>
         </div>
       </section>
-    </main>
-
-    <button
+    
+    </div>  </AppShell><button
       type="button"
       class="fixed bottom-6 right-6 z-40 w-11 h-11 rounded-full bg-indigo-600 text-white shadow-lg hover:bg-indigo-700 flex items-center justify-center"
       @click="scrollToTop"
@@ -149,10 +150,11 @@
         />
       </svg>
     </button>
-  </div>
+  
 </template>
 
 <script setup>
+import AppShell from "@/components/layout/AppShell.vue"
 import { computed, nextTick, onMounted, ref } from "vue"
 import { RouterLink, useRoute } from "vue-router"
 import api from "@/services/api"

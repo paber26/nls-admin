@@ -1,15 +1,15 @@
 <template>
-  <body class="bg-bgsoft font-poppins">
-    <div class="flex min-h-screen">
-      <Sidebar></Sidebar>
 
-      <!-- ================= MAIN ================= -->
-      <main class="flex-1">
-        <!-- Topbar -->
-        <header class="bg-white border-b px-6 py-4">
+    <AppShell>
+    <template #header>
+      <div>
           <h1 class="text-lg font-semibold text-slate-800">Kelola Peserta</h1>
           <p class="text-sm text-slate-500">Daftar seluruh peserta yang terdaftar di platform</p>
-        </header>
+              </div>
+    </template>
+
+        <!-- Topbar -->
+        
 
         <!-- Content -->
         <div class="px-6 py-6">
@@ -246,12 +246,12 @@
             </div>
           </div>
         </div>
-      </main>
-    </div>
-  </body>
+        </AppShell>
+  
 </template>
 
 <script setup>
+import AppShell from "@/components/layout/AppShell.vue"
 import { ref, onMounted, computed, watch } from "vue"
 import api from "@/services/api"
 

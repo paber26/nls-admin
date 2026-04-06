@@ -1,24 +1,24 @@
 <template>
-  <body class="bg-bgsoft font-poppins">
-    <div class="flex min-h-screen">
-      <Sidebar></Sidebar>
 
-      <!-- ================= MAIN ================= -->
-      <main class="flex-1">
+    <AppShell>
+    <template #header>
+      <div class="flex w-full flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div class="min-w-0">
+          <h1 class="text-lg font-semibold text-slate-800">Bank Soal (Paket)</h1>
+          <p class="text-sm text-slate-500">Kelola paket soal berdasarkan mata pelajaran KSN SMA</p>
+        </div>
+
+        <RouterLink
+          to="/banksoal/tambah"
+          class="inline-flex w-full shrink-0 items-center justify-center rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-md transition hover:bg-indigo-700 sm:w-auto"
+        >
+          + Tambah Soal
+        </RouterLink>
+      </div>
+    </template>
+
         <!-- Topbar -->
-        <header class="bg-white border-b px-6 py-4 flex justify-between items-center">
-          <div>
-            <h1 class="text-lg font-semibold text-slate-800">Bank Soal (Paket)</h1>
-            <p class="text-sm text-slate-500">Kelola paket soal berdasarkan mata pelajaran KSN SMA</p>
-          </div>
-
-          <RouterLink
-            to="/banksoal/tambah"
-            class="px-5 py-2.5 bg-indigo-600 text-white text-sm font-semibold rounded-lg shadow-md hover:bg-indigo-700 transition"
-          >
-            + Tambah Soal
-          </RouterLink>
-        </header>
+        
 
         <!-- Content -->
         <div class="px-6 py-6">
@@ -136,12 +136,12 @@
             *Setiap paket soal hanya untuk satu mata pelajaran dan dapat digunakan pada satu atau beberapa tryout.
           </p>
         </div>
-      </main>
-    </div>
-  </body>
+        </AppShell>
+  
 </template>
 
 <script setup>
+import AppShell from "@/components/layout/AppShell.vue"
 import { ref, onMounted, nextTick, watch } from "vue"
 import "katex/dist/katex.min.css"
 // import { api } from "@/services/api"

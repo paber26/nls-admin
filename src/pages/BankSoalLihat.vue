@@ -1,9 +1,13 @@
 <template>
-  <div class="flex min-h-screen bg-bgsoft font-poppins">
-    <Sidebar />
 
-    <main class="flex-1 px-6 py-6">
-      <h1 class="text-lg font-semibold mb-6">Lihat Soal</h1>
+    <AppShell>
+    <template #header>
+      <div class="w-full flex justify-between items-center">
+        <h1 class="text-lg font-semibold text-slate-800">Lihat Soal</h1>
+      </div>
+    </template>
+
+    <div class="px-6 py-6">
 
       <div class="bg-white border rounded-xl p-6 space-y-6 w-full">
         <!-- Mapel -->
@@ -101,11 +105,11 @@
           </button>
         </div>
       </div>
-    </main>
-  </div>
-</template>
+    
+    </div>  </AppShell></template>
 
 <script setup>
+import AppShell from "@/components/layout/AppShell.vue"
 import { ref, onMounted } from "vue"
 import { useRoute, useRouter } from "vue-router"
 import api from "@/services/api"

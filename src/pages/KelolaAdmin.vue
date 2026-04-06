@@ -1,22 +1,22 @@
 <template>
-  <body class="bg-bgsoft font-poppins">
-    <div class="flex min-h-screen">
-      <Sidebar></Sidebar>
 
-      <!-- ================= MAIN ================= -->
-      <main class="flex-1">
+    <AppShell>
+    <template #header>
+      <div class="flex w-full flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div class="min-w-0">
+          <h1 class="text-lg font-semibold text-slate-800">Kelola User</h1>
+          <p class="text-sm text-slate-500">Atur role Peserta atau Admin</p>
+        </div>
+
+        <div class="shrink-0 text-left text-sm sm:text-right">
+          <p class="font-medium text-slate-800">Admin</p>
+          <p class="text-slate-500">Super Administrator</p>
+        </div>
+      </div>
+    </template>
+
         <!-- Topbar -->
-        <header class="bg-white border-b px-6 py-4 flex justify-between items-center">
-          <div>
-            <h1 class="text-lg font-semibold text-slate-800">Kelola User</h1>
-            <p class="text-sm text-slate-500">Atur role Peserta atau Admin</p>
-          </div>
-
-          <div class="text-right text-sm">
-            <p class="font-medium text-slate-800">Admin</p>
-            <p class="text-slate-500">Super Administrator</p>
-          </div>
-        </header>
+        
 
         <!-- Content -->
         <div class="px-6 py-8">
@@ -59,12 +59,12 @@
             </div>
           </section>
         </div>
-      </main>
-    </div>
-  </body>
+        </AppShell>
+  
 </template>
 
 <script setup>
+import AppShell from "@/components/layout/AppShell.vue"
 import { ref, onMounted } from "vue"
 import Sidebar from "../components/layout/Sidebar.vue"
 import api from "@/services/api"

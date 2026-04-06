@@ -1,9 +1,13 @@
 <template>
-  <div class="flex min-h-screen bg-bgsoft font-poppins">
-    <Sidebar />
 
-    <main class="flex-1 px-6 py-6">
-      <h1 class="text-lg font-semibold mb-4">Edit Soal</h1>
+    <AppShell>
+    <template #header>
+      <div class="w-full flex justify-between items-center">
+        <h1 class="text-lg font-semibold text-slate-800">Edit Soal</h1>
+      </div>
+    </template>
+
+    <div class="px-6 py-6">
 
       <form class="bg-white border rounded-xl p-6 space-y-4 w-full" @submit.prevent="submitEdit">
         <!-- Mapel -->
@@ -158,11 +162,11 @@
           </button>
         </div>
       </div>
-    </main>
-  </div>
-</template>
+    
+    </div>  </AppShell></template>
 
 <script setup>
+import AppShell from "@/components/layout/AppShell.vue"
 import { Ckeditor } from "@ckeditor/ckeditor5-vue"
 import {
   ClassicEditor,
