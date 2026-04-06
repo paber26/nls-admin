@@ -33,6 +33,7 @@ import Persiapan from "../pages/TryoutPersiapan.vue"
 import TryoutHasil from "../pages/TryoutHasil.vue"
 
 import KelolaAdmin from "../pages/KelolaAdmin.vue"
+import IntegrasiCodeforces from "../pages/IntegrasiCodeforces.vue"
 
 const routes = [
   {
@@ -160,6 +161,11 @@ const routes = [
     path: "/oauth/callback",
     name: "oauth-callback",
     component: OAuthCallback
+  },
+  {
+    path: "/integrasi-codeforces",
+    name: "IntegrasiCodeforces",
+    component: IntegrasiCodeforces
   }
 ]
 

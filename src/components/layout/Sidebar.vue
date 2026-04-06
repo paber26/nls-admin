@@ -108,6 +108,17 @@
         <span>Kelola Admin</span>
       </RouterLink>
 
+      <RouterLink
+        to="/integrasi-codeforces"
+        class="flex items-center gap-3 px-4 py-3 rounded-lg transition"
+        :class="
+          $route.path.startsWith('/integrasi-codeforces') ? 'bg-slate-800 text-white' : 'hover:bg-slate-800 text-slate-300'
+        "
+      >
+        🧑‍💻
+        <span>Integrasi CF</span>
+      </RouterLink>
+
       <!-- <RouterLink
         to="/pengaturan"
         class="flex items-center gap-3 px-4 py-3 rounded-lg transition"
