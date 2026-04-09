@@ -135,6 +135,17 @@
         <span v-if="open">Integrasi CF</span>
         <span v-if="!open" :class="tooltipClass">Integrasi Codeforces</span>
       </RouterLink>
+
+      <RouterLink
+        to="/cp-tryout"
+        class="group relative flex rounded-lg py-3 transition"
+        :class="navItemClass(isSectionActive('/cp-tryout'))"
+        @click="handleNavigate"
+      >
+        <span class="text-xl leading-none px-1">💻</span>
+        <span v-if="open">Tryout CP</span>
+        <span v-if="!open" :class="tooltipClass">Tryout CP</span>
+      </RouterLink>
     </nav>
 
     <!-- Logout Section -->
