@@ -25,36 +25,36 @@
 .ck-content ul,
 .prose ul,
 .rich-text ul {
-  list-style-type: disc !important;
-  margin: 0.5rem 0 !important;
-  padding-left: 1.5rem !important;
+  list-style-type: disc;
+  margin: 0.5rem 0;
+  padding-left: 1.5rem;
 }
 
 .ck-content ul ul,
 .prose ul ul,
 .rich-text ul ul {
-  list-style-type: circle !important;
+  list-style-type: circle;
 }
 
 .ck-content ul ul ul,
 .prose ul ul ul,
 .rich-text ul ul ul {
-  list-style-type: square !important;
+  list-style-type: square;
 }
 
 .ck-content ol,
 .prose ol,
 .rich-text ol {
-  list-style-type: decimal !important;
-  margin: 0.5rem 0 !important;
-  padding-left: 1.5rem !important;
+  list-style-type: decimal;
+  margin: 0.5rem 0;
+  padding-left: 1.5rem;
 }
 
 .ck-content li,
 .prose li,
 .rich-text li {
-  margin: 0.25rem 0 !important;
-  display: list-item !important;
+  margin: 0.25rem 0;
+  display: list-item;
 }
 
 .ck-content table,
