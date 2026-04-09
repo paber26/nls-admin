@@ -375,8 +375,26 @@
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
           </button>
         </div>
+        <div class="border-b border-slate-200">
+          <nav class="-mb-px flex space-x-6 px-6" aria-label="Tabs">
+            <button @click="previewTab = 'original'" :class="[previewTab === 'original' ? 'border-blue-500 text-blue-600' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300', 'whitespace-nowrap pb-3 pt-4 px-1 border-b-2 font-medium text-sm transition-colors cursor-pointer']">
+              Asli (Codeforces)
+            </button>
+            <button @click="previewTab = 'custom'" :class="[previewTab === 'custom' ? 'border-blue-500 text-blue-600' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300', 'whitespace-nowrap pb-3 pt-4 px-1 border-b-2 font-medium text-sm transition-colors cursor-pointer relative']">
+              Kustom (Indonesia)
+              <span v-if="selectedProblem?.is_custom_statement" class="absolute -top-1 -right-4 inline-flex items-center rounded-full bg-green-100 px-1.5 py-0.5 text-xs font-medium text-green-700">Aktif</span>
+            </button>
+          </nav>
+        </div>
         
-        <div class="p-6 overflow-y-auto flex-1">
+        <div class="p-6 overflow-y-auto flex-1 bg-slate-50" v-if="previewTab === 'custom'">
+          <div v-if="!customStatementHtmlPreview" class="text-center py-8 text-slate-500 italic">
+            Belum ada narasi kustom yang disimpan. Silakan klik tombol "Edit Text" pada daftar soal untuk membuat naskah sendiri.
+          </div>
+          <div v-else class="cf-problem-statement prose max-w-none prose-slate bg-white p-6 rounded-xl border border-slate-200 shadow-sm" v-html="customStatementHtmlPreview"></div>
+        </div>
+
+        <div class="p-6 overflow-y-auto flex-1" v-if="previewTab === 'original'">
           <div v-if="isFetchingStatement" class="flex justify-center py-12">
             <svg class="h-8 w-8 animate-spin text-blue-600" fill="none" viewBox="0 0 24 24">
               <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -498,6 +516,8 @@ const isSavingProblem = ref(false)
 const isStatementModalOpen = ref(false)
 const isFetchingStatement = ref(false)
 const statementHtml = ref("")
+const customStatementHtmlPreview = ref("")
+const previewTab = ref("original")
 const statementError = ref("")
 const selectedProblem = ref(null)
 
@@ -870,6 +890,10 @@ const viewStatement = async (problem) => {
   isFetchingStatement.value = true
   statementError.value = ""
   statementHtml.value = ""
+  customStatementHtmlPreview.value = problem.custom_statement_html || ""
+  
+  // Set default tab based on what's configured for the user
+  previewTab.value = problem.is_custom_statement ? "custom" : "original"
 
   try {
     const { data } = await api.get(`/cf-problems/${problem.id}/statement`)
