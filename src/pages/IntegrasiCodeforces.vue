@@ -344,7 +344,8 @@
                         {{ p.mapel ? p.mapel.nama : '-' }}
                       </td>
                       <td class="px-6 py-4 text-slate-600">{{ p.points }}</td>
-                      <td class="px-6 py-4 whitespace-nowrap text-right">
+                      <td class="px-6 py-4 whitespace-nowrap text-right space-x-3">
+                        <button class="text-blue-600 hover:text-blue-800 text-xs font-medium" @click="viewStatement(p)">Lihat Soal</button>
                         <button class="text-rose-600 hover:text-rose-800 text-xs font-medium" @click="deleteProblem(p.id)">Hapus</button>
                       </td>
                     </tr>
@@ -360,6 +361,39 @@
               </div>
             </section>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Lihat Soal -->
+    <div v-if="isStatementModalOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+      <div class="bg-white rounded-2xl shadow-xl w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden">
+        <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-slate-50/50">
+          <h3 class="text-lg font-semibold text-slate-800">{{ selectedProblem?.name || 'Deskripsi Soal' }}</h3>
+          <button type="button" class="text-slate-400 hover:text-slate-600 cursor-pointer" @click="isStatementModalOpen = false">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+          </button>
+        </div>
+        
+        <div class="p-6 overflow-y-auto flex-1">
+          <div v-if="isFetchingStatement" class="flex justify-center py-12">
+            <svg class="h-8 w-8 animate-spin text-blue-600" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+            </svg>
+          </div>
+          <div v-else-if="statementError" class="text-center py-8 text-rose-600">
+            {{ statementError }}
+          </div>
+          <div v-else class="cf-problem-statement prose max-w-none prose-slate" v-html="statementHtml"></div>
+        </div>
+        
+        <div class="px-6 py-4 border-t border-slate-100 bg-slate-50/50 flex justify-end gap-3 flex-wrap">
+          <a v-if="selectedProblem" :href="'https://codeforces.com/contest/' + selectedProblem.cf_contest_id + '/problem/' + selectedProblem.cf_index" target="_blank" rel="noopener noreferrer" class="px-4 py-2 bg-indigo-50 text-indigo-700 hover:bg-indigo-100 rounded-lg font-medium text-sm transition-colors border border-indigo-200 flex items-center gap-2">
+            Buka di Codeforces
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+          </a>
+          <button type="button" class="px-4 py-2 bg-slate-200 text-slate-700 rounded-lg hover:bg-slate-300 font-medium text-sm transition-colors" @click="isStatementModalOpen = false">Tutup</button>
         </div>
       </div>
     </div>
@@ -389,6 +423,13 @@ const savedProblems = ref([])
 const newProblemMapelId = ref("")
 const newProblemPoints = ref(100)
 const isSavingProblem = ref(false)
+
+// Statement Viewer
+const isStatementModalOpen = ref(false)
+const isFetchingStatement = ref(false)
+const statementHtml = ref("")
+const statementError = ref("")
+const selectedProblem = ref(null)
 
 const connection = ref({
   online: null,
@@ -656,9 +697,112 @@ const deleteProblem = async (id) => {
   }
 }
 
+const viewStatement = async (problem) => {
+  selectedProblem.value = problem
+  isStatementModalOpen.value = true
+  isFetchingStatement.value = true
+  statementError.value = ""
+  statementHtml.value = ""
+
+  try {
+    const { data } = await api.get(`/cf-problems/${problem.id}/statement`)
+    statementHtml.value = data.data || ""
+    
+    // Inject mathjax styling logic if needed natively
+    setTimeout(() => {
+      if (window.MathJax && window.MathJax.typesetPromise) {
+        window.MathJax.typesetPromise()
+      }
+    }, 100)
+  } catch (error) {
+    statementError.value = extractErrorMessage(error)
+  } finally {
+    isFetchingStatement.value = false
+  }
+}
+
 onMounted(() => {
   pingApi({ silent: true })
   loadMapel()
   loadSavedProblems()
 })
 </script>
+
+<style>
+/* Custom Codeforces Statement Styling */
+.cf-problem-statement {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  color: #222;
+}
+.cf-problem-statement .header {
+  text-align: center;
+  margin-bottom: 2em;
+}
+.cf-problem-statement .header .title {
+  font-size: 1.75em;
+  font-weight: bold;
+  margin-bottom: 0.5em;
+}
+.cf-problem-statement .header .time-limit,
+.cf-problem-statement .header .memory-limit,
+.cf-problem-statement .header .input-file,
+.cf-problem-statement .header .output-file {
+  margin: 0;
+  font-size: 0.9em;
+}
+.cf-problem-statement .header .property-title {
+  display: inline;
+  font-weight: bold;
+}
+.cf-problem-statement .header .property-title:after {
+  content: ": ";
+}
+.cf-problem-statement .sample-tests {
+  margin-top: 2em;
+}
+.cf-problem-statement .sample-tests .section-title {
+  font-weight: bold;
+  font-size: 1.25em;
+  margin-bottom: 0.5em;
+}
+.cf-problem-statement .sample-tests .sample-test {
+  display: flex;
+  flex-direction: column;
+}
+.cf-problem-statement .sample-tests .sample-test .input,
+.cf-problem-statement .sample-tests .sample-test .output {
+  border: 1px solid #ccc;
+  margin-bottom: 1em;
+  border-radius: 4px;
+}
+.cf-problem-statement .sample-tests .sample-test .title {
+  font-weight: bold;
+  padding: 0.25em 0.75em;
+  border-bottom: 1px solid #ccc;
+  background-color: #f5f5f5;
+  font-size: 0.9em;
+  margin: 0;
+}
+.cf-problem-statement .sample-tests .sample-test pre {
+  margin: 0;
+  padding: 0.75em;
+  background-color: #fafafa !important;
+  color: #333 !important;
+  font-family: Consolas, "Courier New", monospace;
+  white-space: pre-wrap;
+  border-radius: 0 0 4px 4px;
+  font-size: 0.9em;
+  line-height: 1.4;
+}
+.cf-problem-statement p {
+  margin-top: 0.5em;
+  margin-bottom: 1em;
+}
+.cf-problem-statement ul {
+  list-style-type: disc !important;
+  padding-left: 2em !important;
+}
+.cf-problem-statement li {
+  margin-bottom: 0.25em;
+}
+</style>
