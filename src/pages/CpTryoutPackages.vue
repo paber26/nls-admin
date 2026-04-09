@@ -34,18 +34,26 @@
                 <th class="px-4 py-3 text-left">Paket</th>
                 <th class="px-4 py-3 text-center">Durasi</th>
                 <th class="px-4 py-3 text-center">Soal</th>
+                <th class="px-4 py-3 text-center">Periode</th>
                 <th class="px-4 py-3 text-center">Status</th>
                 <th class="px-4 py-3 text-center">Aksi</th>
               </tr>
             </thead>
             <tbody>
               <tr v-if="loadingPackages">
-                <td colspan="5" class="px-4 py-6 text-center text-slate-400">Memuat paket...</td>
+                <td colspan="6" class="px-4 py-6 text-center text-slate-400">Memuat paket...</td>
               </tr>
               <tr v-for="item in packages" :key="item.id" class="border-t">
                 <td class="px-4 py-3 font-medium">{{ item.nama_paket }}</td>
                 <td class="px-4 py-3 text-center">{{ item.durasi_menit }} menit</td>
                 <td class="px-4 py-3 text-center">{{ item.jumlah_soal }}</td>
+                <td class="px-4 py-3 text-center text-xs text-slate-600">
+                  <div class="flex flex-col leading-tight">
+                    <span>{{ formatDate(item.mulai) }}</span>
+                    <span class="text-slate-400">s/d</span>
+                    <span>{{ formatDate(item.selesai) }}</span>
+                  </div>
+                </td>
                 <td class="px-4 py-3 text-center">
                   <span
                     class="rounded px-2 py-1 text-xs font-medium"
@@ -63,6 +71,9 @@
                     <button type="button" class="text-indigo-600 hover:underline cursor-pointer" @click="openManage(item.id)">
                       Kelola
                     </button>
+                    <button type="button" class="text-emerald-700 hover:underline cursor-pointer" @click="openStatusModal(item.id)">
+                      Edit
+                    </button>
                     <button
                       type="button"
                       class="text-slate-700 hover:underline cursor-pointer"
@@ -74,7 +85,7 @@
                 </td>
               </tr>
               <tr v-if="!loadingPackages && !packages.length">
-                <td colspan="5" class="px-4 py-8 text-center text-slate-400">Belum ada paket CP.</td>
+                <td colspan="6" class="px-4 py-8 text-center text-slate-400">Belum ada paket CP.</td>
               </tr>
             </tbody>
           </table>
@@ -202,6 +213,81 @@
         </form>
       </div>
     </div>
+
+    <div
+      v-if="showStatusModal"
+      class="fixed inset-0 z-[70] flex items-center justify-center bg-slate-900/50 p-4"
+      @click.self="closeStatusModal"
+    >
+      <div class="w-full max-w-md rounded-xl bg-white p-5 shadow-2xl">
+        <div class="mb-4 flex items-center justify-between">
+          <h2 class="text-base font-semibold text-slate-800">Edit Paket Tryout CP</h2>
+          <button type="button" class="text-slate-500 hover:text-slate-700 cursor-pointer" @click="closeStatusModal">✕</button>
+        </div>
+
+        <div class="space-y-4">
+          <div>
+            <label class="text-sm text-slate-600">Nama Paket</label>
+            <input
+              v-model="statusForm.paket"
+              type="text"
+              class="mt-1 w-full rounded-lg border px-3 py-2 text-sm"
+            />
+          </div>
+
+          <div>
+            <label class="text-sm text-slate-600">Durasi (menit)</label>
+            <input
+              v-model.number="statusForm.durasi_menit"
+              type="number"
+              min="1"
+              class="mt-1 w-full rounded-lg border px-3 py-2 text-sm"
+            />
+          </div>
+
+          <div>
+            <label class="text-sm text-slate-600">Status</label>
+            <select v-model="statusForm.status" class="mt-1 w-full rounded-lg border px-3 py-2 text-sm">
+              <option value="draft">Draft</option>
+              <option value="active">Aktif</option>
+              <option value="finished">Selesai</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="text-sm text-slate-600">Mulai</label>
+            <input
+              v-model="statusForm.mulai"
+              type="datetime-local"
+              class="mt-1 w-full rounded-lg border px-3 py-2 text-sm"
+            />
+          </div>
+
+          <div>
+            <label class="text-sm text-slate-600">Selesai</label>
+            <input
+              v-model="statusForm.selesai"
+              type="datetime-local"
+              class="mt-1 w-full rounded-lg border px-3 py-2 text-sm"
+            />
+          </div>
+        </div>
+
+        <div class="mt-5 flex justify-end gap-2">
+          <button type="button" class="rounded-lg border px-4 py-2 text-sm hover:bg-slate-50 cursor-pointer" @click="closeStatusModal">
+            Batal
+          </button>
+          <button
+            type="button"
+            class="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700 cursor-pointer disabled:cursor-not-allowed disabled:opacity-60"
+            :disabled="savingStatus"
+            @click="saveStatus"
+          >
+            {{ savingStatus ? "Menyimpan..." : "Simpan Perubahan" }}
+          </button>
+        </div>
+      </div>
+    </div>
   </AppShell>
 </template>
 
@@ -225,6 +311,9 @@ const successMessage = ref("")
 const errorMessage = ref("")
 
 const showCreateModal = ref(false)
+const showStatusModal = ref(false)
+const savingStatus = ref(false)
+
 const createForm = ref({
   nama_paket: "",
   durasi_menit: 120,
@@ -233,15 +322,55 @@ const createForm = ref({
   status: "draft",
 })
 
+const statusForm = ref({
+  id: null,
+  nama_paket: "",
+  status: "draft",
+  paket: "",
+  durasi_menit: 0,
+  mulai: "",
+  selesai: "",
+})
+
 const toDateTimePayload = (value) => {
   if (!value) return null
   return value.length === 16 ? `${value}:00` : value
+}
+
+const toDateTimeInput = (value) => {
+  if (!value) return ""
+
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) {
+    const normalized = String(value).replace(" ", "T")
+    return normalized.length >= 16 ? normalized.slice(0, 16) : ""
+  }
+
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, "0")
+  const day = String(date.getDate()).padStart(2, "0")
+  const hours = String(date.getHours()).padStart(2, "0")
+  const minutes = String(date.getMinutes()).padStart(2, "0")
+  return `${year}-${month}-${day}T${hours}:${minutes}`
 }
 
 const prettyStatus = (status) => {
   if (status === "active") return "Aktif"
   if (status === "finished") return "Selesai"
   return "Draft"
+}
+
+const formatDate = (datetime) => {
+  if (!datetime) return "-"
+  const date = new Date(datetime)
+  if (Number.isNaN(date.getTime())) return "-"
+  return date.toLocaleString("id-ID", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit"
+  })
 }
 
 const clearMessages = () => {
@@ -269,6 +398,19 @@ const closeCreateModal = () => {
   showCreateModal.value = false
 }
 
+const closeStatusModal = () => {
+  showStatusModal.value = false
+  statusForm.value = {
+    id: null,
+    nama_paket: "",
+    status: "draft",
+    paket: "",
+    durasi_menit: 0,
+    mulai: "",
+    selesai: "",
+  }
+}
+
 const fetchPackages = async () => {
   loadingPackages.value = true
   try {
@@ -285,9 +427,30 @@ const openManage = (id) => {
   router.push(`/cp-tryout/${id}/kelola`)
 }
 
+const openStatusModal = async (id) => {
+  clearMessages()
+  try {
+    const { data } = await api.get(`/cp-tryout-packages/${id}`)
+    const detail = data?.data
+    if (!detail) return
+
+    statusForm.value = {
+      id: detail.id,
+      nama_paket: detail.nama_paket || "-",
+      status: detail.status || "draft",
+      paket: detail.nama_paket || "",
+      durasi_menit: Number(detail.durasi_menit || 0),
+      mulai: toDateTimeInput(detail.mulai),
+      selesai: toDateTimeInput(detail.selesai),
+    }
+    showStatusModal.value = true
+  } catch (error) {
+    errorMessage.value = error?.response?.data?.message || "Gagal memuat data paket untuk edit status."
+  }
+}
+
 const openLeaderboard = async (id) => {
   clearMessages()
-
   try {
     const { data } = await api.get(`/cp-tryout-packages/${id}`)
     selectedPackageId.value = id
@@ -342,8 +505,30 @@ const fetchLeaderboard = async () => {
   }
 }
 
+const saveStatus = async () => {
+  clearMessages()
+  if (!statusForm.value.id) return
+
+  savingStatus.value = true
+  try {
+    await api.put(`/cp-tryout-packages/${statusForm.value.id}`, {
+      nama_paket: statusForm.value.paket,
+      durasi_menit: Number(statusForm.value.durasi_menit || 0),
+      mulai: toDateTimePayload(statusForm.value.mulai),
+      selesai: toDateTimePayload(statusForm.value.selesai),
+      status: statusForm.value.status,
+    })
+    successMessage.value = "Paket CP berhasil diperbarui."
+    closeStatusModal()
+    await fetchPackages()
+  } catch (error) {
+    errorMessage.value = error?.response?.data?.message || "Gagal memperbarui status paket CP."
+  } finally {
+    savingStatus.value = false
+  }
+}
+
 onMounted(async () => {
   await fetchPackages()
 })
 </script>
-

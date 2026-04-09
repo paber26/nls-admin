@@ -223,7 +223,11 @@ import {
   ImageStyle,
   ImageUpload,
   ImageResize,
-  ImageResizeButtons
+  ImageResizeButtons,
+  Table,
+  TableToolbar,
+  TableProperties,
+  TableCellProperties
 } from "ckeditor5"
 import api from "@/services/api"
 import { useRouter } from "vue-router"
@@ -281,10 +285,14 @@ const editorConfig = {
     ImageStyle,
     ImageUpload,
     ImageResize,
-    ImageResizeButtons
+    ImageResizeButtons,
+    Table,
+    TableToolbar,
+    TableProperties,
+    TableCellProperties
   ],
   extraPlugins: [MyCustomUploadAdapterPlugin],
-  toolbar: ["undo", "redo", "|", "bold", "italic", "link", "|", "bulletedList", "numberedList", "|", "uploadImage"],
+  toolbar: ["undo", "redo", "|", "bold", "italic", "link", "|", "bulletedList", "numberedList", "|", "insertTable", "uploadImage"],
   image: {
     resizeOptions: [
       {
@@ -310,6 +318,9 @@ const editorConfig = {
     ],
     toolbar: ["imageStyle:alignLeft", "imageStyle:alignCenter", "imageStyle:alignRight", "|", "resizeImage"],
     resizeUnit: "%"
+  },
+  table: {
+    contentToolbar: ["tableColumn", "tableRow", "mergeTableCells", "tableProperties", "tableCellProperties"]
   }
 }
 
