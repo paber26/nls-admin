@@ -960,7 +960,7 @@ const saveStatementHtml = async () => {
     })
     successMessage.value = data.message || "Teks soal kustom berhasil diupdate."
     isEditorModalOpen.value = false
-    loadSavedProblems()
+    loadSavedProblems() 
   } catch (error) {
     errorMessage.value = extractErrorMessage(error)
   } finally {
