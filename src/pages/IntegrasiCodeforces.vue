@@ -443,8 +443,26 @@
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
           </button>
         </div>
+        <div class="border-b border-slate-200 bg-slate-50 relative mt-0">
+          <nav class="-mb-px flex px-6" aria-label="Tabs">
+            <button @click="editorTab = 'original'" :class="[editorTab === 'original' ? 'border-blue-500 text-blue-600 bg-white' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300 hover:bg-slate-100', 'whitespace-nowrap py-3 px-5 border-b-2 font-medium text-sm transition-colors cursor-pointer rounded-t-lg']">
+              Isi Teks Asli (Raw HTML)
+            </button>
+            <button @click="editorTab = 'custom'" :class="[editorTab === 'custom' ? 'border-blue-500 text-blue-600 bg-white' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300 hover:bg-slate-100', 'whitespace-nowrap py-3 px-5 border-b-2 font-medium text-sm transition-colors cursor-pointer rounded-t-lg']">
+              Isi Narasi Kustom (Terjemahan)
+            </button>
+          </nav>
+        </div>
         
-        <div class="p-6 overflow-y-auto flex-1 cf-editor-container">
+        <div class="p-6 overflow-y-auto flex-1 cf-editor-container bg-slate-50" v-if="editorTab === 'original'">
+          <div class="mb-4">
+            <h4 class="font-semibold text-slate-800">Bypass Blokir Codeforces (Salin Kodenya secara Manual)</h4>
+            <p class="text-xs text-slate-600 mt-1">Jika sistem dilarang mengambil HTML otomatis, buka masalah tersebut di browser khusus, temukan &lt;div class="problemindexholder"&gt;, Inspect Element, lalu klik kanan &rarr; Copy element dan tempel source code mentahnya di bawah ini agar format asli dan rumus (MathJax) Codeforces terselamatkan.</p>
+          </div>
+          <textarea v-model="editStatementHtml" rows="14" class="w-full border border-slate-300 rounded-lg p-4 font-mono text-sm bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder='<div class="problemindexholder" problemindex="A" ...'></textarea>
+        </div>
+
+        <div class="p-6 overflow-y-auto flex-1 cf-editor-container" v-if="editorTab === 'custom'">
           <div class="mb-4 p-4 bg-indigo-50 border border-indigo-100 rounded-xl flex items-center justify-between">
             <div>
               <h4 class="font-semibold text-indigo-900">Gunakan Narasi Kustom (Terjemahan Sendiri)</h4>
@@ -522,6 +540,8 @@ const statementError = ref("")
 const selectedProblem = ref(null)
 
 const isEditorModalOpen = ref(false)
+const editorTab = ref("original")
+const editStatementHtml = ref("")
 const editCustomStatementHtml = ref("")
 const isCustomStatementActive = ref(false)
 const isSavingHtml = ref(false)
@@ -915,8 +935,16 @@ const viewStatement = async (problem) => {
 const openEditor = async (problem) => {
   selectedProblem.value = problem
   isEditorModalOpen.value = true
+  editorTab.value = problem.is_custom_statement ? "custom" : "original"
   isCustomStatementActive.value = Boolean(problem.is_custom_statement)
   editCustomStatementHtml.value = problem.custom_statement_html || ""
+  
+  try {
+    const { data } = await api.get(`/cf-problems/${problem.id}/statement`)
+    editStatementHtml.value = data.data || "" // Biarkan admin melihat HTML asli jika berhasil, atau kosong jika diblokir
+  } catch (error) {
+    editStatementHtml.value = problem.statement_html || ""
+  }
 }
 
 const saveStatementHtml = async () => {
@@ -927,7 +955,8 @@ const saveStatementHtml = async () => {
   try {
     const { data } = await api.put(`/cf-problems/${selectedProblem.value.id}`, {
       is_custom_statement: isCustomStatementActive.value,
-      custom_statement_html: editCustomStatementHtml.value
+      custom_statement_html: editCustomStatementHtml.value,
+      statement_html: editStatementHtml.value
     })
     successMessage.value = data.message || "Teks soal kustom berhasil diupdate."
     isEditorModalOpen.value = false
