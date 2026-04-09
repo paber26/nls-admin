@@ -345,8 +345,9 @@
                       </td>
                       <td class="px-6 py-4 text-slate-600">{{ p.points }}</td>
                       <td class="px-6 py-4 whitespace-nowrap text-right space-x-3">
-                        <button class="text-blue-600 hover:text-blue-800 text-xs font-medium" @click="viewStatement(p)">Lihat Soal</button>
-                        <button class="text-rose-600 hover:text-rose-800 text-xs font-medium" @click="deleteProblem(p.id)">Hapus</button>
+                        <button class="text-blue-600 hover:text-blue-800 text-xs font-medium cursor-pointer" @click="viewStatement(p)">Lihat Soal</button>
+                        <button class="text-indigo-600 hover:text-indigo-800 text-xs font-medium cursor-pointer" @click="openEditor(p)">Edit Text</button>
+                        <button class="text-rose-600 hover:text-rose-800 text-xs font-medium cursor-pointer" @click="deleteProblem(p.id)">Hapus</button>
                       </td>
                     </tr>
                   </tbody>
@@ -415,6 +416,31 @@
         </div>
       </div>
     </div>
+    <!-- Modal Edit Narasi Soal -->
+    <div v-if="isEditorModalOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+      <div class="bg-white rounded-2xl shadow-xl w-full max-w-5xl max-h-[90vh] flex flex-col overflow-hidden">
+        <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-slate-50/50">
+          <h3 class="text-lg font-semibold text-slate-800">Edit Narasi (HTML) - {{ selectedProblem?.name }}</h3>
+          <button type="button" class="text-slate-400 hover:text-slate-600 cursor-pointer" @click="isEditorModalOpen = false">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+          </button>
+        </div>
+        
+        <div class="p-6 overflow-y-auto flex-1 cf-editor-container">
+          <p class="text-sm text-slate-500 mb-4">Gunakan editor ini untuk menyusun narasi bahasa Indonesia kustom untuk problem ini. Input dan output *judgement* tetap mengacu ke Codeforces aslinya.</p>
+          <div class="border rounded-lg border-slate-200 overflow-hidden">
+            <ckeditor :editor="editor" v-model="editStatementHtml" :config="editorConfig" />
+          </div>
+        </div>
+        
+        <div class="px-6 py-4 border-t border-slate-100 bg-slate-50/50 flex justify-end gap-3">
+          <button type="button" class="px-4 py-2 bg-slate-200 text-slate-700 rounded-lg hover:bg-slate-300 font-medium text-sm transition-colors cursor-pointer" @click="isEditorModalOpen = false">Batal</button>
+          <button type="button" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-medium text-sm transition-colors cursor-pointer" @click="saveStatementHtml" :disabled="isSavingHtml">
+            {{ isSavingHtml ? 'Menyimpan...' : 'Simpan Perubahan' }}
+          </button>
+        </div>
+      </div>
+    </div>
   </AppShell>
 </template>
 
@@ -422,6 +448,21 @@
 import { computed, onMounted, ref } from "vue"
 import AppShell from "@/components/layout/AppShell.vue"
 import api from "@/services/api"
+import { Ckeditor } from "@ckeditor/ckeditor5-vue"
+import {
+  ClassicEditor,
+  Essentials,
+  Paragraph,
+  Bold,
+  Italic,
+  Underline,
+  Link,
+  List,
+  Image,
+  ImageToolbar,
+  ImageResize,
+  ImageUpload
+} from "ckeditor5"
 
 const isPinging = ref(false)
 const isSyncing = ref(false)
@@ -449,8 +490,84 @@ const statementHtml = ref("")
 const statementError = ref("")
 const selectedProblem = ref(null)
 
+const isEditorModalOpen = ref(false)
+const editStatementHtml = ref("")
+const isSavingHtml = ref(false)
+
 const isConfirmDeleteModalOpen = ref(false)
 const problemToDelete = ref(null)
+
+const editor = ClassicEditor
+
+function MyUploadAdapter(loader) {
+  this.loader = loader
+}
+
+MyUploadAdapter.prototype.upload = function () {
+  return this.loader.file.then((file) => {
+    const data = new FormData()
+    data.append("upload", file)
+
+    return api
+      .post("/upload-image", data, {
+        headers: {
+          "Content-Type": "multipart/form-data"
+        }
+      })
+      .then((res) => {
+        return {
+          default: res.data.url
+        }
+      })
+  })
+}
+
+function MyCustomUploadAdapterPlugin(editor) {
+  editor.plugins.get("FileRepository").createUploadAdapter = (loader) => {
+    return new MyUploadAdapter(loader)
+  }
+}
+
+const editorConfig = {
+  licenseKey: "GPL",
+  plugins: [Essentials, Paragraph, Bold, Italic, Underline, Link, List, Image, ImageToolbar, ImageResize, ImageUpload],
+  extraPlugins: [MyCustomUploadAdapterPlugin],
+  toolbar: [
+    "undo",
+    "redo",
+    "|",
+    "bold",
+    "italic",
+    "underline",
+    "|",
+    "link",
+    "|",
+    "bulletedList",
+    "numberedList",
+    "|",
+    "imageUpload"
+  ],
+  image: {
+    resizeOptions: [
+      {
+        name: "resizeImage:original",
+        label: "Original",
+        value: null
+      },
+      {
+        name: "resizeImage:50",
+        label: "50%",
+        value: "50"
+      },
+      {
+        name: "resizeImage:75",
+        label: "75%",
+        value: "75"
+      }
+    ],
+    toolbar: ["resizeImage:original", "resizeImage:50", "resizeImage:75"]
+  }
+}
 
 const connection = ref({
   online: null,
@@ -759,6 +876,41 @@ const viewStatement = async (problem) => {
   }
 }
 
+const openEditor = async (problem) => {
+  selectedProblem.value = problem
+  isEditorModalOpen.value = true
+  editStatementHtml.value = "Memuat..." // Placeholder
+  
+  try {
+    const { data } = await api.get(`/cf-problems/${problem.id}/statement`)
+    editStatementHtml.value = data.data || ""
+  } catch (error) {
+    // Jika API aslinya terblokir, kita bisa memberi area kosong kepada pengguna.
+    editStatementHtml.value = problem.statement_html || ""
+    successMessage.value = ''
+    errorMessage.value = "Soal asal diblokir Cloudflare. Anda dapat menulis manual dari awal."
+  }
+}
+
+const saveStatementHtml = async () => {
+  if (!selectedProblem.value) return
+  isSavingHtml.value = true
+  errorMessage.value = ""
+  
+  try {
+    const { data } = await api.put(`/cf-problems/${selectedProblem.value.id}`, {
+      statement_html: editStatementHtml.value
+    })
+    successMessage.value = data.message || "Teks soal berhasil diupdate."
+    isEditorModalOpen.value = false
+    loadSavedProblems()
+  } catch (error) {
+    errorMessage.value = extractErrorMessage(error)
+  } finally {
+    isSavingHtml.value = false
+  }
+}
+
 onMounted(() => {
   pingApi({ silent: true })
   loadMapel()
@@ -842,5 +994,8 @@ onMounted(() => {
 }
 .cf-problem-statement li {
   margin-bottom: 0.25em;
+}
+.cf-editor-container .ck-editor__editable_inline {
+  min-height: 400px;
 }
 </style>
