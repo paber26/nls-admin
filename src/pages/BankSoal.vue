@@ -92,7 +92,7 @@
                 <tr v-for="item in bankSoal" :key="item.id" class="border-t">
                   <td class="px-4 py-3">{{ item.mapel }}</td>
                   <td class="px-4 py-3 font-medium">
-                    <div v-html="formatSoal(item.pertanyaan)"></div>
+                    <div class="rich-text" v-html="formatSoal(item.pertanyaan)"></div>
                   </td>
                   <td class="px-4 py-3 text-center">{{ item.pembuat }}</td>
                   <td class="px-4 py-3 text-center">{{ item.jumlah_terpakai }}</td>

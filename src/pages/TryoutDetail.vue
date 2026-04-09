@@ -89,13 +89,13 @@
         <!-- KETENTUAN KHUSUS -->
         <section v-if="tryout?.ketentuan_khusus" class="bg-white rounded-xl border p-6 mb-6">
           <h2 class="text-sm font-semibold mb-3 text-slate-700">Ketentuan Khusus</h2>
-          <div class="text-sm leading-relaxed" v-html="tryout.ketentuan_khusus"></div>
+          <div class="text-sm leading-relaxed rich-text" v-html="tryout.ketentuan_khusus"></div>
         </section>
 
         <!-- PESAN SELESAI -->
         <section v-if="tryout?.pesan_selesai" class="bg-white rounded-xl border p-6 mb-6">
           <h2 class="text-sm font-semibold mb-3 text-slate-700">Pesan Setelah Selesai</h2>
-          <div class="text-sm leading-relaxed" v-html="tryout.pesan_selesai"></div>
+          <div class="text-sm leading-relaxed rich-text" v-html="tryout.pesan_selesai"></div>
         </section>
 
         <!-- PREVIEW SOAL -->
@@ -143,7 +143,7 @@
               </RouterLink>
             </div>
 
-            <div class="mb-4 leading-relaxed" v-html="item.pertanyaan"></div>
+            <div class="mb-4 leading-relaxed rich-text" v-html="item.pertanyaan"></div>
 
             <!-- PERNYATAAN PG KOMPLEKS -->
             <div
@@ -152,7 +152,7 @@
             >
               <div v-for="p in item.pernyataan" :key="p.urutan" class="flex items-start gap-2">
                 <span class="font-medium">{{ p.urutan }}.</span>
-                <span v-html="p.teks"></span>
+                <span class="rich-text" v-html="p.teks"></span>
                 <span
                   class="ml-auto text-xs px-2 py-0.5 rounded"
                   :class="p.jawaban_benar ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500'"
@@ -170,7 +170,7 @@
                 class="flex justify-between items-center"
                 :class="opsi.is_correct ? 'font-semibold text-emerald-600' : ''"
               >
-                <span v-html="`${opsi.label}. ${opsi.teks}`"></span>
+                <span class="rich-text" v-html="`${opsi.label}. ${opsi.teks}`"></span>
 
                 <span class="text-xs px-2 py-0.5 rounded bg-slate-100 text-slate-600">{{ opsi.poin }} poin</span>
               </li>
@@ -186,7 +186,7 @@
             <!-- PEMBAHASAN -->
             <div v-if="item.pembahasan" class="mt-4 p-4 bg-slate-50 rounded-lg text-sm">
               <p class="font-medium mb-1">Pembahasan:</p>
-              <div v-html="item.pembahasan"></div>
+              <div class="rich-text" v-html="item.pembahasan"></div>
             </div>
           </div>
         </section>

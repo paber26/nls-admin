@@ -3,8 +3,10 @@
 @theme {
   --font-poppins: "Poppins", sans-serif;
 
-  --color-primary: #4f46e5; /* bg-indigo-500 */
-  --color-sidebar: #0f172a; /* bg-slate-900 */
+  --color-primary: #4f46e5;
+  /* bg-indigo-500 */
+  --color-sidebar: #0f172a;
+  /* bg-slate-900 */
   --color-sideover: #1e293b;
   --color-bgsoft: #f1f5f9;
 }
@@ -17,4 +19,59 @@
   .text-primary {
     color: var(--color-primary);
   }
+}
+
+/* Normalize rich-text output from CKEditor in both editor and read-only views. */
+.ck-content ul,
+.prose ul,
+.rich-text ul {
+  list-style-type: disc !important;
+  margin: 0.5rem 0 !important;
+  padding-left: 1.5rem !important;
+}
+
+.ck-content ul ul,
+.prose ul ul,
+.rich-text ul ul {
+  list-style-type: circle !important;
+}
+
+.ck-content ul ul ul,
+.prose ul ul ul,
+.rich-text ul ul ul {
+  list-style-type: square !important;
+}
+
+.ck-content ol,
+.prose ol,
+.rich-text ol {
+  list-style-type: decimal !important;
+  margin: 0.5rem 0 !important;
+  padding-left: 1.5rem !important;
+}
+
+.ck-content li,
+.prose li,
+.rich-text li {
+  margin: 0.25rem 0 !important;
+  display: list-item !important;
+}
+
+.ck-content table,
+.prose table,
+.rich-text table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0.75rem 0;
+}
+
+.ck-content th,
+.ck-content td,
+.prose th,
+.prose td,
+.rich-text th,
+.rich-text td {
+  border: 1px solid #d1d5db;
+  padding: 0.5rem 0.625rem;
+  vertical-align: top;
 }

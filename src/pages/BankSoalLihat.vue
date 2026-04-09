@@ -30,7 +30,7 @@
         <!-- Pertanyaan -->
         <div>
           <p class="text-sm text-gray-500 mb-2">Pertanyaan</p>
-          <div class="prose max-w-none" v-html="pertanyaan"></div>
+          <div class="prose rich-text max-w-none" v-html="pertanyaan"></div>
         </div>
 
         <!-- ISIAN -->
@@ -49,7 +49,7 @@
             :class="opsi.is_correct ? 'border-green-500 bg-green-50' : 'border-gray-200'"
           >
             <span class="font-semibold">{{ String.fromCharCode(65 + i) }}.</span>
-            <div class="flex-1" v-html="opsi.text"></div>
+            <div class="flex-1 rich-text" v-html="opsi.text"></div>
             <span class="text-xs text-gray-500">Poin: {{ opsi.poin }}</span>
           </div>
         </div>
@@ -64,7 +64,7 @@
             :class="opsi.is_correct ? 'border-green-500 bg-green-50' : 'border-gray-200'"
           >
             <span class="font-semibold">{{ String.fromCharCode(65 + i) }}.</span>
-            <div class="flex-1" v-html="opsi.text"></div>
+            <div class="flex-1 rich-text" v-html="opsi.text"></div>
             <div class="flex flex-col items-end">
               <span class="text-xs text-gray-500">Poin: {{ opsi.poin }}</span>
               <span v-if="opsi.is_correct" class="text-xs text-green-600 font-medium">Jawaban Benar</span>
@@ -82,7 +82,7 @@
           >
             <div class="flex gap-2">
               <span class="font-semibold">{{ index + 1 }}.</span>
-              <div v-html="item.text"></div>
+              <div class="rich-text" v-html="item.text"></div>
             </div>
             <span
               class="text-xs px-2 py-1 rounded-full"
@@ -96,7 +96,7 @@
         <!-- Pembahasan -->
         <div>
           <p class="text-sm text-gray-500 mb-2">Pembahasan</p>
-          <div class="prose max-w-none" v-html="pembahasan"></div>
+          <div class="prose rich-text max-w-none" v-html="pembahasan"></div>
         </div>
 
         <div class="pt-4">

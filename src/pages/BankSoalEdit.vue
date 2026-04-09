@@ -4,6 +4,9 @@
     <template #header>
       <div class="w-full flex justify-between items-center">
         <h1 class="text-lg font-semibold text-slate-800">Edit Soal</h1>
+        <button type="button" @click="openPreview" class="px-4 py-2 bg-indigo-100 text-indigo-700 rounded-lg hover:bg-indigo-200 text-sm font-medium">
+          👁️ Lihat Tampilan
+        </button>
       </div>
     </template>
 
@@ -162,6 +165,106 @@
           </button>
         </div>
       </div>
+
+      <!-- Preview Popup -->
+      <div v-if="showPreviewPopup" class="fixed inset-0 bg-black bg-opacity-40 overflow-y-auto flex items-center justify-center z-[100] p-4 sm:p-6" @click.self="showPreviewPopup = false">
+        <div class="bg-white rounded-xl shadow-lg w-full max-w-4xl flex flex-col max-h-full">
+          <div class="p-4 border-b flex justify-between items-center sticky top-0 bg-white rounded-t-xl z-10 w-full">
+            <h2 class="text-lg font-semibold text-gray-800">Pratinjau Soal</h2>
+            <button type="button" @click="showPreviewPopup = false" class="text-gray-500 hover:text-gray-700 text-2xl leading-none">&times;</button>
+          </div>
+          <div class="p-6 overflow-y-auto w-full text-left bg-white text-gray-800" id="preview-content">
+            <!-- Tipe -->
+            <div class="mb-4">
+              <p class="text-sm text-gray-500">Tipe Soal</p>
+              <p class="font-medium">
+                <span v-if="tipeSoal === 'pg'">Pilihan Ganda</span>
+                <span v-else-if="tipeSoal === 'isian'">Isian</span>
+                <span v-else-if="tipeSoal === 'pg_kompleks'">PG Kompleks</span>
+                <span v-else-if="tipeSoal === 'pg_majemuk'">PG Majemuk</span>
+              </p>
+            </div>
+
+            <!-- Pertanyaan -->
+            <div class="mb-4">
+              <p class="text-sm text-gray-500 mb-2">Pertanyaan</p>
+              <div class="prose rich-text max-w-none" v-html="pertanyaan"></div>
+            </div>
+
+            <!-- ISIAN -->
+            <div v-if="tipeSoal === 'isian'" class="mb-4">
+              <p class="text-sm text-gray-500 mb-2">Jawaban</p>
+              <p class="font-medium px-4 py-2 bg-gray-50 border rounded-lg">{{ jawabanIsian }}</p>
+            </div>
+
+            <!-- PG -->
+            <div v-if="tipeSoal === 'pg'" class="mb-4">
+              <p class="text-sm text-gray-500 mb-2">Opsi Jawaban</p>
+              <div
+                v-for="(opsi, i) in opsiJawaban"
+                :key="i"
+                class="flex items-start gap-3 p-3 border rounded-lg mb-2"
+                :class="opsi.is_correct ? 'border-green-500 bg-green-50' : 'border-gray-200'"
+              >
+                <span class="font-semibold mt-1">{{ String.fromCharCode(65 + i) }}.</span>
+                <div class="flex-1 rich-text" v-html="opsi.text"></div>
+                <span class="text-xs text-gray-500 mt-1 whitespace-nowrap">Poin: {{ opsi.poin }}</span>
+              </div>
+            </div>
+
+            <!-- PG MAJEMUK -->
+            <div v-if="tipeSoal === 'pg_majemuk'" class="mb-4">
+              <p class="text-sm text-gray-500 mb-2">Opsi Jawaban</p>
+              <div
+                v-for="(opsi, i) in opsiJawaban"
+                :key="i"
+                class="flex items-start gap-3 p-3 border rounded-lg mb-2"
+                :class="opsi.is_correct ? 'border-green-500 bg-green-50' : 'border-gray-200'"
+              >
+                <span class="font-semibold mt-1">{{ String.fromCharCode(65 + i) }}.</span>
+                <div class="flex-1 rich-text" v-html="opsi.text"></div>
+                <div class="flex flex-col items-end whitespace-nowrap mt-1">
+                  <span class="text-xs text-gray-500">Poin: {{ opsi.poin }}</span>
+                  <span v-if="opsi.is_correct" class="text-xs text-green-600 font-medium">Jawaban Benar</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- PG KOMPLEKS -->
+            <div v-if="tipeSoal === 'pg_kompleks'" class="mb-4">
+              <p class="text-sm text-gray-500 mb-2">Pernyataan</p>
+              <div
+                v-for="(item, index) in pernyataanKompleks"
+                :key="index"
+                class="flex justify-between items-start gap-4 p-3 border rounded-lg mb-2 bg-gray-50"
+              >
+                <div class="flex gap-2 flex-1">
+                  <span class="font-semibold text-gray-700 mt-1">{{ index + 1 }}.</span>
+                  <div class="rich-text flex-1" v-html="item.text"></div>
+                </div>
+                <div class="mt-1">
+                  <span
+                    class="text-xs px-3 py-1 rounded-full font-medium whitespace-nowrap"
+                    :class="String(item.jawaban) === 'true' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'"
+                  >
+                    {{ String(item.jawaban) === 'true' ? "Benar" : "Salah" }}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Pembahasan -->
+            <div v-if="pembahasan" class="mt-6 pt-4 border-t">
+              <p class="text-sm text-gray-500 mb-2">Pembahasan</p>
+              <div class="prose rich-text max-w-none" v-html="pembahasan"></div>
+            </div>
+            
+            <div class="mt-6 flex justify-end">
+               <button @click="showPreviewPopup = false" class="px-4 py-2 bg-gray-200 rounded-lg text-sm font-medium hover:bg-gray-300">Tutup</button>
+            </div>
+          </div>
+        </div>
+      </div>
     
     </div>  </AppShell></template>
 
@@ -177,6 +280,7 @@ import {
   Underline,
   Link,
   List,
+  ListProperties,
   Image,
   ImageToolbar,
   ImageResize,
@@ -190,6 +294,9 @@ import { ref, onMounted, nextTick } from "vue"
 import { useRoute, useRouter } from "vue-router"
 import api from "@/services/api"
 import Sidebar from "@/components/layout/Sidebar.vue"
+import katex from "katex"
+import renderMathInElement from "katex/contrib/auto-render"
+import "katex/dist/katex.min.css"
 
 const route = useRoute()
 const router = useRouter()
@@ -215,6 +322,23 @@ const showSuccessPopup = ref(false)
 const successMessage = ref("")
 const showErrorPopup = ref(false)
 const errorMessage = ref("")
+
+const showPreviewPopup = ref(false)
+const openPreview = () => {
+  showPreviewPopup.value = true
+  nextTick(() => {
+    const previewEl = document.getElementById("preview-content")
+    if (previewEl) {
+      renderMathInElement(previewEl, {
+        delimiters: [
+          { left: "$$", right: "$$", display: true },
+          { left: "$", right: "$", display: false }
+        ],
+        throwOnError: false
+      })
+    }
+  })
+}
 
 const editor = ClassicEditor
 
@@ -257,6 +381,7 @@ const editorConfig = {
     Underline,
     Link,
     List,
+    ListProperties,
     Image,
     ImageToolbar,
     ImageResize,
@@ -284,6 +409,13 @@ const editorConfig = {
     "|",
     "imageUpload"
   ],
+  list: {
+    properties: {
+      styles: true,
+      startIndex: true,
+      reversed: true
+    }
+  },
   image: {
     resizeOptions: [
       {

@@ -218,6 +218,7 @@ import {
   Undo,
   Link,
   List,
+  ListProperties,
   Image,
   ImageToolbar,
   ImageStyle,
@@ -280,6 +281,7 @@ const editorConfig = {
     Undo,
     Link,
     List,
+    ListProperties,
     Image,
     ImageToolbar,
     ImageStyle,
@@ -293,6 +295,13 @@ const editorConfig = {
   ],
   extraPlugins: [MyCustomUploadAdapterPlugin],
   toolbar: ["undo", "redo", "|", "bold", "italic", "link", "|", "bulletedList", "numberedList", "|", "insertTable", "uploadImage"],
+  list: {
+    properties: {
+      styles: true,
+      startIndex: true,
+      reversed: true
+    }
+  },
   image: {
     resizeOptions: [
       {

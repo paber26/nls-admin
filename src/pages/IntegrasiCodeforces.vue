@@ -505,6 +505,7 @@ import {
   Underline,
   Link,
   List,
+  ListProperties,
   Image,
   ImageToolbar,
   ImageResize,
@@ -594,6 +595,7 @@ const editorConfig = {
     Underline,
     Link,
     List,
+    ListProperties,
     Image,
     ImageToolbar,
     ImageResize,
@@ -621,6 +623,13 @@ const editorConfig = {
     "|",
     "imageUpload"
   ],
+  list: {
+    properties: {
+      styles: true,
+      startIndex: true,
+      reversed: true
+    }
+  },
   image: {
     resizeOptions: [
       {
