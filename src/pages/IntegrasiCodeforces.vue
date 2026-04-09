@@ -687,7 +687,7 @@ const saveProblem = async () => {
   errorMessage.value = ''
   
   try {
-    await api.post('/cf-problems', {
+    const { data } = await api.post('/cf-problems', {
       mapel_id: newProblemMapelId.value,
       cf_contest_id: resolvedProblem.value.contestId,
       cf_index: resolvedProblem.value.index,
@@ -697,7 +697,14 @@ const saveProblem = async () => {
       points: newProblemPoints.value
     })
     
-    successMessage.value = "Problem Codeforces berhasil disimpan ke database!"
+    if (data.message && data.message.includes("Gagal")) {
+      errorMessage.value = data.message // Tampilkan sbg error/warning jika diblokir
+      successMessage.value = ""
+    } else {
+      successMessage.value = data.message || "Problem Codeforces berhasil disimpan ke database!"
+      errorMessage.value = ""
+    }
+    
     resolvedProblem.value = null
     targetProblemUrl.value = ""
     loadSavedProblems()
