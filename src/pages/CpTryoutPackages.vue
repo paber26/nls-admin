@@ -4,10 +4,16 @@
       <div class="flex w-full flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 class="text-lg font-semibold text-slate-800">Tryout CP Paket</h1>
-          <p class="text-sm text-slate-500">
-            Buat paket Competitive Programming dari soal Codeforces, atur waktu, dan monitor leaderboard.
-          </p>
+          <p class="text-sm text-slate-500">Kelola paket Competitive Programming dari soal Codeforces.</p>
         </div>
+
+        <button
+          type="button"
+          class="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 cursor-pointer"
+          @click="openCreateModal"
+        >
+          + Tambah Paket
+        </button>
       </div>
     </template>
 
@@ -19,139 +25,72 @@
         {{ errorMessage }}
       </div>
 
-      <section class="grid grid-cols-1 gap-6 xl:grid-cols-3">
-        <div class="xl:col-span-2 rounded-xl border bg-white">
-          <div class="border-b bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-700">Daftar Paket CP</div>
-          <div class="overflow-x-auto">
-            <table class="w-full text-sm">
-              <thead class="bg-slate-100 text-slate-700">
-                <tr>
-                  <th class="px-4 py-3 text-left">Paket</th>
-                  <th class="px-4 py-3 text-center">Durasi</th>
-                  <th class="px-4 py-3 text-center">Soal</th>
-                  <th class="px-4 py-3 text-center">Status</th>
-                  <th class="px-4 py-3 text-center">Aksi</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-if="loadingPackages">
-                  <td colspan="5" class="px-4 py-6 text-center text-slate-400">Memuat paket...</td>
-                </tr>
-                <tr v-for="item in packages" :key="item.id" class="border-t">
-                  <td class="px-4 py-3 font-medium">{{ item.nama_paket }}</td>
-                  <td class="px-4 py-3 text-center">{{ item.durasi_menit }} menit</td>
-                  <td class="px-4 py-3 text-center">{{ item.jumlah_soal }}</td>
-                  <td class="px-4 py-3 text-center">
-                    <span
-                      class="rounded px-2 py-1 text-xs font-medium"
-                      :class="{
-                        'bg-slate-200 text-slate-700': item.status === 'draft',
-                        'bg-emerald-100 text-emerald-700': item.status === 'active',
-                        'bg-blue-100 text-blue-700': item.status === 'finished'
-                      }"
-                    >
-                      {{ prettyStatus(item.status) }}
-                    </span>
-                  </td>
-                  <td class="px-4 py-3 text-center">
-                    <button type="button" class="text-indigo-600 hover:underline cursor-pointer" @click="selectPackage(item.id)">
+      <section class="rounded-xl border bg-white">
+        <div class="border-b bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-700">Daftar Paket CP</div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead class="bg-slate-100 text-slate-700">
+              <tr>
+                <th class="px-4 py-3 text-left">Paket</th>
+                <th class="px-4 py-3 text-center">Durasi</th>
+                <th class="px-4 py-3 text-center">Soal</th>
+                <th class="px-4 py-3 text-center">Status</th>
+                <th class="px-4 py-3 text-center">Aksi</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-if="loadingPackages">
+                <td colspan="5" class="px-4 py-6 text-center text-slate-400">Memuat paket...</td>
+              </tr>
+              <tr v-for="item in packages" :key="item.id" class="border-t">
+                <td class="px-4 py-3 font-medium">{{ item.nama_paket }}</td>
+                <td class="px-4 py-3 text-center">{{ item.durasi_menit }} menit</td>
+                <td class="px-4 py-3 text-center">{{ item.jumlah_soal }}</td>
+                <td class="px-4 py-3 text-center">
+                  <span
+                    class="rounded px-2 py-1 text-xs font-medium"
+                    :class="{
+                      'bg-slate-200 text-slate-700': item.status === 'draft',
+                      'bg-emerald-100 text-emerald-700': item.status === 'active',
+                      'bg-blue-100 text-blue-700': item.status === 'finished'
+                    }"
+                  >
+                    {{ prettyStatus(item.status) }}
+                  </span>
+                </td>
+                <td class="px-4 py-3 text-center">
+                  <div class="flex items-center justify-center gap-3">
+                    <button type="button" class="text-indigo-600 hover:underline cursor-pointer" @click="openManage(item.id)">
                       Kelola
                     </button>
-                  </td>
-                </tr>
-                <tr v-if="!loadingPackages && !packages.length">
-                  <td colspan="5" class="px-4 py-8 text-center text-slate-400">Belum ada paket CP.</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <div class="rounded-xl border bg-white p-4">
-          <h2 class="text-base font-semibold text-slate-800">{{ selectedPackageId ? "Edit Paket CP" : "Buat Paket CP" }}</h2>
-          <form class="mt-4 space-y-4" @submit.prevent="savePackage">
-            <div>
-              <label class="text-sm text-slate-600">Nama Paket</label>
-              <input v-model="form.nama_paket" type="text" class="mt-1 w-full rounded-lg border px-3 py-2 text-sm" />
-            </div>
-            <div>
-              <label class="text-sm text-slate-600">Durasi (menit)</label>
-              <input v-model.number="form.durasi_menit" type="number" min="1" class="mt-1 w-full rounded-lg border px-3 py-2 text-sm" />
-            </div>
-            <div>
-              <label class="text-sm text-slate-600">Mulai</label>
-              <input v-model="form.mulai" type="datetime-local" class="mt-1 w-full rounded-lg border px-3 py-2 text-sm" />
-            </div>
-            <div>
-              <label class="text-sm text-slate-600">Selesai</label>
-              <input v-model="form.selesai" type="datetime-local" class="mt-1 w-full rounded-lg border px-3 py-2 text-sm" />
-            </div>
-            <div>
-              <label class="text-sm text-slate-600">Status</label>
-              <select v-model="form.status" class="mt-1 w-full rounded-lg border px-3 py-2 text-sm">
-                <option value="draft">Draft</option>
-                <option value="active">Aktif</option>
-                <option value="finished">Selesai</option>
-              </select>
-            </div>
-            <div class="flex gap-2">
-              <button type="submit" class="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 cursor-pointer">
-                {{ selectedPackageId ? "Update Paket" : "Buat Paket" }}
-              </button>
-              <button
-                v-if="selectedPackageId"
-                type="button"
-                class="rounded-lg border px-4 py-2 text-sm hover:bg-slate-50 cursor-pointer"
-                @click="resetForm"
-              >
-                Paket Baru
-              </button>
-            </div>
-          </form>
+                    <button
+                      type="button"
+                      class="text-slate-700 hover:underline cursor-pointer"
+                      @click="openLeaderboard(item.id)"
+                    >
+                      Leaderboard
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              <tr v-if="!loadingPackages && !packages.length">
+                <td colspan="5" class="px-4 py-8 text-center text-slate-400">Belum ada paket CP.</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </section>
 
-      <section class="rounded-xl border bg-white p-4">
-        <div class="mb-4 flex items-center justify-between gap-2">
-          <h2 class="text-base font-semibold text-slate-800">Soal Dalam Paket</h2>
-          <button
-            type="button"
-            class="rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800 cursor-pointer disabled:cursor-not-allowed disabled:opacity-60"
-            :disabled="!selectedPackageId || savingProblems"
-            @click="saveSelectedProblems"
-          >
-            {{ savingProblems ? "Menyimpan..." : "Simpan Daftar Soal" }}
-          </button>
-        </div>
-
-        <div v-if="!selectedPackageId" class="rounded-lg border border-dashed px-4 py-6 text-sm text-slate-500">
-          Pilih paket dulu untuk menambahkan soal.
-        </div>
-
-        <div v-else class="space-y-3">
-          <div v-if="loadingProblems" class="text-sm text-slate-500">Memuat soal Codeforces...</div>
-          <div v-else-if="!cfProblems.length" class="text-sm text-slate-500">Belum ada soal Codeforces terintegrasi.</div>
-          <label
-            v-for="problem in cfProblems"
-            :key="problem.id"
-            class="flex items-start gap-3 rounded-lg border px-3 py-2 text-sm"
-          >
-            <input v-model="selectedProblemIds" :value="problem.id" type="checkbox" class="mt-0.5 h-4 w-4" />
-            <span>
-              <span class="font-medium">{{ problem.cf_contest_id }}{{ problem.cf_index }} - {{ problem.name }}</span>
-              <span class="block text-xs text-slate-500">Poin {{ problem.points ?? 0 }} • Rating {{ problem.rating ?? "-" }}</span>
-            </span>
-          </label>
-        </div>
-      </section>
-
-      <section class="rounded-xl border bg-white">
+      <section v-if="selectedPackageId" class="rounded-xl border bg-white">
         <div class="flex items-center justify-between border-b bg-slate-50 px-4 py-3">
-          <h2 class="text-base font-semibold text-slate-700">Leaderboard Paket CP</h2>
+          <div>
+            <h2 class="text-base font-semibold text-slate-700">Leaderboard Paket CP</h2>
+            <p class="text-xs text-slate-500">{{ selectedPackageName || "-" }}</p>
+          </div>
           <button
             type="button"
             class="text-sm text-indigo-600 hover:underline cursor-pointer disabled:cursor-not-allowed disabled:text-slate-400"
-            :disabled="!selectedPackageId || loadingLeaderboard"
+            :disabled="loadingLeaderboard"
             @click="fetchLeaderboard"
           >
             Refresh
@@ -197,7 +136,7 @@
               </tr>
               <tr v-if="!loadingLeaderboard && !leaderboardRows.length">
                 <td colspan="6" class="px-4 py-8 text-center text-slate-400">
-                  {{ selectedPackageId ? "Belum ada peserta yang mengerjakan soal pada paket ini." : "Pilih paket untuk melihat leaderboard." }}
+                  Belum ada peserta yang mengerjakan soal pada paket ini.
                 </td>
               </tr>
             </tbody>
@@ -205,29 +144,88 @@
         </div>
       </section>
     </div>
+
+    <div
+      v-if="showCreateModal"
+      class="fixed inset-0 z-[70] flex items-center justify-center bg-slate-900/50 p-4"
+      @click.self="closeCreateModal"
+    >
+      <div class="w-full max-w-lg rounded-xl bg-white p-5 shadow-2xl">
+        <div class="mb-4 flex items-center justify-between">
+          <h2 class="text-base font-semibold text-slate-800">Buat Paket CP</h2>
+          <button type="button" class="text-slate-500 hover:text-slate-700 cursor-pointer" @click="closeCreateModal">✕</button>
+        </div>
+
+        <form class="space-y-4" @submit.prevent="savePackage">
+          <div>
+            <label class="text-sm text-slate-600">Nama Paket</label>
+            <input v-model="createForm.nama_paket" type="text" class="mt-1 w-full rounded-lg border px-3 py-2 text-sm" />
+          </div>
+          <div>
+            <label class="text-sm text-slate-600">Durasi (menit)</label>
+            <input
+              v-model.number="createForm.durasi_menit"
+              type="number"
+              min="1"
+              class="mt-1 w-full rounded-lg border px-3 py-2 text-sm"
+            />
+          </div>
+          <div>
+            <label class="text-sm text-slate-600">Mulai</label>
+            <input v-model="createForm.mulai" type="datetime-local" class="mt-1 w-full rounded-lg border px-3 py-2 text-sm" />
+          </div>
+          <div>
+            <label class="text-sm text-slate-600">Selesai</label>
+            <input
+              v-model="createForm.selesai"
+              type="datetime-local"
+              class="mt-1 w-full rounded-lg border px-3 py-2 text-sm"
+            />
+          </div>
+          <div>
+            <label class="text-sm text-slate-600">Status</label>
+            <select v-model="createForm.status" class="mt-1 w-full rounded-lg border px-3 py-2 text-sm">
+              <option value="draft">Draft</option>
+              <option value="active">Aktif</option>
+              <option value="finished">Selesai</option>
+            </select>
+          </div>
+
+          <div class="flex justify-end gap-2 pt-2">
+            <button type="button" class="rounded-lg border px-4 py-2 text-sm hover:bg-slate-50 cursor-pointer" @click="closeCreateModal">
+              Batal
+            </button>
+            <button type="submit" class="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 cursor-pointer">
+              Buat Paket
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
   </AppShell>
 </template>
 
 <script setup>
 import { onMounted, ref } from "vue"
+import { useRouter } from "vue-router"
 import AppShell from "@/components/layout/AppShell.vue"
 import api from "@/services/api"
 
+const router = useRouter()
+
 const packages = ref([])
-const cfProblems = ref([])
 const leaderboardRows = ref([])
-const selectedProblemIds = ref([])
 const selectedPackageId = ref(null)
+const selectedPackageName = ref("")
 
 const loadingPackages = ref(false)
-const loadingProblems = ref(false)
 const loadingLeaderboard = ref(false)
-const savingProblems = ref(false)
 
 const successMessage = ref("")
 const errorMessage = ref("")
 
-const form = ref({
+const showCreateModal = ref(false)
+const createForm = ref({
   nama_paket: "",
   durasi_menit: 120,
   mulai: "",
@@ -240,11 +238,6 @@ const toDateTimePayload = (value) => {
   return value.length === 16 ? `${value}:00` : value
 }
 
-const toDateTimeInput = (value) => {
-  if (!value) return ""
-  return value.slice(0, 16)
-}
-
 const prettyStatus = (status) => {
   if (status === "active") return "Aktif"
   if (status === "finished") return "Selesai"
@@ -254,6 +247,26 @@ const prettyStatus = (status) => {
 const clearMessages = () => {
   successMessage.value = ""
   errorMessage.value = ""
+}
+
+const resetCreateForm = () => {
+  createForm.value = {
+    nama_paket: "",
+    durasi_menit: 120,
+    mulai: "",
+    selesai: "",
+    status: "draft",
+  }
+}
+
+const openCreateModal = () => {
+  clearMessages()
+  resetCreateForm()
+  showCreateModal.value = true
+}
+
+const closeCreateModal = () => {
+  showCreateModal.value = false
 }
 
 const fetchPackages = async () => {
@@ -268,81 +281,42 @@ const fetchPackages = async () => {
   }
 }
 
-const fetchCfProblems = async () => {
-  loadingProblems.value = true
-  try {
-    const { data } = await api.get("/cf-problems")
-    cfProblems.value = Array.isArray(data?.data) ? data.data : []
-  } catch (error) {
-    errorMessage.value = error?.response?.data?.message || "Gagal memuat daftar soal Codeforces."
-  } finally {
-    loadingProblems.value = false
-  }
+const openManage = (id) => {
+  router.push(`/cp-tryout/${id}/kelola`)
 }
 
-const selectPackage = async (id) => {
+const openLeaderboard = async (id) => {
   clearMessages()
-  selectedPackageId.value = id
-  leaderboardRows.value = []
 
   try {
     const { data } = await api.get(`/cp-tryout-packages/${id}`)
-    const pkg = data?.data
-    if (!pkg) return
-
-    form.value = {
-      nama_paket: pkg.nama_paket || "",
-      durasi_menit: pkg.durasi_menit || 120,
-      mulai: toDateTimeInput(pkg.mulai),
-      selesai: toDateTimeInput(pkg.selesai),
-      status: pkg.status || "draft",
-    }
-
-    selectedProblemIds.value = Array.isArray(pkg.soal) ? pkg.soal.map((item) => item.id) : []
+    selectedPackageId.value = id
+    selectedPackageName.value = data?.data?.nama_paket || ""
     await fetchLeaderboard()
   } catch (error) {
-    errorMessage.value = error?.response?.data?.message || "Gagal memuat detail paket CP."
+    errorMessage.value = error?.response?.data?.message || "Gagal memuat leaderboard paket CP."
   }
-}
-
-const resetForm = () => {
-  selectedPackageId.value = null
-  selectedProblemIds.value = []
-  leaderboardRows.value = []
-  form.value = {
-    nama_paket: "",
-    durasi_menit: 120,
-    mulai: "",
-    selesai: "",
-    status: "draft",
-  }
-  clearMessages()
 }
 
 const savePackage = async () => {
   clearMessages()
 
   const payload = {
-    nama_paket: form.value.nama_paket,
-    durasi_menit: Number(form.value.durasi_menit),
-    mulai: toDateTimePayload(form.value.mulai),
-    selesai: toDateTimePayload(form.value.selesai),
-    status: form.value.status,
+    nama_paket: createForm.value.nama_paket,
+    durasi_menit: Number(createForm.value.durasi_menit),
+    mulai: toDateTimePayload(createForm.value.mulai),
+    selesai: toDateTimePayload(createForm.value.selesai),
+    status: createForm.value.status,
   }
 
   try {
-    if (selectedPackageId.value) {
-      await api.put(`/cp-tryout-packages/${selectedPackageId.value}`, payload)
-      successMessage.value = "Paket CP berhasil diperbarui."
-      await selectPackage(selectedPackageId.value)
-    } else {
-      const { data } = await api.post("/cp-tryout-packages", payload)
-      const newId = data?.data?.id
-      successMessage.value = "Paket CP berhasil dibuat."
-      await fetchPackages()
-      if (newId) await selectPackage(newId)
-    }
+    const { data } = await api.post("/cp-tryout-packages", payload)
+    successMessage.value = "Paket CP berhasil dibuat."
+    closeCreateModal()
     await fetchPackages()
+
+    const newId = data?.data?.id
+    if (newId) router.push(`/cp-tryout/${newId}/kelola`)
   } catch (error) {
     const validationErrors = error?.response?.data?.errors
     if (validationErrors) {
@@ -351,29 +325,6 @@ const savePackage = async () => {
       return
     }
     errorMessage.value = error?.response?.data?.message || "Gagal menyimpan paket CP."
-  }
-}
-
-const saveSelectedProblems = async () => {
-  clearMessages()
-
-  if (!selectedPackageId.value) {
-    errorMessage.value = "Pilih paket terlebih dahulu."
-    return
-  }
-
-  savingProblems.value = true
-  try {
-    await api.put(`/cp-tryout-packages/${selectedPackageId.value}/problems`, {
-      problem_ids: selectedProblemIds.value,
-    })
-    successMessage.value = "Daftar soal paket berhasil disimpan."
-    await fetchPackages()
-    await fetchLeaderboard()
-  } catch (error) {
-    errorMessage.value = error?.response?.data?.message || "Gagal menyimpan daftar soal."
-  } finally {
-    savingProblems.value = false
   }
 }
 
@@ -392,6 +343,7 @@ const fetchLeaderboard = async () => {
 }
 
 onMounted(async () => {
-  await Promise.all([fetchPackages(), fetchCfProblems()])
+  await fetchPackages()
 })
 </script>
+

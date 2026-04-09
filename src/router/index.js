@@ -35,6 +35,7 @@ import TryoutHasil from "../pages/TryoutHasil.vue"
 import KelolaAdmin from "../pages/KelolaAdmin.vue"
 import IntegrasiCodeforces from "../pages/IntegrasiCodeforces.vue"
 import CpTryoutPackages from "../pages/CpTryoutPackages.vue"
+import CpTryoutManage from "../pages/CpTryoutManage.vue"
 
 const routes = [
   {
@@ -172,6 +173,11 @@ const routes = [
     path: "/cp-tryout",
     name: "CpTryoutPackages",
     component: CpTryoutPackages
+  },
+  {
+    path: "/cp-tryout/:id/kelola",
+    name: "CpTryoutManage",
+    component: CpTryoutManage
   }
 ]
 
