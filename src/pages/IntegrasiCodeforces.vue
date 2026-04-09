@@ -427,9 +427,20 @@
         </div>
         
         <div class="p-6 overflow-y-auto flex-1 cf-editor-container">
-          <p class="text-sm text-slate-500 mb-4">Gunakan editor ini untuk menyusun narasi bahasa Indonesia kustom untuk problem ini. Input dan output *judgement* tetap mengacu ke Codeforces aslinya.</p>
-          <div class="border rounded-lg border-slate-200 overflow-hidden">
-            <ckeditor :editor="editor" v-model="editStatementHtml" :config="editorConfig" />
+          <div class="mb-4 p-4 bg-indigo-50 border border-indigo-100 rounded-xl flex items-center justify-between">
+            <div>
+              <h4 class="font-semibold text-indigo-900">Gunakan Narasi Kustom (Terjemahan Sendiri)</h4>
+              <p class="text-xs text-indigo-700 mt-1">Jika aktif, siswa akan melihat teks ini alih-alih teks asli Codeforces.</p>
+            </div>
+            <label class="relative inline-flex items-center cursor-pointer">
+              <input type="checkbox" v-model="isCustomStatementActive" class="sr-only peer">
+              <div class="w-11 h-6 bg-slate-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+            </label>
+          </div>
+
+          <p class="text-sm text-slate-500 mb-4">Gunakan editor ini untuk menyusun narasi kustom untuk problem ini. Input dan output *judgement* tetap mengacu ke Codeforces aslinya.</p>
+          <div class="border rounded-lg border-slate-200 overflow-hidden" :class="{ 'opacity-50 pointer-events-none': !isCustomStatementActive }">
+            <ckeditor :editor="editor" v-model="editCustomStatementHtml" :config="editorConfig" />
           </div>
         </div>
         
@@ -491,7 +502,8 @@ const statementError = ref("")
 const selectedProblem = ref(null)
 
 const isEditorModalOpen = ref(false)
-const editStatementHtml = ref("")
+const editCustomStatementHtml = ref("")
+const isCustomStatementActive = ref(false)
 const isSavingHtml = ref(false)
 
 const isConfirmDeleteModalOpen = ref(false)
@@ -879,17 +891,8 @@ const viewStatement = async (problem) => {
 const openEditor = async (problem) => {
   selectedProblem.value = problem
   isEditorModalOpen.value = true
-  editStatementHtml.value = "Memuat..." // Placeholder
-  
-  try {
-    const { data } = await api.get(`/cf-problems/${problem.id}/statement`)
-    editStatementHtml.value = data.data || ""
-  } catch (error) {
-    // Jika API aslinya terblokir, kita bisa memberi area kosong kepada pengguna.
-    editStatementHtml.value = problem.statement_html || ""
-    successMessage.value = ''
-    errorMessage.value = "Soal asal diblokir Cloudflare. Anda dapat menulis manual dari awal."
-  }
+  isCustomStatementActive.value = Boolean(problem.is_custom_statement)
+  editCustomStatementHtml.value = problem.custom_statement_html || ""
 }
 
 const saveStatementHtml = async () => {
@@ -899,9 +902,10 @@ const saveStatementHtml = async () => {
   
   try {
     const { data } = await api.put(`/cf-problems/${selectedProblem.value.id}`, {
-      statement_html: editStatementHtml.value
+      is_custom_statement: isCustomStatementActive.value,
+      custom_statement_html: editCustomStatementHtml.value
     })
-    successMessage.value = data.message || "Teks soal berhasil diupdate."
+    successMessage.value = data.message || "Teks soal kustom berhasil diupdate."
     isEditorModalOpen.value = false
     loadSavedProblems()
   } catch (error) {
