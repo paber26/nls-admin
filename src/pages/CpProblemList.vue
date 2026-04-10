@@ -46,6 +46,12 @@
               <td class="px-6 py-4">{{ p.points }}</td>
               <td class="px-6 py-4">
                 <div class="flex gap-2">
+                  <button
+                    @click="openPreview(p)"
+                    class="bg-blue-100 text-blue-700 hover:bg-blue-200 px-3 py-1.5 rounded-lg font-medium transition"
+                  >
+                    Lihat
+                  </button>
                   <RouterLink
                     :to="`/cp-problems/edit/${p.id}`"
                     class="bg-amber-100 text-amber-700 hover:bg-amber-200 px-3 py-1.5 rounded-lg font-medium transition"
@@ -70,6 +76,51 @@
         </table>
       </div>
     </div>
+
+    <!-- MODAL PREVIEW -->
+    <transition
+      enter-active-class="transition duration-200 ease-out"
+      enter-from-class="opacity-0 scale-95"
+      enter-to-class="opacity-100 scale-100"
+      leave-active-class="transition duration-150 ease-in"
+      leave-from-class="opacity-100 scale-100"
+      leave-to-class="opacity-0 scale-95"
+    >
+      <div v-if="showModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
+        <div class="bg-white rounded-xl shadow-xl w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden">
+          
+          <div class="flex items-center justify-between px-6 py-4 border-b border-slate-200 bg-slate-50">
+            <div>
+              <h2 class="text-xl font-bold text-slate-800">{{ selectedProblem?.title }}</h2>
+              <p class="text-xs text-slate-500 mt-1 font-mono">
+                ⏱ {{ selectedProblem?.time_limit }}s &nbsp;|&nbsp; 💾 {{ selectedProblem?.memory_limit }}MB &nbsp;|&nbsp; 🏅 {{ selectedProblem?.points }} Poin
+              </p>
+            </div>
+            <button @click="showModal = false" class="text-slate-400 hover:text-slate-600 transition">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+          </div>
+
+          <div class="p-6 overflow-y-auto" style="max-height: calc(90vh - 140px);">
+            <div class="prose prose-slate max-w-none text-sm cf-custom-styles mb-8" v-html="selectedProblem?.description_html"></div>
+
+            <div v-if="selectedProblem?.input_format_html" class="mb-6">
+              <h3 class="font-bold text-slate-800 text-lg border-b pb-2 mb-3">Format Masukan</h3>
+              <div class="prose prose-slate max-w-none text-sm cf-custom-styles" v-html="selectedProblem?.input_format_html"></div>
+            </div>
+
+            <div v-if="selectedProblem?.output_format_html" class="mb-6">
+              <h3 class="font-bold text-slate-800 text-lg border-b pb-2 mb-3">Format Keluaran</h3>
+              <div class="prose prose-slate max-w-none text-sm cf-custom-styles" v-html="selectedProblem?.output_format_html"></div>
+            </div>
+          </div>
+
+          <div class="px-6 py-4 border-t border-slate-200 bg-slate-50 flex justify-end">
+            <button @click="showModal = false" class="px-5 py-2 z-10 bg-slate-200 text-slate-700 hover:bg-slate-300 font-medium rounded-lg transition">Tutup</button>
+          </div>
+        </div>
+      </div>
+    </transition>
   </AppShell>
 </template>
 
@@ -81,6 +132,14 @@ import api from '@/services/api'
 const problems = ref([])
 const loading = ref(true)
 const error = ref(null)
+
+const showModal = ref(false)
+const selectedProblem = ref(null)
+
+const openPreview = (problem) => {
+  selectedProblem.value = problem
+  showModal.value = true
+}
 
 const fetchProblems = async () => {
   loading.value = true
