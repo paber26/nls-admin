@@ -102,6 +102,23 @@
             </section>
           </form>
         </div>
+
+        <!-- TOAST POPUP -->
+        <transition
+          enter-active-class="transition duration-300 ease-out"
+          enter-from-class="transform translate-y-4 opacity-0"
+          enter-to-class="transform translate-y-0 opacity-100"
+          leave-active-class="transition duration-200 ease-in"
+          leave-from-class="transform translate-y-0 opacity-100"
+          leave-to-class="transform translate-y-4 opacity-0"
+        >
+          <div v-if="toast.show" class="fixed bottom-6 right-6 z-[100] flex items-center gap-3 px-5 py-4 rounded-xl shadow-2xl font-medium text-sm"
+            :class="toast.type === 'success' ? 'bg-emerald-600 text-white' : 'bg-red-600 text-white'">
+            <svg v-if="toast.type === 'success'" class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+            <svg v-else class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            {{ toast.message }}
+          </div>
+        </transition>
         </AppShell>
   
 </template>
@@ -223,6 +240,21 @@ const form = ref({
   pesan_selesai: ""
 })
 
+const toast = ref({
+  show: false,
+  message: '',
+  type: 'success'
+})
+let toastTimeout = null
+
+const showToast = (message, type = 'success') => {
+  if (toastTimeout) clearTimeout(toastTimeout)
+  toast.value = { show: true, message, type }
+  toastTimeout = setTimeout(() => {
+    toast.value.show = false
+  }, 3000)
+}
+
 const mapels = ref([])
 
 const fetchMapel = async () => {
@@ -256,7 +288,7 @@ onMounted(async () => {
       pesan_selesai: data.pesan_selesai ?? ""
     }
   } catch (err) {
-    // handle error, e.g. notify user
+    showToast("Gagal memuat tryout", "error")
   }
 })
 
@@ -275,11 +307,13 @@ const handleSubmit = async () => {
     }
 
     const res = await api.put(`/tryout/${id}`, payload)
-    alert(res.data.message || "Soal berhasil diperbarui")
-    router.push("/tryout")
+    showToast(res.data.message || "Soal berhasil diperbarui", "success")
+    setTimeout(() => {
+      router.push("/tryout")
+    }, 1500)
   } catch (err) {
     console.error("Gagal memperbarui tryout:", err)
-    // handle error, e.g. notify user
+    showToast("Gagal memperbarui tryout", "error")
   }
 }
 </script>
