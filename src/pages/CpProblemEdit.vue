@@ -141,6 +141,7 @@ const form = ref({
 
 const editorConfig = {
   plugins: [Essentials, Bold, Italic, BlockQuote, List, Link, Heading, Table, TableToolbar, TableColumnResize, TableProperties, TableCellProperties],
+  licenseKey: 'GPL',
   toolbar: ['heading', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', 'blockQuote', '|', 'insertTable', 'undo', 'redo'],
   table: {
     contentToolbar: ['tableColumn', 'tableRow', 'mergeTableCells', 'tableProperties', 'tableCellProperties']
