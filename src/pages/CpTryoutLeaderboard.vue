@@ -151,9 +151,15 @@
           </div>
 
           <div class="space-y-2">
-            <label class="text-sm font-bold text-slate-700 flex items-center gap-2">
-              <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>
-              Source Code
+            <label class="text-sm font-bold text-slate-700 flex items-center justify-between">
+              <span class="flex items-center gap-2">
+                <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>
+                Source Code
+              </span>
+              <button @click="copyCode(selectedSubmission?.source_code)" class="text-xs bg-indigo-50 text-indigo-600 px-3 py-1 rounded-md hover:bg-indigo-100 transition flex items-center gap-1 font-semibold">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"></path></svg>
+                Salin Kode
+              </button>
             </label>
             <div class="relative group">
               <pre class="bg-slate-900 text-slate-100 p-4 rounded-xl font-mono text-sm overflow-x-auto border border-slate-800 leading-relaxed min-h-[200px]">{{ selectedSubmission.source_code }}</pre>
@@ -226,6 +232,17 @@ async function viewSubmission(subId) {
     alert('Error: Gagal memuat detail submission')
   } finally {
     loadingDetail.value = false
+  }
+}
+
+const copyCode = async (code) => {
+  if (!code) return
+  try {
+    await navigator.clipboard.writeText(code)
+    alert("Kode berhasil disalin ke clipboard!")
+  } catch (err) {
+    console.error("Gagal menyalin kode:", err)
+    alert("Gagal menyalin kode.")
   }
 }
 </script>
