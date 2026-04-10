@@ -76,10 +76,10 @@
                     </button>
                     <button
                       type="button"
-                      class="font-bold text-indigo-700 hover:underline cursor-pointer"
+                      class="font-bold text-indigo-700 hover:underline cursor-pointer flex items-center gap-1"
                       @click="$router.push(`/cp-tryout/${item.id}/leaderboard`)"
                     >
-                      🏆 Hasil & Leaderboard
+                      📄 Riwayat Submissions
                     </button>
                   </div>
                 </td>
@@ -359,9 +359,7 @@ async function fetchPackages() {
   }
 }
 
-const openManage = (id) => {
-  router.push(`/cp-tryout/${id}/kelola`)
-}
+
 
 const openStatusModal = async (id) => {
   clearMessages()
@@ -385,17 +383,7 @@ const openStatusModal = async (id) => {
   }
 }
 
-const openLeaderboard = async (id) => {
-  clearMessages()
-  try {
-    const { data } = await api.get(`/cp-tryout-packages/${id}`)
-    selectedPackageId.value = id
-    selectedPackageName.value = data?.data?.nama_paket || ""
-    await fetchLeaderboard()
-  } catch (error) {
-    errorMessage.value = error?.response?.data?.message || "Gagal memuat leaderboard paket CP."
-  }
-}
+
 
 const savePackage = async () => {
   clearMessages()
@@ -427,19 +415,7 @@ const savePackage = async () => {
   }
 }
 
-const fetchLeaderboard = async () => {
-  if (!selectedPackageId.value) return
 
-  loadingLeaderboard.value = true
-  try {
-    const { data } = await api.get(`/cp-tryout-packages/${selectedPackageId.value}/leaderboard`)
-    leaderboardRows.value = Array.isArray(data?.data?.leaderboard) ? data.data.leaderboard : []
-  } catch (error) {
-    errorMessage.value = error?.response?.data?.message || "Gagal memuat leaderboard."
-  } finally {
-    loadingLeaderboard.value = false
-  }
-}
 
 const saveStatus = async () => {
   clearMessages()
