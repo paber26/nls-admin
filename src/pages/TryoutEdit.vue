@@ -10,12 +10,6 @@
 
           <div class="flex gap-3">
             <RouterLink
-              :to="`/admin-tryout/${route.params.id}`"
-              class="px-4 py-2 rounded-lg border text-sm hover:bg-slate-100"
-            >
-              Preview
-            </RouterLink>
-            <RouterLink
               :to="`/tryout/kelola/${route.params.id}`"
               class="px-4 py-2 rounded-lg border text-sm hover:bg-slate-100"
             >
