@@ -65,8 +65,14 @@
               </div>
 
               <div>
-                <label class="text-sm text-slate-500">Password / Access Key</label>
-                <input type="text" v-model="form.access_key" placeholder="Kosongkan jika bebas akses" class="w-full mt-1 px-4 py-2 border rounded-lg" />
+                <label class="flex items-center gap-2 text-sm text-slate-700 font-medium cursor-pointer">
+                  <input type="checkbox" v-model="useAccessKey" class="w-4 h-4 rounded text-indigo-500 focus:ring-indigo-500 border-slate-300" />
+                  Gunakan Kunci Akses
+                </label>
+                <div v-if="useAccessKey" class="mt-3">
+                  <label class="text-sm text-slate-500">Kunci Akses</label>
+                  <input type="text" v-model="form.access_key" placeholder="Masukkan kunci akses..." class="w-full mt-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none" />
+                </div>
               </div>
             </section>
 
@@ -278,6 +284,8 @@ const statusOptions = computed(() => [
   { value: "finished", label: "Selesai" }
 ])
 
+const useAccessKey = ref(false)
+
 onMounted(async () => {
   fetchMapel()
   try {
@@ -294,6 +302,7 @@ onMounted(async () => {
       ketentuan_khusus: data.ketentuan_khusus ?? "",
       pesan_selesai: data.pesan_selesai ?? ""
     }
+    useAccessKey.value = !!form.value.access_key
   } catch (err) {
     showToast("Gagal memuat tryout", "error")
   }
@@ -308,7 +317,7 @@ const handleSubmit = async () => {
       durasi_menit: Number(form.value.durasi_menit),
       mulai: form.value.mulai,
       selesai: form.value.selesai,
-      access_key: form.value.access_key,
+      access_key: useAccessKey.value ? form.value.access_key : "",
       status: form.value.status,
       ketentuan_khusus: form.value.ketentuan_khusus,
       pesan_selesai: form.value.pesan_selesai

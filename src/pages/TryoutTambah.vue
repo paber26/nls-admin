@@ -92,6 +92,17 @@
                 <label class="text-sm text-slate-500">Waktu Selesai</label>
                 <input type="time" class="w-full mt-1 px-4 py-2 border rounded-lg" />
               </div>
+
+              <div>
+                <label class="flex items-center gap-2 text-sm text-slate-700 font-medium cursor-pointer">
+                  <input type="checkbox" v-model="useAccessKey" class="w-4 h-4 rounded text-indigo-500 focus:ring-indigo-500 border-slate-300" />
+                  Gunakan Kunci Akses
+                </label>
+                <div v-if="useAccessKey" class="mt-3">
+                  <label class="text-sm text-slate-500">Kunci Akses</label>
+                  <input type="text" v-model="form.access_key" placeholder="Masukkan kunci akses..." class="w-full mt-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none" />
+                </div>
+              </div>
             </section>
 
             <!-- ACTION -->
@@ -124,8 +135,11 @@ const form = ref({
   durasi_menit: "",
   mulai: "",
   selesai: "",
+  access_key: "",
   is_active: 0
 })
+
+const useAccessKey = ref(false)
 
 const errors = ref({})
 
@@ -148,6 +162,9 @@ const loadDraftOrApi = () => {
       form.value = {
         ...form.value,
         ...parsed
+      }
+      if (parsed.access_key) {
+        useAccessKey.value = true
       }
     } catch (e) {
       // console.error("Gagal memuat draft tryout:", e)
@@ -194,6 +211,12 @@ const submitTryout = async () => {
   if (!validateForm()) {
     return
   }
+
+  // Jika opsi tidak dicentang, kosongkan akses key sebelum submit
+  if (!useAccessKey.value) {
+    form.value.access_key = ""
+  }
+
   try {
     // simpan draft terakhir ke localStorage
     localStorage.setItem("draft_tryout_last", JSON.stringify(form.value))
