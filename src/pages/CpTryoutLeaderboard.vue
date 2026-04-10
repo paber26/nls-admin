@@ -1,5 +1,6 @@
 <template>
-  <div class="space-y-6">
+  <AppShell>
+    <div class="space-y-6 p-6">
     <div class="flex justify-between items-center bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
       <div>
         <h1 class="text-2xl font-bold text-slate-800">📄 Riwayat Seluruh Submission CP</h1>
@@ -109,13 +110,14 @@
         </table>
       </div>
     </div>
-  </div>
+  </AppShell>
 </template>
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import api from '@/services/api'
+import AppShell from "@/components/layout/AppShell.vue"
 
 const route = useRoute()
 const loadingSubmissions = ref(false)
