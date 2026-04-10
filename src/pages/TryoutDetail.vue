@@ -215,14 +215,13 @@ const totalPoin = computed(() => {
 
 const formatDateTime = (datetime) => {
   if (!datetime) return "-"
-  const date = new Date(datetime)
-  return date.toLocaleString("id-ID", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit"
-  })
+  const safeStr = datetime.replace('Z', '').replace(' ', 'T').slice(0, 16)
+  if (safeStr.length < 16) return "-"
+  const [datePart, timePart] = safeStr.split('T')
+  const [yyyy, mm, dd] = datePart.split('-')
+  const [hh, mn] = timePart.split(':')
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des']
+  return `${dd} ${months[parseInt(mm, 10)-1]} ${yyyy}, ${hh}.${mn} WIB`
 }
 
 const renderKatex = async () => {
