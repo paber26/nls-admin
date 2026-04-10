@@ -66,6 +66,7 @@
               <th class="p-4 text-center">Execution Waktu</th>
               <th class="p-4 text-center">Memory</th>
               <th class="p-4">Verdict</th>
+              <th class="p-4 text-center">Aksi</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-slate-100 text-sm">
@@ -99,11 +100,73 @@
                   {{ sub.verdict }}
                 </span>
               </td>
+              <td class="p-4 text-center">
+                <button 
+                  @click="viewSubmission(sub.id)"
+                  class="text-indigo-600 hover:text-indigo-900 font-semibold"
+                >
+                  Lihat
+                </button>
+              </td>
             </tr>
           </tbody>
         </table>
       </div>
     </div>
+    </div>
+
+    <!-- MODAL DETAIL SUBMISSION -->
+    <div v-if="selectedSubmission" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
+      <div class="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden">
+        <div class="p-6 border-b border-slate-100 flex justify-between items-center">
+          <div>
+            <h3 class="text-xl font-bold text-slate-800">Detail Submission #{{ selectedSubmission.id }}</h3>
+            <p class="text-sm text-slate-500 mt-1">
+              Oleh <span class="font-bold">{{ selectedSubmission.user }}</span> untuk soal <span class="font-bold">{{ selectedSubmission.problem_title }}</span>
+            </p>
+          </div>
+          <button @click="selectedSubmission = null" class="text-slate-400 hover:text-slate-600 transition-colors">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+          </button>
+        </div>
+        
+        <div class="flex-1 overflow-y-auto p-6 bg-slate-50">
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+            <div class="bg-white p-3 rounded-xl border border-slate-200">
+              <span class="block text-[10px] uppercase tracking-wider text-slate-400 font-bold mb-1">Status</span>
+              <span :class="[selectedSubmission.verdict === 'Accepted' ? 'text-emerald-600' : 'text-red-600', 'font-bold']">{{ selectedSubmission.verdict }}</span>
+            </div>
+            <div class="bg-white p-3 rounded-xl border border-slate-200">
+              <span class="block text-[10px] uppercase tracking-wider text-slate-400 font-bold mb-1">Bahasa</span>
+              <span class="text-indigo-600 font-mono font-bold">{{ selectedSubmission.language }}</span>
+            </div>
+            <div class="bg-white p-3 rounded-xl border border-slate-200">
+              <span class="block text-[10px] uppercase tracking-wider text-slate-400 font-bold mb-1">Waktu</span>
+              <span class="text-slate-700 font-mono">{{ selectedSubmission.execution_time }}s</span>
+            </div>
+            <div class="bg-white p-3 rounded-xl border border-slate-200">
+              <span class="block text-[10px] uppercase tracking-wider text-slate-400 font-bold mb-1">Memori</span>
+              <span class="text-slate-700 font-mono">{{ selectedSubmission.memory_used }} KB</span>
+            </div>
+          </div>
+
+          <div class="space-y-2">
+            <label class="text-sm font-bold text-slate-700 flex items-center gap-2">
+              <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>
+              Source Code
+            </label>
+            <div class="relative group">
+              <pre class="bg-slate-900 text-slate-100 p-4 rounded-xl font-mono text-sm overflow-x-auto border border-slate-800 leading-relaxed min-h-[200px]">{{ selectedSubmission.source_code }}</pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="p-6 border-t border-slate-100 bg-slate-50 flex justify-end">
+          <button @click="selectedSubmission = null" class="bg-white border border-slate-200 text-slate-700 font-bold py-2 px-6 rounded-xl hover:bg-slate-50 transition-all shadow-sm">
+            Tutup
+          </button>
+        </div>
+      </div>
     </div>
   </AppShell>
 </template>
@@ -119,6 +182,8 @@ const loadingSubmissions = ref(false)
 const searchQuery = ref('')
 const paketInfo = ref(null)
 const submissionsList = ref([])
+const selectedSubmission = ref(null)
+const loadingDetail = ref(false)
 
 onMounted(() => {
   fetchSubmissions()
@@ -148,6 +213,19 @@ async function fetchSubmissions() {
     alert('Error: Gagal memuat daftar riwayat')
   } finally {
     loadingSubmissions.value = false
+  }
+}
+
+async function viewSubmission(subId) {
+  loadingDetail.value = true
+  try {
+    const res = await api.get(`/cp-tryout-packages/submission-detail/${subId}`)
+    selectedSubmission.value = res.data.data
+  } catch (err) {
+    console.error('Failed fetching submission detail:', err)
+    alert('Error: Gagal memuat detail submission')
+  } finally {
+    loadingDetail.value = false
   }
 }
 </script>
