@@ -1,14 +1,22 @@
 <template>
   <AppShell>
-    <div class="px-6 py-8 font-poppins text-slate-800">
-      <div class="flex items-center gap-4 mb-8">
-        <RouterLink to="/cp-problems" class="text-slate-400 hover:text-indigo-600 transition">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-          </svg>
-        </RouterLink>
-        <h1 class="text-2xl font-bold">Tambah Soal Native CP</h1>
+    <template #header>
+      <div class="flex w-full flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div class="flex items-center gap-4">
+          <RouterLink to="/cp-problems" class="text-slate-400 hover:text-indigo-600 transition">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+          </RouterLink>
+          <div>
+            <h1 class="text-lg font-semibold text-slate-800">Tambah Soal Native CP</h1>
+            <p class="text-sm text-slate-500">Buat soal baru beserta informasi Time/Memory Limit</p>
+          </div>
+        </div>
       </div>
+    </template>
+
+    <div class="px-6 py-6 font-poppins text-slate-800">
 
       <div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
         

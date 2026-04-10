@@ -1,16 +1,23 @@
 <template>
   <AppShell>
-    <div class="p-6">
-      <div class="flex items-center justify-between mb-6">
-        <h1 class="text-2xl font-bold text-slate-800">Manajemen Soal Native CP</h1>
-        <RouterLink
-          to="/cp-problems/tambah"
-          class="bg-indigo-600 px-4 py-2 text-white font-semibold rounded-lg shadow hover:bg-indigo-700 transition"
-        >
-          + Tambah Soal CP
-        </RouterLink>
+    <template #header>
+      <div class="flex w-full flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h1 class="text-lg font-semibold text-slate-800">Manajemen Soal Native CP</h1>
+          <p class="text-sm text-slate-500">Daftar bank soal khusus untuk tipe Competitive Programming</p>
+        </div>
+        <div class="flex gap-3">
+          <RouterLink
+            to="/cp-problems/tambah"
+            class="px-4 py-2 rounded-lg bg-indigo-600 text-white text-sm hover:bg-indigo-700 font-medium"
+          >
+            + Tambah Soal
+          </RouterLink>
+        </div>
       </div>
+    </template>
 
+    <div class="p-6">
       <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
         <div v-if="loading" class="p-8 text-center text-slate-500">
           <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 mx-auto mb-4"></div>
