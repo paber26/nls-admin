@@ -63,6 +63,11 @@
                 <label class="text-sm text-slate-500">Waktu Selesai</label>
                 <input type="datetime-local" v-model="form.selesai" class="w-full mt-1 px-4 py-2 border rounded-lg" />
               </div>
+
+              <div>
+                <label class="text-sm text-slate-500">Password / Access Key</label>
+                <input type="text" v-model="form.access_key" placeholder="Kosongkan jika bebas akses" class="w-full mt-1 px-4 py-2 border rounded-lg" />
+              </div>
             </section>
 
             <!-- KETENTUAN KHUSUS -->
@@ -236,6 +241,7 @@ const form = ref({
   durasi_menit: "",
   mulai: "",
   selesai: "",
+  access_key: "",
   ketentuan_khusus: "",
   pesan_selesai: ""
 })
@@ -283,6 +289,7 @@ onMounted(async () => {
       durasi_menit: data.durasi_menit ?? "",
       mulai: (data.mulai || "").slice(0, 16),
       selesai: (data.selesai || "").slice(0, 16),
+      access_key: data.access_key ?? "",
       status: data.status ?? "",
       ketentuan_khusus: data.ketentuan_khusus ?? "",
       pesan_selesai: data.pesan_selesai ?? ""
@@ -301,6 +308,7 @@ const handleSubmit = async () => {
       durasi_menit: Number(form.value.durasi_menit),
       mulai: form.value.mulai,
       selesai: form.value.selesai,
+      access_key: form.value.access_key,
       status: form.value.status,
       ketentuan_khusus: form.value.ketentuan_khusus,
       pesan_selesai: form.value.pesan_selesai
