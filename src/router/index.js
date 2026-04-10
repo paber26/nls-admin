@@ -38,6 +38,7 @@ import CpProblemTambah from "../pages/CpProblemTambah.vue"
 import CpProblemEdit from "../pages/CpProblemEdit.vue"
 import CpTryoutPackages from "../pages/CpTryoutPackages.vue"
 import CpTryoutManage from "../pages/CpTryoutManage.vue"
+import CpTryoutLeaderboard from "../pages/CpTryoutLeaderboard.vue"
 
 const routes = [
   {
@@ -190,6 +191,11 @@ const routes = [
     path: "/cp-tryout/:id/kelola",
     name: "CpTryoutManage",
     component: CpTryoutManage
+  },
+  {
+    path: "/cp-tryout/:id/leaderboard",
+    name: "CpTryoutLeaderboard",
+    component: CpTryoutLeaderboard
   }
 ]
 

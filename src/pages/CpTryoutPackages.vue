@@ -76,79 +76,16 @@
                     </button>
                     <button
                       type="button"
-                      class="text-slate-700 hover:underline cursor-pointer"
-                      @click="openLeaderboard(item.id)"
+                      class="font-bold text-indigo-700 hover:underline cursor-pointer"
+                      @click="$router.push(`/cp-tryout/${item.id}/leaderboard`)"
                     >
-                      Leaderboard
+                      🏆 Hasil & Leaderboard
                     </button>
                   </div>
                 </td>
               </tr>
               <tr v-if="!loadingPackages && !packages.length">
                 <td colspan="6" class="px-4 py-8 text-center text-slate-400">Belum ada paket CP.</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-      <section v-if="selectedPackageId" class="rounded-xl border bg-white">
-        <div class="flex items-center justify-between border-b bg-slate-50 px-4 py-3">
-          <div>
-            <h2 class="text-base font-semibold text-slate-700">Leaderboard Paket CP</h2>
-            <p class="text-xs text-slate-500">{{ selectedPackageName || "-" }}</p>
-          </div>
-          <button
-            type="button"
-            class="text-sm text-indigo-600 hover:underline cursor-pointer disabled:cursor-not-allowed disabled:text-slate-400"
-            :disabled="loadingLeaderboard"
-            @click="fetchLeaderboard"
-          >
-            Refresh
-          </button>
-        </div>
-        <div class="overflow-x-auto">
-          <table class="w-full text-sm">
-            <thead class="bg-slate-100 text-slate-700">
-              <tr>
-                <th class="px-4 py-3 text-center">Rank</th>
-                <th class="px-4 py-3 text-left">Nama</th>
-                <th class="px-4 py-3 text-left">Handle</th>
-                <th class="px-4 py-3 text-center">Solved</th>
-                <th class="px-4 py-3 text-center">Poin</th>
-                <th class="px-4 py-3 text-center">Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-if="loadingLeaderboard">
-                <td colspan="6" class="px-4 py-6 text-center text-slate-400">Memuat leaderboard...</td>
-              </tr>
-              <tr v-for="item in leaderboardRows" :key="item.user_id" class="border-t">
-                <td class="px-4 py-3 text-center font-semibold">{{ item.rank }}</td>
-                <td class="px-4 py-3">
-                  <div class="font-medium">{{ item.name }}</div>
-                  <div class="text-xs text-slate-500">{{ item.school || "-" }}</div>
-                </td>
-                <td class="px-4 py-3">{{ item.cf_handle || "-" }}</td>
-                <td class="px-4 py-3 text-center">{{ item.solved_count }}</td>
-                <td class="px-4 py-3 text-center font-medium">{{ item.total_points }}</td>
-                <td class="px-4 py-3 text-center">
-                  <span
-                    class="rounded px-2 py-1 text-xs font-medium"
-                    :class="
-                      item.status_pengerjaan === 'sudah_mengerjakan'
-                        ? 'bg-emerald-100 text-emerald-700'
-                        : 'bg-slate-200 text-slate-700'
-                    "
-                  >
-                    {{ item.status_pengerjaan === "sudah_mengerjakan" ? "Sudah Mengerjakan" : "Belum Mengerjakan" }}
-                  </span>
-                </td>
-              </tr>
-              <tr v-if="!loadingLeaderboard && !leaderboardRows.length">
-                <td colspan="6" class="px-4 py-8 text-center text-slate-400">
-                  Belum ada peserta yang mengerjakan soal pada paket ini.
-                </td>
               </tr>
             </tbody>
           </table>
@@ -300,12 +237,7 @@ import api from "@/services/api"
 const router = useRouter()
 
 const packages = ref([])
-const leaderboardRows = ref([])
-const selectedPackageId = ref(null)
-const selectedPackageName = ref("")
-
 const loadingPackages = ref(false)
-const loadingLeaderboard = ref(false)
 
 const successMessage = ref("")
 const errorMessage = ref("")
@@ -360,17 +292,20 @@ const prettyStatus = (status) => {
   return "Draft"
 }
 
-const formatDate = (datetime) => {
-  if (!datetime) return "-"
-  const date = new Date(datetime)
-  if (Number.isNaN(date.getTime())) return "-"
-  return date.toLocaleString("id-ID", {
-    day: "2-digit",
-    month: "short",
+function formatDate(dt) {
+  if (!dt) return "-"
+  const d = new Date(dt)
+  return d.toLocaleString("id-ID", {
     year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
     hour: "2-digit",
     minute: "2-digit"
   })
+}
+
+function openManage(id) {
+  router.push(`/cp-tryout/${id}/kelola`)
 }
 
 const clearMessages = () => {
@@ -411,8 +346,9 @@ const closeStatusModal = () => {
   }
 }
 
-const fetchPackages = async () => {
+async function fetchPackages() {
   loadingPackages.value = true
+  errorMessage.value = ""
   try {
     const { data } = await api.get("/cp-tryout-packages")
     packages.value = Array.isArray(data?.data) ? data.data : []
