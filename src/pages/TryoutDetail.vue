@@ -2,28 +2,28 @@
 
     <AppShell>
     <template #header>
-      <div>
+      <div class="flex w-full flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 class="text-lg font-semibold">Detail Tryout</h1>
+          <h1 class="text-lg font-semibold text-slate-800">Detail Tryout</h1>
           <p class="text-sm text-slate-500">Preview soal sebelum tryout dibuka ke peserta</p>
         </div>
 
         <div class="flex gap-3">
           <RouterLink
             :to="`/tryout/kelola/${route.params.id}`"
-            class="px-4 py-2 rounded-lg border text-sm hover:bg-slate-100"
+            class="px-4 py-2 rounded-lg border text-sm hover:bg-slate-100 font-medium text-slate-700 bg-white"
           >
             Kelola Soal
           </RouterLink>
 
           <RouterLink
             :to="`/tryout/edit/${route.params.id}`"
-            class="px-4 py-2 rounded-lg bg-emerald-600 text-white text-sm hover:bg-emerald-700"
+            class="px-4 py-2 rounded-lg bg-emerald-600 text-white text-sm hover:bg-emerald-700 font-medium"
           >
             Edit Tryout
           </RouterLink>
         </div>
-            </div>
+      </div>
     </template>
 
       <!-- TOPBAR -->
