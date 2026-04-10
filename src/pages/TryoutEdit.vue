@@ -2,7 +2,7 @@
 
     <AppShell>
     <template #header>
-      <div>
+      <div class="flex justify-between items-center w-full">
           <div>
             <h1 class="text-lg font-semibold text-slate-800">Edit Tryout</h1>
             <p class="text-sm text-slate-500">{{ form.paket }}</p>
