@@ -1,30 +1,24 @@
 <template>
   <AppShell>
-    <div class="space-y-6 p-6">
-    <div class="flex justify-between items-center bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-      <div>
-        <h1 class="text-2xl font-bold text-slate-800">📄 Riwayat Seluruh Submission CP</h1>
-        <p class="text-slate-500 text-sm mt-1">Pemantauan log submission peserta secara realtime dari mesin Judge0.</p>
-        <div v-if="paketInfo" class="mt-3 flex items-center gap-3">
-          <span class="bg-indigo-50 text-indigo-700 px-3 py-1 rounded-full text-xs font-semibold">
-            Paket: {{ paketInfo.nama_paket }}
-          </span>
-          <span class="text-slate-400 text-xs flex items-center gap-1">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-            {{ paketInfo.durasi_menit }} Menit
-          </span>
+    <template #header>
+      <div class="flex w-full flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h1 class="text-lg font-semibold text-slate-800">Riwayat Submissions</h1>
+          <p class="text-sm text-slate-500 truncate">Monitoring daftar submission dari peserta.</p>
         </div>
-      </div>
-      <div>
-        <button @click="$router.push('/cp-tryout')" class="bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 font-medium py-2 px-4 rounded-xl shadow-sm flex items-center gap-2 transition-all">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+        
+        <button
+          @click="$router.push('/cp-tryout')"
+          type="button"
+          class="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 cursor-pointer"
+        >
           Kembali ke Paket
         </button>
       </div>
-    </div>
+    </template>
 
-    <!-- FILTER & SEARCH -->
-    <div class="flex items-center gap-4 bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
+    <div class="space-y-6 p-6">
+      <div class="flex items-center gap-4 bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
       <div class="relative flex-1">
         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
           <svg class="h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -109,6 +103,7 @@
           </tbody>
         </table>
       </div>
+    </div>
     </div>
   </AppShell>
 </template>
