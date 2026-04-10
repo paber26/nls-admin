@@ -35,7 +35,7 @@
               <th class="px-6 py-4">Judul Soal</th>
               <th class="px-6 py-4">Time Label</th>
               <th class="px-6 py-4">Poin</th>
-              <th class="px-6 py-4">Aksi</th>
+              <th class="px-6 py-4 text-center">Aksi</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-slate-100">
@@ -45,7 +45,7 @@
               <td class="px-6 py-4">{{ p.time_limit }}s / {{ p.memory_limit }}MB</td>
               <td class="px-6 py-4">{{ p.points }}</td>
               <td class="px-6 py-4">
-                <div class="flex gap-2">
+                <div class="flex gap-2 justify-center">
                   <button
                     @click="openPreview(p)"
                     class="bg-blue-100 text-blue-700 hover:bg-blue-200 px-3 py-1.5 rounded-lg font-medium transition"
@@ -89,14 +89,12 @@
       <div v-if="showModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
         <div class="bg-white rounded-xl shadow-xl w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden">
           
-          <div class="flex items-center justify-between px-6 py-4 border-b border-slate-200 bg-slate-50">
-            <div>
-              <h2 class="text-xl font-bold text-slate-800">{{ selectedProblem?.title }}</h2>
-              <p class="text-xs text-slate-500 mt-1 font-mono">
-                ⏱ {{ selectedProblem?.time_limit }}s &nbsp;|&nbsp; 💾 {{ selectedProblem?.memory_limit }}MB &nbsp;|&nbsp; 🏅 {{ selectedProblem?.points }} Poin
-              </p>
-            </div>
-            <button @click="showModal = false" class="text-slate-400 hover:text-slate-600 transition">
+          <div class="flex flex-col items-center justify-center px-6 py-5 border-b border-slate-200 bg-slate-50 relative">
+            <h2 class="text-xl font-bold text-slate-800 text-center">{{ selectedProblem?.title }}</h2>
+            <p class="text-xs text-slate-500 mt-1 font-mono text-center">
+              ⏱ {{ selectedProblem?.time_limit }}s &nbsp;|&nbsp; 💾 {{ selectedProblem?.memory_limit }}MB &nbsp;|&nbsp; 🏅 {{ selectedProblem?.points }} Poin
+            </p>
+            <button @click="showModal = false" class="absolute right-6 top-6 text-slate-400 hover:text-slate-600 transition">
               <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
             </button>
           </div>
@@ -109,10 +107,31 @@
               <div class="prose prose-slate max-w-none text-sm cf-custom-styles" v-html="selectedProblem?.input_format_html"></div>
             </div>
 
-            <div v-if="selectedProblem?.output_format_html" class="mb-6">
+            <div v-if="selectedProblem?.output_format_html" class="mb-8">
               <h3 class="font-bold text-slate-800 text-lg border-b pb-2 mb-3">Format Keluaran</h3>
               <div class="prose prose-slate max-w-none text-sm cf-custom-styles" v-html="selectedProblem?.output_format_html"></div>
             </div>
+            
+            <div v-if="selectedProblem?.test_cases && selectedProblem.test_cases.length > 0">
+              <h3 class="font-bold text-slate-800 text-lg border-b pb-2 mb-4">Contoh Kasus Uji</h3>
+              <div v-for="(tc, idx) in selectedProblem.test_cases" :key="idx" class="mb-6 rounded-lg border border-slate-200 overflow-hidden shadow-sm">
+                <div class="bg-slate-50 px-4 py-2 font-mono text-sm font-semibold border-b border-slate-200 text-slate-700 flex justify-between">
+                  <span>Kasus #{{ idx + 1 }}</span>
+                  <span v-if="tc.is_hidden" class="text-xs text-amber-600 bg-amber-100 px-2 py-0.5 rounded">Hidden</span>
+                </div>
+                <div class="flex flex-col sm:flex-row">
+                  <div class="flex-1 p-4 border-b sm:border-b-0 sm:border-r border-slate-200">
+                    <div class="text-xs font-bold text-slate-500 mb-2 uppercase tracking-wide">Input (STDIN)</div>
+                    <pre class="font-mono text-sm bg-white border border-slate-100 rounded p-3 overflow-x-auto text-slate-800">{{ tc.input }}</pre>
+                  </div>
+                  <div class="flex-1 p-4">
+                    <div class="text-xs font-bold text-slate-500 mb-2 uppercase tracking-wide">Output (STDOUT)</div>
+                    <pre class="font-mono text-sm bg-white border border-slate-100 rounded p-3 overflow-x-auto text-slate-800">{{ tc.expected_output }}</pre>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
           </div>
 
           <div class="px-6 py-4 border-t border-slate-200 bg-slate-50 flex justify-end">
