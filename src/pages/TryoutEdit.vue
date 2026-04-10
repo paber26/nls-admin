@@ -249,8 +249,8 @@ onMounted(async () => {
       paket: data.paket ?? "",
       mapel_id: data.mapel_id ?? "",
       durasi_menit: data.durasi_menit ?? "",
-      mulai: data.mulai ?? "",
-      selesai: data.selesai ?? "",
+      mulai: (data.mulai || "").slice(0, 16),
+      selesai: (data.selesai || "").slice(0, 16),
       status: data.status ?? "",
       ketentuan_khusus: data.ketentuan_khusus ?? "",
       pesan_selesai: data.pesan_selesai ?? ""
