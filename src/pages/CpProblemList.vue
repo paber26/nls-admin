@@ -80,7 +80,7 @@ const fetchProblems = async () => {
   error.value = null
   try {
     const res = await api.get('/cp-problems')
-    problems.value = res.data
+    problems.value = res.data.data || []
   } catch (err) {
     error.value = err.response?.data?.message || 'Gagal memuat data.'
   } finally {

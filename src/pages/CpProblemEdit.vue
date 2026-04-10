@@ -129,13 +129,14 @@ const editorConfig = {
 const fetchProblem = async () => {
   try {
     const res = await api.get(`/cp-problems/${route.params.id}`)
+    const problemData = res.data.data
     form.value = {
-      title: res.data.title,
-      description_html: res.data.description_html || '',
-      time_limit: res.data.time_limit,
-      memory_limit: res.data.memory_limit,
-      points: res.data.points,
-      test_cases: res.data.test_cases.map(tc => ({
+      title: problemData.title,
+      description_html: problemData.description_html || '',
+      time_limit: problemData.time_limit,
+      memory_limit: problemData.memory_limit,
+      points: problemData.points,
+      test_cases: problemData.test_cases.map(tc => ({
         input: tc.input || '',
         expected_output: tc.expected_output || '',
         is_hidden: !!tc.is_hidden

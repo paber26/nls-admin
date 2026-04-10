@@ -4,7 +4,7 @@
       <div class="flex w-full flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 class="text-lg font-semibold text-slate-800">Tryout CP Paket</h1>
-          <p class="text-sm text-slate-500">Kelola paket Competitive Programming dari soal Codeforces.</p>
+          <p class="text-sm text-slate-500">Kelola paket Competitive Programming dari soal Native CP.</p>
         </div>
 
         <button
