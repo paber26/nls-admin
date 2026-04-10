@@ -41,6 +41,16 @@
               <ckeditor :editor="ClassicEditor" v-model="form.description_html" :config="editorConfig" />
             </div>
 
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-1">Format Masukan (Input)</label>
+              <ckeditor :editor="ClassicEditor" v-model="form.input_format_html" :config="editorConfig" />
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-1">Format Keluaran (Output)</label>
+              <ckeditor :editor="ClassicEditor" v-model="form.output_format_html" :config="editorConfig" />
+            </div>
+
             <div class="grid grid-cols-3 gap-4">
               <div>
                 <label class="block text-sm font-medium text-slate-700 mb-1">Batas Waktu (Detik)</label>
@@ -121,6 +131,8 @@ const pageLoading = ref(true)
 const form = ref({
   title: '',
   description_html: '',
+  input_format_html: '',
+  output_format_html: '',
   time_limit: 1.0,
   memory_limit: 256,
   points: 100,
@@ -142,6 +154,8 @@ const fetchProblem = async () => {
     form.value = {
       title: problemData.title,
       description_html: problemData.description_html || '',
+      input_format_html: problemData.input_format_html || '',
+      output_format_html: problemData.output_format_html || '',
       time_limit: problemData.time_limit,
       memory_limit: problemData.memory_limit,
       points: problemData.points,
