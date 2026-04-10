@@ -174,6 +174,23 @@
         </div>
       </div>
     </div>
+
+    <!-- TOAST POPUP -->
+    <transition
+      enter-active-class="transition duration-300 ease-out"
+      enter-from-class="transform translate-y-4 opacity-0"
+      enter-to-class="transform translate-y-0 opacity-100"
+      leave-active-class="transition duration-200 ease-in"
+      leave-from-class="transform translate-y-0 opacity-100"
+      leave-to-class="transform translate-y-4 opacity-0"
+    >
+      <div v-if="toast.show" class="fixed bottom-6 right-6 z-[100] flex items-center gap-3 px-5 py-4 rounded-xl shadow-2xl font-medium text-sm"
+        :class="toast.type === 'success' ? 'bg-emerald-600 text-white' : 'bg-red-600 text-white'">
+        <svg v-if="toast.type === 'success'" class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+        <svg v-else class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+        {{ toast.message }}
+      </div>
+    </transition>
   </AppShell>
 </template>
 
@@ -190,6 +207,21 @@ const paketInfo = ref(null)
 const submissionsList = ref([])
 const selectedSubmission = ref(null)
 const loadingDetail = ref(false)
+
+const toast = ref({
+  show: false,
+  message: '',
+  type: 'success'
+})
+let toastTimeout = null
+
+const showToast = (message, type = 'success') => {
+  if (toastTimeout) clearTimeout(toastTimeout)
+  toast.value = { show: true, message, type }
+  toastTimeout = setTimeout(() => {
+    toast.value.show = false
+  }, 3000)
+}
 
 onMounted(() => {
   fetchSubmissions()
@@ -216,7 +248,7 @@ async function fetchSubmissions() {
     submissionsList.value = res.data.data.submissions
   } catch (err) {
     console.error('Failed fetching submissions:', err)
-    alert('Error: Gagal memuat daftar riwayat')
+    showToast('Error: Gagal memuat daftar riwayat', 'error')
   } finally {
     loadingSubmissions.value = false
   }
@@ -229,7 +261,7 @@ async function viewSubmission(subId) {
     selectedSubmission.value = res.data.data
   } catch (err) {
     console.error('Failed fetching submission detail:', err)
-    alert('Error: Gagal memuat detail submission')
+    showToast('Error: Gagal memuat detail submission', 'error')
   } finally {
     loadingDetail.value = false
   }
@@ -239,10 +271,10 @@ const copyCode = async (code) => {
   if (!code) return
   try {
     await navigator.clipboard.writeText(code)
-    alert("Kode berhasil disalin ke clipboard!")
+    showToast("Kode berhasil disalin ke clipboard!", "success")
   } catch (err) {
     console.error("Gagal menyalin kode:", err)
-    alert("Gagal menyalin kode.")
+    showToast("Gagal menyalin kode.", "error")
   }
 }
 </script>
