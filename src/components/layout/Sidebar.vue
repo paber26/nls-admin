@@ -126,14 +126,14 @@
       </RouterLink>
 
       <RouterLink
-        to="/integrasi-codeforces"
+        to="/cp-problems"
         class="group relative flex rounded-lg py-3 transition"
-        :class="navItemClass(isSectionActive('/integrasi-codeforces'))"
+        :class="navItemClass(isSectionActive('/cp-problems'))"
         @click="handleNavigate"
       >
-        <span class="text-xl leading-none px-1">🧑‍💻</span>
-        <span v-if="open">Integrasi CF</span>
-        <span v-if="!open" :class="tooltipClass">Integrasi Codeforces</span>
+        <span class="text-xl leading-none px-1">📝</span>
+        <span v-if="open">Kelola Soal CP</span>
+        <span v-if="!open" :class="tooltipClass">Kelola Soal CP</span>
       </RouterLink>
 
       <RouterLink

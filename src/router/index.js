@@ -33,7 +33,9 @@ import Persiapan from "../pages/TryoutPersiapan.vue"
 import TryoutHasil from "../pages/TryoutHasil.vue"
 
 import KelolaAdmin from "../pages/KelolaAdmin.vue"
-import IntegrasiCodeforces from "../pages/IntegrasiCodeforces.vue"
+import CpProblemList from "../pages/CpProblemList.vue"
+import CpProblemTambah from "../pages/CpProblemTambah.vue"
+import CpProblemEdit from "../pages/CpProblemEdit.vue"
 import CpTryoutPackages from "../pages/CpTryoutPackages.vue"
 import CpTryoutManage from "../pages/CpTryoutManage.vue"
 
@@ -165,9 +167,19 @@ const routes = [
     component: OAuthCallback
   },
   {
-    path: "/integrasi-codeforces",
-    name: "IntegrasiCodeforces",
-    component: IntegrasiCodeforces
+    path: "/cp-problems",
+    name: "CpProblemList",
+    component: CpProblemList
+  },
+  {
+    path: "/cp-problems/tambah",
+    name: "CpProblemTambah",
+    component: CpProblemTambah
+  },
+  {
+    path: "/cp-problems/edit/:id",
+    name: "CpProblemEdit",
+    component: CpProblemEdit
   },
   {
     path: "/cp-tryout",
