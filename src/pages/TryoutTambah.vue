@@ -101,6 +101,9 @@
                 <div v-if="useAccessKey" class="mt-3">
                   <label class="text-sm text-slate-500">Kunci Akses</label>
                   <input type="text" v-model="form.access_key" placeholder="Masukkan kunci akses..." class="w-full mt-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none" />
+
+                  <label class="text-sm text-slate-500 mt-3 block">Keterangan (tampil ke siswa)</label>
+                  <input type="text" v-model="form.access_key_info" placeholder="Contoh: Hubungi admin..." class="w-full mt-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none" />
                 </div>
               </div>
             </section>
@@ -136,6 +139,7 @@ const form = ref({
   mulai: "",
   selesai: "",
   access_key: "",
+  access_key_info: "Hubungi admin next level study untuk mendapatkan kunci akses.",
   is_active: 0
 })
 
@@ -215,6 +219,7 @@ const submitTryout = async () => {
   // Jika opsi tidak dicentang, kosongkan akses key sebelum submit
   if (!useAccessKey.value) {
     form.value.access_key = ""
+    form.value.access_key_info = ""
   }
 
   try {

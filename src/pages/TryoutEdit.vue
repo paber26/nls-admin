@@ -72,6 +72,9 @@
                 <div v-if="useAccessKey" class="mt-3">
                   <label class="text-sm text-slate-500">Kunci Akses</label>
                   <input type="text" v-model="form.access_key" placeholder="Masukkan kunci akses..." class="w-full mt-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none" />
+                  
+                  <label class="text-sm text-slate-500 mt-3 block">Keterangan (tampil ke siswa)</label>
+                  <input type="text" v-model="form.access_key_info" placeholder="Contoh: Hubungi admin next level study..." class="w-full mt-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none" />
                 </div>
               </div>
             </section>
@@ -248,6 +251,7 @@ const form = ref({
   mulai: "",
   selesai: "",
   access_key: "",
+  access_key_info: "",
   ketentuan_khusus: "",
   pesan_selesai: ""
 })
@@ -298,6 +302,7 @@ onMounted(async () => {
       mulai: (data.mulai || "").slice(0, 16),
       selesai: (data.selesai || "").slice(0, 16),
       access_key: data.access_key ?? "",
+      access_key_info: data.access_key_info ?? "Hubungi admin next level study untuk mendapatkan kunci akses.",
       status: data.status ?? "",
       ketentuan_khusus: data.ketentuan_khusus ?? "",
       pesan_selesai: data.pesan_selesai ?? ""
@@ -318,6 +323,7 @@ const handleSubmit = async () => {
       mulai: form.value.mulai,
       selesai: form.value.selesai,
       access_key: useAccessKey.value ? form.value.access_key : "",
+      access_key_info: useAccessKey.value ? form.value.access_key_info : "",
       status: form.value.status,
       ketentuan_khusus: form.value.ketentuan_khusus,
       pesan_selesai: form.value.pesan_selesai
