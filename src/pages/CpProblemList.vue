@@ -99,7 +99,7 @@
             </button>
           </div>
 
-          <div class="p-6 overflow-y-auto" style="max-height: calc(90vh - 140px);">
+          <div class="p-6 overflow-y-auto" style="max-height: calc(90vh - 140px);" id="math-container">
             <div class="prose prose-slate max-w-none text-sm cf-custom-styles mb-8" v-html="selectedProblem?.description_html"></div>
 
             <div v-if="selectedProblem?.input_format_html" class="mb-6">
@@ -144,9 +144,12 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, nextTick } from 'vue'
 import AppShell from '@/components/layout/AppShell.vue'
 import api from '@/services/api'
+import katex from "katex"
+import renderMathInElement from "katex/contrib/auto-render"
+import "katex/dist/katex.min.css"
 
 const problems = ref([])
 const loading = ref(true)
@@ -155,9 +158,33 @@ const error = ref(null)
 const showModal = ref(false)
 const selectedProblem = ref(null)
 
-const openPreview = (problem) => {
+const renderKatex = async () => {
+  await nextTick()
+  const container = document.getElementById("math-container")
+  if (!container) return
+
+  try {
+    renderMathInElement(container, {
+      delimiters: [
+        { left: "$$", right: "$$", display: true },
+        { left: "$", right: "$", display: false },
+        { left: "\\[", right: "\\]", display: true },
+        { left: "\\(", right: "\\)", display: false }
+      ],
+      throwOnError: false
+    })
+  } catch (e) {
+    console.error("KaTeX render error:", e)
+  }
+}
+
+const openPreview = async (problem) => {
   selectedProblem.value = problem
   showModal.value = true
+  await nextTick()
+  setTimeout(() => {
+    renderKatex()
+  }, 100)
 }
 
 const fetchProblems = async () => {

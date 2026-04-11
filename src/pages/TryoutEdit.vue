@@ -71,7 +71,7 @@
                 </label>
                 <div v-if="useAccessKey" class="mt-3">
                   <label class="text-sm text-slate-500">Kunci Akses</label>
-                  <input type="text" v-model="form.access_key" placeholder="Masukkan kunci akses..." class="w-full mt-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none" />
+                  <input type="text" v-model="form.access_key" @input="form.access_key = $event.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '')" placeholder="Masukkan kunci akses..." class="w-full mt-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none" />
                   
                   <label class="text-sm text-slate-500 mt-3 block">Keterangan (tampil ke siswa)</label>
                   <input type="text" v-model="form.access_key_info" placeholder="Contoh: Hubungi admin next level study..." class="w-full mt-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none" />
